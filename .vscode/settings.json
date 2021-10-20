@@ -5,6 +5,12 @@
         "string_view": "cpp",
         "initializer_list": "cpp",
         "ranges": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "ctime": "cpp",
+        "iostream": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp"
     }
 }

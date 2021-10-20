@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <sdsl/int_vector.hpp>
+#include <sdsl/bit_vectors.hpp>
 #include <queue>
 #include <math.h>
 #include <vector>
@@ -14,10 +15,10 @@ using namespace std;
 class binTrie {
 
     uint16_t height;
-
+    
     public:
-        vector <bit_vector> bTrie;
-        vector < rank_support_v<> > rank_vector;
+        vector <sdsl::bit_vector> bTrie;
+        sdsl::rank_support_v<>* bv_rank;
 
         binTrie() = default;
 
@@ -26,7 +27,8 @@ class binTrie {
             
             util::bit_compress(set);
             binTrie::height = (uint16_t)set.width();
-
+            binTrie::bv_rank = new rank_support_v<1>[height];
+            
             for (int level = 0; level < binTrie::height; ++level) {
                 uint64_t max_nodes_level = 2 * pow(2, level);
                 bit_vector level_bv = bit_vector(max_nodes_level, 0);
@@ -119,21 +121,50 @@ class binTrie {
                     break;
                 }
             }
+
+            for (uint16_t i = 0; i < height; ++i) {
+                binTrie::bv_rank[i] = sdsl::rank_support_v<1>(&bTrie[i]);
+            }
+        };
+
+        // Empty binary trie constructor
+        binTrie(uint16_t height) {
+            binTrie::height = height;
+            binTrie::bv_rank = new rank_support_v<1>[height];
+            for (int level = 0; level < binTrie::height; ++level) {
+                uint64_t max_nodes_level = 2 * pow(2, level);
+                bit_vector level_bv = bit_vector(max_nodes_level, 0);
+                binTrie::bTrie.push_back(level_bv);
+            }
+
+        };
+
+        void initRank(){
+            for (uint16_t i = 0; i < binTrie::height; ++i) {
+                binTrie::bv_rank[i] = sdsl::rank_support_v<1>(&binTrie::bTrie[i]);
+            }
+        }
+
+        bit_vector getNode(uint64_t node_id, uint16_t level){
+            bit_vector node = bit_vector(2, 0);
+            node[0] = binTrie::bTrie[level][2*node_id];
+            node[1] = binTrie::bTrie[level][(2*node_id) + 1];
+            return node;
         };
 
         uint16_t getHeight(){
             return binTrie::bTrie.size() - 1;
-        }
+        };
 
 
         uint64_t getLeftChild(uint64_t node_id, uint16_t level) {
-            uint64_t node = binTrie::bTrie[level].rank(2*node_id + 1);
-            return node;
+            uint64_t node = binTrie::bv_rank[level].rank(2*node_id + 1);
+            return node - 1;
         };
 
         uint64_t getRightChild(uint64_t node_id, uint16_t level) {
-            uint64_t node = binTrie::bTrie[level].rank((2*node_id + 1) + 1);
-            return node;
+            uint64_t node = binTrie::bv_rank[level].rank((2*node_id + 1) + 1);
+            return node - 1;
         };
 
 
