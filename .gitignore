@@ -34,5 +34,5 @@
 # compile program
 program
 
-# visual code files
-.vscode
+# visual studio code files
+.vscode/
