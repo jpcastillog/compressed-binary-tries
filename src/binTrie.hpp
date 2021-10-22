@@ -153,7 +153,7 @@ class binTrie {
         };
 
         uint16_t getHeight(){
-            return binTrie::bTrie.size() - 1;
+            return binTrie::bTrie.size();
         };
 
 
@@ -166,7 +166,5 @@ class binTrie {
             uint64_t node = binTrie::bv_rank[level].rank((2*node_id + 1) + 1);
             return node - 1;
         };
-
-
 };
 #endif
