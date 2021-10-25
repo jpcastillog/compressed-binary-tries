@@ -9,5 +9,6 @@
 #include "binTrie.hpp"
 
 binTrie intersectTries(vector<binTrie> &Bs);
+binTrie intersectTriesV2(vector<binTrie> &Bs);
 
 #endif

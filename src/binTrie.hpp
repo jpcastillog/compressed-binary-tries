@@ -131,13 +131,29 @@ class binTrie {
         binTrie(uint16_t height) {
             binTrie::height = height;
             binTrie::bv_rank = new rank_support_v<1>[height];
-            for (int level = 0; level < binTrie::height; ++level) {
+            for (uint16_t level = 0; level < binTrie::height; ++level) {
                 uint64_t max_nodes_level = 2 * pow(2, level);
                 bit_vector level_bv = bit_vector(max_nodes_level, 0);
                 binTrie::bTrie.push_back(level_bv);
             }
-
         };
+
+
+        binTrie(vector<uint64_t> ones_to_write[], uint16_t height, vector<uint64_t> nodes_per_level) {
+            binTrie::height = height;
+            binTrie::bv_rank = new rank_support_v<1>[height];
+            for (uint16_t level = 0; level < binTrie::height; ++level) {
+                uint64_t n_nodes_level = 2 * nodes_per_level[level];
+                bit_vector level_bv = bit_vector(n_nodes_level, 0);
+               
+                for (uint64_t j = 0; j < ones_to_write[level].size(); ++j) {
+                    uint64_t pos = ones_to_write[level][j];
+                    level_bv[pos] = 1;
+                }
+                binTrie::bTrie.push_back(level_bv);
+            }
+        }
+        
 
         void initRank(){
             for (uint16_t i = 0; i < binTrie::height; ++i) {

@@ -7,6 +7,17 @@
 #include "utils_functions.hpp"
 #include "intersection.hpp"
 
+void foo(int arr[], int n) {
+    arr[0] = 1;
+
+    cout << "In foo function" << endl;
+    for (int i = 0; i < n; ++i) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+
+};
+
 int main(){
     // int_vector<> s = {1, 2, 3, 5};
     int_vector<> s1 = {1, 3, 7, 8, 9, 11, 12};
@@ -34,11 +45,21 @@ int main(){
 
     vector<binTrie> Bs = {b1, b2};
     binTrie result = intersectTries(Bs);
-    cout << "-----------result-----------" << endl;
+    cout << "-----------resultV1-----------" << endl;
     for (int i = 0; i < result.bTrie.size(); ++i) {
         // result.bTrie[i].resize(last_pos[i]);
         for (int j = 0; j < result.bTrie[i].size(); ++(++j)) {
             cout << result.bTrie[i][j] << result.bTrie[i][j+1] << " ";
+        }
+        cout << endl;
+    }
+
+    binTrie result2 = intersectTriesV2(Bs);
+    cout << "-----------resultV2-----------" << endl;
+    for (int i = 0; i < result2.bTrie.size(); ++i) {
+        // result.bTrie[i].resize(last_pos[i]);
+        for (int j = 0; j < result2.bTrie[i].size(); ++(++j)) {
+            cout << result2.bTrie[i][j] << result2.bTrie[i][j+1] << " ";
         }
         cout << endl;
     }
@@ -61,5 +82,19 @@ int main(){
     }
     cout << endl;
 
+    cout << "-----------Test Code-----------" << endl;
+    int arr[] = {0, 1, 2, 3};
+    int n = 4;
+    cout << "Before foo function" << endl;
+    for (int i = 0; i < n; ++i) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+    foo(arr, n);
+    cout << "After foo function" << endl;
+    for (int i = 0; i < n; ++i) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
     return 0;
 }
