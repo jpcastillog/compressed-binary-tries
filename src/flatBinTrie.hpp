@@ -36,7 +36,7 @@ class flatBinTrie{
             queue<tuple<uint64_t, uint64_t, uint64_t>> q;
             
             // add all set to split
-            tuple<uint64_t, uint64_t, uint64_t> split = {0, n-1, n};
+            tuple<uint64_t, uint64_t, uint64_t> split = {(uint64_t)0, n-1, n};
             q.push(split);
 
             uint16_t level            = 0;
@@ -82,7 +82,7 @@ class flatBinTrie{
                 if (left_elements > 0) {
                     // write 1
                     bTrie[index] = 1;
-                    left_split = {ll, lr, left_elements};
+                    tuple<uint64_t,uint64_t,uint64_t> left_split = {ll, lr, left_elements};
                     q.push(left_split);
                     nodes_next_level++;
                     index++;
@@ -98,7 +98,7 @@ class flatBinTrie{
                 if (right_elements > 0) {
                     // write 1
                     bTrie[index] = 1;
-                    right_split = {rl, rr, right_elements};
+                    tuple<uint64_t,uint64_t,uint64_t> right_split = {rl, rr, right_elements};
                     q.push(right_split);
                     nodes_next_level++;
                     index++;
