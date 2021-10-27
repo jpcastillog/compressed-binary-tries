@@ -112,6 +112,7 @@ void read_inverted_index(string file_path) {
     }
     uint64_t u;
     input_stream >> u;
+    cout << "Universe: " << u << endl;
     uint64_t total_size_tries = 0;
     uint64_t total_elements = 0;
     // for (uint64_t i = 0; i < u; ++i) {
@@ -121,7 +122,7 @@ void read_inverted_index(string file_path) {
         if (set_size >= 100000) {
             int_vector<> *il = read_inverted_list(input_stream, set_size);
             // uint64_t max_value = il[ set_size - 1];
-            cout << "max value: "<< il[ set_size - 1] << endl;
+            cout << "max value: "<< (*il)[ set_size - 1] << endl;
             flatBinTrie trie = flatBinTrie(*il);
             uint64_t size_trie = trie.size_in_bytes();
             cout << "height: " << trie.getHeight() << endl;
