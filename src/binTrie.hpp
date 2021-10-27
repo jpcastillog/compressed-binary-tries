@@ -23,7 +23,7 @@ class binTrie {
         binTrie() = default;
 
         binTrie(int_vector<> &set) {
-            uint32_t n = set.size();
+            uint64_t n = set.size();
             
             util::bit_compress(set);
             binTrie::height = (uint16_t)set.width();
