@@ -120,11 +120,11 @@ void read_inverted_index(string file_path) {
         input_stream >> set_size;
         if (set_size >= 100000) {
             int_vector<> *il = read_inverted_list(input_stream, set_size);
-            uint64_t max_value = il[(il->size()) - 1];
+            // uint64_t max_value = il[ set_size - 1];
             flatBinTrie trie = flatBinTrie(*il);
             uint64_t size_trie = trie.size_in_bytes();
             cout << "height: " << trie.getHeight() << endl;
-            cout << "max value: "<< max_value << endl;
+            cout << "max value: "<< il[ set_size - 1] << endl;
             cout << "n° elements: " << set_size << endl;
             cout << "size in bits: " << size_trie*8 << endl;
             cout << "avg size: " << (float)(size_trie*8)/set_size << endl;
