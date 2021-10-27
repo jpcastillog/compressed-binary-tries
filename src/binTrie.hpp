@@ -38,7 +38,7 @@ class binTrie {
             queue<tuple<uint64_t, uint64_t, uint64_t>> q;
             
             // add all set to split
-            tuple<uint64_t, uint64_t, uint64_t> split ((uint64_t)0, n-1, n);
+            tuple<uint64_t, uint64_t, uint64_t> split(0, n-1, n);
             q.push(split);
 
             uint16_t level            = 0;
