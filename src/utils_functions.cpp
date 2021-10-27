@@ -73,8 +73,8 @@ void read_inverted_index(string file_path) {
             uint64_t size_trie = trie.size_in_bytes();
             cout << "n° elements: " << set_size << endl;
             cout << "size in bits: " << size_trie*8 << endl;
-            cout << "avg size: " << (size_trie*8)/set_size << endl;
-            cout << "--------------------------------------";
+            cout << "avg size: " << (float)(size_trie*8)/set_size << endl;
+            cout << "--------------------------------------" << endl;
             total_size_tries += size_trie;
             total_elements += set_size;
         }
@@ -84,5 +84,5 @@ void read_inverted_index(string file_path) {
     }
     cout << "Total elements: " << total_elements << endl;
     cout << "Total size: " << total_size_tries << endl;
-    cout << "Avg size: " << (total_size_tries*8)/total_elements << endl;
+    cout << "Avg size: " << (float)(total_size_tries*8)/total_elements << endl;
 }
