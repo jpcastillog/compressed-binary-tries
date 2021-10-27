@@ -38,7 +38,7 @@ class binTrie {
             queue<tuple<uint64_t, uint64_t, uint64_t>> q;
             
             // add all set to split
-            tuple<uint64_t, uint64_t, uint64_t> split = {(uint64_t)0, n-1, n};
+            tuple<uint64_t, uint64_t, uint64_t> split ((uint64_t)0, n-1, n);
             q.push(split);
 
             uint16_t level            = 0;
@@ -82,7 +82,7 @@ class binTrie {
                     // write 1
                     bTrie[level][index] = 1;
                     // Add to queue split sets and write nodes
-                    tuple<uint64_t,uint64_t,uint64_t> left_split = {ll, lr, left_elements};
+                    tuple<uint64_t,uint64_t,uint64_t> left_split(ll, lr, left_elements);
                     q.push(left_split);
                     nodes_next_level++;
                     index++;
@@ -97,7 +97,7 @@ class binTrie {
                     // write 1
                     bTrie[level][index] = 1;
                     // Add to queue split sets and write nodes
-                    tuple<uint64_t,uint64_t,uint64_t> right_split = {rl, rr, right_elements};
+                    tuple<uint64_t,uint64_t,uint64_t> right_split(rl, rr, right_elements);
                     q.push(right_split);
                     nodes_next_level++;
                     index++;
