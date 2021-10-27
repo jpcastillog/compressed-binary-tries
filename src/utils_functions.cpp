@@ -1,8 +1,10 @@
 #include <iostream>
 #include "binTrie.hpp"
+#include "flatBinTrie.hpp"
 #include <sdsl/int_vector.hpp>
 #include <sdsl/bit_vectors.hpp>
 #include <math.h>
+#include <fstream>
 
 
 void decodeBinTrie(binTrie b, vector<uint64_t> &decoded, bit_vector partial_result,
@@ -48,4 +50,39 @@ sdsl::int_vector<>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
     }
 
     return inverted_list;
+}
+
+
+void read_inverted_index(string file_path) {
+    std::ifstream input_stream(file_path);
+    if (!input_stream.is_open()) {
+        cout << "No se pudo abrir el archivo: " << file_path << endl;
+        return;
+    }
+    uint64_t u;
+    input_stream >> u;
+    uint64_t total_size_tries = 0;
+    uint64_t total_elements = 0;
+    // for (uint64_t i = 0; i < u; ++i) {
+    for (uint64_t i = 0; i < 1; ++i)    
+        uint64_t set_size;
+        input_stream >> set_size;
+        if (set_size >= 100000) {
+            int_vector<> *il = read_inverted_list(input_stream, set_size);
+            flatBinTrie trie = flatBinTrie(*il);
+            uint64_t size_trie = trie.size_in_bytes();
+            cout << "n° elements: " << set_size << endl;
+            cout << "size in bits: " << size_trie*8 << endl;
+            cout << "avg size: " << (size_trie*8)/set_size << endl;
+            cout << "--------------------------------------";
+            total_size_tries += size_trie;
+            total_elements += set_size;
+        }
+        else {
+            input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
+    cout << "Total elements: " << total_elements << endl;
+    cout << "Total size: " << total_size_tries << endl;
+    cout << "Avg size: " << (total_size_tries*8)/total_elements << endl;
 }

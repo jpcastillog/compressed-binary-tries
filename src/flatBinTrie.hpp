@@ -12,6 +12,7 @@ using namespace sdsl;
 using namespace std;
 
 class flatBinTrie{
+
     uint16_t height;
 
     public:
@@ -179,6 +180,12 @@ class flatBinTrie{
             return right_child_id;
         };
 
+
+        uint64_t size_in_bytes(){
+            uint64_t bv_size = sdsl::size_in_bytes(flatBinTrie::bTrie);
+            uint64_t rank_size = sdsl::size_in_bytes(flatBinTrie::b_rank);
+            return bv_size + rank_size + 8;
+        }
 
         // uint64_t size_bytes(){
         //     // Size in bytes of bit_vector of binary trie
