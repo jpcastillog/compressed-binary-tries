@@ -123,6 +123,7 @@ void read_inverted_index(string file_path) {
             flatBinTrie trie = flatBinTrie(*il);
             uint64_t size_trie = trie.size_in_bytes();
             cout << "height: " << trie.getHeight() << endl;
+            cout << "max value: "<< il[(il->size()) - 1] << endl;
             cout << "n° elements: " << set_size << endl;
             cout << "size in bits: " << size_trie*8 << endl;
             cout << "avg size: " << (float)(size_trie*8)/set_size << endl;
