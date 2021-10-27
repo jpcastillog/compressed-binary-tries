@@ -21,7 +21,7 @@ class flatBinTrie{
         vector<uint64_t> level_pos;
 
         flatBinTrie() = default;
-
+        // pasar como parametro el universo
         flatBinTrie(int_vector<> &set) {
             uint32_t n = set.size();
             
@@ -125,6 +125,12 @@ class flatBinTrie{
                 }
             }
             flatBinTrie::bTrie.resize(total_nodes);
+            bit_vector new_bv(total_nodes, 0);
+            cout << bTrie << endl;
+            for (uint64_t i = 0; i < total_nodes; ++i) {
+                new_bv[i] = bTrie[i];
+            }
+            flatBinTrie::bTrie = new_bv;
             flatBinTrie::b_rank = rank_support_v<1>(&bTrie);
         };
 
