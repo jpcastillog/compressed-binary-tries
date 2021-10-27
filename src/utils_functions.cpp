@@ -4,6 +4,7 @@
 #include <sdsl/bit_vectors.hpp>
 #include <math.h>
 
+
 void decodeBinTrie(binTrie b, vector<uint64_t> &decoded, bit_vector partial_result,
                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
    
@@ -33,4 +34,18 @@ void decodeBinTrie(binTrie b, vector<uint64_t> &decoded, bit_vector partial_resu
         uint64_t right_child = b.getRightChild(node_id, curr_level);
         decodeBinTrie(b, decoded, rightResult, right_child, next_level, max_level);
     }
+}
+
+
+sdsl::int_vector<>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
+    uint64_t x;
+    uint64_t i;
+
+    int_vector<>* inverted_list  = new int_vector<>(n);
+    for (i = 0; i < n; i++){
+        input_stream >> x;
+        (*inverted_list)[i] = x;
+    }
+
+    return inverted_list;
 }

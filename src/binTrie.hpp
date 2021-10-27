@@ -161,6 +161,7 @@ class binTrie {
             }
         }
 
+
         bit_vector getNode(uint64_t node_id, uint16_t level){
             bit_vector node = bit_vector(2, 0);
             node[0] = binTrie::bTrie[level][2*node_id];
@@ -168,11 +169,12 @@ class binTrie {
             return node;
         };
 
+
         uint16_t getHeight(){
             return binTrie::bTrie.size();
         };
 
-
+        
         uint64_t getLeftChild(uint64_t node_id, uint16_t level) {
             uint64_t node = binTrie::bv_rank[level].rank(2*node_id + 1);
             return node - 1;
