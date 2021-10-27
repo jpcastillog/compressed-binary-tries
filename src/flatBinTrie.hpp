@@ -126,7 +126,7 @@ class flatBinTrie{
             }
             flatBinTrie::bTrie.resize(total_nodes);
             bit_vector new_bv(total_nodes, 0);
-            cout << bTrie << endl;
+            // cout << bTrie << endl;
             for (uint64_t i = 0; i < total_nodes; ++i) {
                 new_bv[i] = bTrie[i];
             }
