@@ -184,7 +184,7 @@ class flatBinTrie{
         uint64_t size_in_bytes(){
             uint64_t bv_size = sdsl::size_in_bytes(flatBinTrie::bTrie);
             uint64_t rank_size = sdsl::size_in_bytes(flatBinTrie::b_rank);
-            return bv_size + rank_size + 8;
+            return bv_size + rank_size + sizeof(uint64_t);
         }
 
         // uint64_t size_bytes(){
