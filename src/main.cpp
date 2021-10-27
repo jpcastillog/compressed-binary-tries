@@ -33,6 +33,8 @@ int main() {
 
 //     flatBinTrie pb1 = flatBinTrie(s1);
 //     flatBinTrie pb2 = flatBinTrie(s2);
+
+//     cout << "Size in bits s1: " << pb1.size_in_bytes() << endl;
     
 //     cout << "-----------Flat binary trie b1-----------" << endl;
 //     uint64_t i = 0;
@@ -130,7 +132,7 @@ int main() {
 //     cout << "-----------decoded result-----------" << endl;
 //     vector<uint64_t> r;
 //     bit_vector partial_result3 = bit_vector(fresult.getHeight(), 0);
-//     decodeBinTrie(result2, r, partial_result3, 0, 0, result2.getHeight());
+//     decodeBinTrie(fresult, r, partial_result3, 0, 0, fresult.getHeight());
 //     for (uint64_t i = 0; i < r.size(); ++i) {
 //         cout << r[i] << " ";
 //     }
