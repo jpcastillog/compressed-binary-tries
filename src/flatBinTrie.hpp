@@ -26,7 +26,7 @@ class flatBinTrie{
             uint32_t n = set.size();
 
             uint16_t height = floor(log2(u - 1)) +  1;
-            cout << "height: " << height << endl;
+            // cout << "height: " << height << endl;
             flatBinTrie::height = height;
             // util::bit_compress(set);
             // flatBinTrie::height = (uint16_t)set.width();

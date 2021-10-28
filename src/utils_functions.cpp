@@ -129,7 +129,9 @@ void read_inverted_index(string file_path) {
             vector<uint64_t> decoded;
             bit_vector p_result(trie.getHeight(), 0);
             decodeBinTrie(trie, decoded, p_result, 0, 0, trie.getHeight());
+            cout << "paso decode" << endl;
             compareVectors(*il, decoded);
+            cout << "paso compare" << endl;
             uint64_t size_trie = trie.size_in_bytes();
             cout << "height: " << trie.getHeight() << endl;
             cout << "n° elements: " << set_size << endl;
