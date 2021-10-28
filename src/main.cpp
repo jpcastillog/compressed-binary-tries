@@ -28,8 +28,12 @@ int main() {
 
 // int main(){
 //     // int_vector<> s = {1, 2, 3, 5};
+//     vector<uint64_t> s =  {1, 3, 7, 8, 9, 11, 12};
 //     int_vector<> s1 = {1, 3, 7, 8, 9, 11, 12};
 //     int_vector<> s2 = {2, 3, 5, 7, 12, 15};
+
+//     flatBinTrie ts = flatBinTrie(s, 12);
+//     ts.print();
 
 //     flatBinTrie pb1 = flatBinTrie(s1);
 //     flatBinTrie pb2 = flatBinTrie(s2);
@@ -37,38 +41,14 @@ int main() {
 //     cout << "Size in bits s1: " << pb1.size_in_bytes() << endl;
     
 //     cout << "-----------Flat binary trie b1-----------" << endl;
-//     uint64_t i = 0;
-//     for (uint16_t level=0; level < pb1.getHeight(); ++level) {
-//         uint64_t next_level_pos = pb1.level_pos[level];
-//         while (i < next_level_pos) {
-//             cout << pb1.bTrie[i] << pb1.bTrie[i+1] << " ";
-//             ++(++i);
-//         }
-//         cout << endl;
-//     }
+//     pb1.print();
 //     cout << "-----------Flat binary trie b2-----------" << endl;
-//     i = 0;
-//     for (uint16_t level=0; level < pb2.getHeight(); ++level) {
-//         uint64_t next_level_pos = pb2.level_pos[level];
-//         while (i < next_level_pos) {
-//             cout << pb2.bTrie[i] << pb2.bTrie[i+1] << " ";
-//             ++(++i);
-//         }
-//         cout << endl;
-//     }
+//     pb2.print();
 
 //     vector<flatBinTrie> pBs = {pb1, pb2};
 //     flatBinTrie fresult = intersectFlatTries(pBs);
 //     cout << "-----------result flat binary trie-----------" << endl;
-//     i = 0;
-//     for (uint16_t level=0; level < fresult.getHeight(); ++level) {
-//         uint64_t next_level_pos = fresult.level_pos[level];
-//         while (i < next_level_pos) {
-//             cout << fresult.bTrie[i] << fresult.bTrie[i+1] << " ";
-//             ++(++i);
-//         }
-//         cout << endl;
-//     }
+//     fresult.print();
     
 //     binTrie b1 = binTrie(s1);
 //     binTrie b2 = binTrie(s2);

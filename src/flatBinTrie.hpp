@@ -21,6 +21,122 @@ class flatBinTrie{
         vector<uint64_t> level_pos;
 
         flatBinTrie() = default;
+
+        flatBinTrie(vector<uint64_t> &set, uint64_t u) {
+            uint32_t n = set.size();
+
+            uint16_t height = floor(log2(u - 1)) +  1;
+            cout << "height: " << height << endl;
+            flatBinTrie::height = height;
+            // util::bit_compress(set);
+            // flatBinTrie::height = (uint16_t)set.width();
+            flatBinTrie::level_pos = vector<uint64_t>(height, 0);
+            
+            uint64_t max_nodes = 2*(pow(2, height+1) - 1);
+            flatBinTrie::bTrie = bit_vector(max_nodes, 0); 
+            
+
+            queue<tuple<uint64_t, uint64_t, uint64_t>> q;
+            
+            // add all set to split
+            tuple<uint64_t, uint64_t, uint64_t> split(0, n-1, n);
+            q.push(split);
+
+            uint16_t level            = 0;
+            uint64_t nodes_curr_level = 1; 
+            uint64_t count_nodes      = 0;
+            uint64_t nodes_next_level = 0;
+            uint64_t index            = 0;
+            uint64_t total_nodes      = 0;
+
+            while (!q.empty()) {
+                count_nodes++; // count node visited
+                // Get node to write
+                tuple<uint64_t, uint64_t, uint64_t> s = q.front();
+                q.pop(); 
+                
+                uint64_t l, r, n;
+                std::tie(l, r, n) = s;
+                uint64_t left_elements  = 0;
+                uint64_t right_elements = 0;
+
+                // j-th most significative bit
+                uint8_t j = height - level;
+                uint64_t ll, lr, rl, rr;
+                for (uint64_t i = l; i < r+1; ++i) {
+                    if ((set[i] >> j-1) & 1) {                        
+                        right_elements = r-i+1;
+                        rl = i;
+                        rr = r;
+                        break;
+                    }
+                    else {
+                        if (i == l){
+                            ll = l;
+                        }
+                        lr = i;    
+                        left_elements++;
+                    }
+                }
+                // Add to queue split sets and write nodes
+                tuple<uint64_t,uint64_t,uint64_t> left_split;
+                tuple<uint64_t,uint64_t,uint64_t> right_split;
+                // left child
+                if (left_elements > 0) {
+                    // write 1
+                    bTrie[index] = 1;
+                    tuple<uint64_t,uint64_t,uint64_t> left_split(ll, lr, left_elements);
+                    q.push(left_split);
+                    nodes_next_level++;
+                    index++;
+                    total_nodes++;
+                }
+                else {
+                    // write 0
+                    bTrie[index] = 0;
+                    index++;
+                    total_nodes++;
+                }
+                // right child
+                if (right_elements > 0) {
+                    // write 1
+                    bTrie[index] = 1;
+                    tuple<uint64_t,uint64_t,uint64_t> right_split(rl, rr, right_elements);
+                    q.push(right_split);
+                    nodes_next_level++;
+                    index++;
+                    total_nodes++;
+                }
+                else {
+                    // write 0
+                    bTrie[index] = 0;
+                    index++;
+                    total_nodes++;
+                }
+
+                if (count_nodes == nodes_curr_level) {
+                    // bTrie[level].resize(2*count_nodes);
+                    level_pos[level] = index;
+                    nodes_curr_level = nodes_next_level;
+                    nodes_next_level = 0;
+                    count_nodes = 0;
+                    level++;
+                    
+                }
+                if (level == flatBinTrie::height) {
+                    break;
+                }
+            }
+            flatBinTrie::bTrie.resize(total_nodes);
+            bit_vector new_bv(total_nodes, 0);
+            // cout << bTrie << endl;
+            for (uint64_t i = 0; i < total_nodes; ++i) {
+                new_bv[i] = bTrie[i];
+            }
+            flatBinTrie::bTrie = new_bv;
+            flatBinTrie::b_rank = rank_support_v<1>(&bTrie);
+        }
+
         // pasar como parametro el universo
         flatBinTrie(int_vector<> &set) {
             uint32_t n = set.size();
@@ -187,13 +303,26 @@ class flatBinTrie{
         };
 
 
-        uint64_t size_in_bytes(){
+        uint64_t size_in_bytes() {
             uint64_t bv_size = sdsl::size_in_bytes(flatBinTrie::bTrie);
             // uint64_t bv_size = flatBinTrie::bTrie.size()/8 + sizeof(uint64_t);
             uint64_t rank_size = sdsl::size_in_bytes(flatBinTrie::b_rank);
             return bv_size +
                     rank_size +
                     sizeof(uint8_t);
+        }
+
+
+        void print() {
+            uint64_t i = 0;
+            for (uint16_t level=0; level < flatBinTrie::height; ++level) {
+                uint64_t next_level_pos = flatBinTrie::level_pos[level];
+                while (i < next_level_pos) {
+                    cout << flatBinTrie::bTrie[i] << flatBinTrie::bTrie[i+1] << " ";
+                    ++(++i);
+                }
+                cout << endl;
+            }
         }
 
         // uint64_t size_bytes(){

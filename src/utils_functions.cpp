@@ -90,14 +90,16 @@ void decodeBinTrie(flatBinTrie b, vector<uint64_t> &decoded, bit_vector partial_
 }
 
 
-sdsl::int_vector<>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
+std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
     uint64_t x;
     uint64_t i;
 
-    int_vector<>* inverted_list  = new int_vector<>(n);
+    // int_vector<>* inverted_list  = new int_vector<>(n);
+    vector<uint64_t>* inverted_list;
     for (i = 0; i < n; i++){
         input_stream >> x;
-        (*inverted_list)[i] = x;
+        // (*inverted_list)[i] = x;
+        inverted_list -> push_back(x);
     }
 
     return inverted_list;
@@ -120,10 +122,14 @@ void read_inverted_index(string file_path) {
         uint64_t set_size;
         input_stream >> set_size;
         if (set_size >= 100000) {
-            int_vector<> *il = read_inverted_list(input_stream, set_size);
-            // uint64_t max_value = il[ set_size - 1];
-            cout << "max value: "<< (*il)[ set_size - 1] << endl;
-            flatBinTrie trie = flatBinTrie(*il);
+            vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
+            uint64_t max_value = (*il)[ set_size - 1];
+            // cout << "max value: "<< (*il)[ set_size - 1] << endl;
+            flatBinTrie trie = flatBinTrie(*il, max_value);
+            vector<uint64_t> decoded;
+            bit_vector p_result(trie.getHeight(), 0);
+            decodeBinTrie(trie, decoded, p_result, 0, 0, trie.getHeight());
+            compareVectors(*il, decoded);
             uint64_t size_trie = trie.size_in_bytes();
             cout << "height: " << trie.getHeight() << endl;
             cout << "n° elements: " << set_size << endl;
