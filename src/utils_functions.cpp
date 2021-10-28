@@ -126,6 +126,7 @@ void read_inverted_index(string file_path) {
             uint64_t max_value = (*il)[ set_size - 1];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
             flatBinTrie trie = flatBinTrie(*il, max_value);
+            cout << "se creo el trie" << endl;
             vector<uint64_t> decoded;
             bit_vector p_result(trie.getHeight(), 0);
             decodeBinTrie(trie, decoded, p_result, 0, 0, trie.getHeight());
