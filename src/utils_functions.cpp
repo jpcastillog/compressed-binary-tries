@@ -95,7 +95,7 @@ std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t 
     uint64_t i;
 
     // int_vector<>* inverted_list  = new int_vector<>(n);
-    vector<uint64_t>* inverted_list;
+    vector<uint64_t>* inverted_list = new vector<uint64_t>;
     for (i = 0; i < n; i++){
         input_stream >> x;
         // (*inverted_list)[i] = x;
