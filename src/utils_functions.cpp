@@ -58,7 +58,7 @@ void decodeBinTrie(binTrie b, vector<uint64_t> &decoded, bit_vector partial_resu
 }
 
 
-void decodeBinTrie(flatBinTrie b, vector<uint64_t> &decoded, bit_vector partial_result,
+void decodeBinTrie(flatBinTrie &b, vector<uint64_t> &decoded, bit_vector partial_result,
                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
    
     if (curr_level == max_level) {
