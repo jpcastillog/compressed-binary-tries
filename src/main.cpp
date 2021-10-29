@@ -1,28 +1,53 @@
 #include <iostream>
 #include <sdsl/int_vector.hpp>
 #include <sdsl/bit_vectors.hpp>
-#include "binTrie.hpp"
-#include "flatBinTrie.hpp"
 #include <ctime>
 #include <math.h>
 #include "utils_functions.hpp"
 #include "intersection.hpp"
+#include "binTrie.hpp"
+#include "flatBinTrie.hpp"
+#include "barbay_and_kenyon.hpp"
 
-void foo(int arr[], int n) {
-    arr[0] = 1;
 
-    cout << "In foo function" << endl;
-    for (int i = 0; i < n; ++i) {
-        cout << arr[i] << " ";
+// int main() {
+//     string file_path = "./../../../../data/bitvectors/ii/gov2/url/gov2_ii_nofreq_url_dif.txt.B";
+//     read_inverted_index(file_path);
+    
+//     return 0;
+// }
+
+int main() {
+    vector<uint64_t> s1 = {1, 3, 7, 8, 9, 11, 12};
+    vector<uint64_t> s2 = {2, 3, 5, 7, 12, 15};
+    cout << "s1: ";
+    for (uint64_t i = 0; i < s1.size(); ++i) {
+        cout << s1[i] << " ";
+    }
+    cout << endl;
+    cout << "s2: ";
+    for (uint64_t i = 0; i < s2.size(); ++i) {
+        cout << s2[i] << " ";
     }
     cout << endl;
 
-};
+    flatBinTrie trie_s1 (s1, 12);
+    flatBinTrie trie_s2 (s2, 15);
 
-int main() {
-    string file_path = "./../../../../data/bitvectors/ii/gov2/url/gov2_ii_nofreq_url_dif.txt.B";
-    read_inverted_index(file_path);
-    
+    cout << "-------------Binary trie s1-------------" << endl;
+    trie_s1.print();
+    cout << "-------------Binary trie s2-------------" << endl;
+    trie_s2.print();
+
+    vector <uint64_t> intersection;
+    vector <uint64_t> positions(2, 0);
+    vector <uint64_t> sets[] = {s1, s2};
+    barbayKenyon(sets, 2, positions, intersection);
+    cout << "Intersection Barbay and Kenyon: ";
+    for (uint64_t i = 0; i < intersection.size(); ++i) {
+        cout << intersection[i] << " ";
+    }
+    cout << endl;
     return 0;
 }
 
@@ -119,18 +144,5 @@ int main() {
 //     cout << endl;
 
 //     cout << "-----------Test Code-----------" << endl;
-//     int arr[] = {0, 1, 2, 3};
-//     int n = 4;
-//     cout << "Before foo function" << endl;
-//     for (int i = 0; i < n; ++i) {
-//         cout << arr[i] << " ";
-//     }
-//     cout << endl;
-//     foo(arr, n);
-//     cout << "After foo function" << endl;
-//     for (int i = 0; i < n; ++i) {
-//         cout << arr[i] << " ";
-//     }
-//     cout << endl;
 //     return 0;
 // }

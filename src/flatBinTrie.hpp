@@ -7,6 +7,7 @@
 #include <vector>
 #include <queue>
 #include <math.h> 
+// #include "utils_functions.hpp"
 
 using namespace sdsl;
 using namespace std;
@@ -137,7 +138,7 @@ class flatBinTrie{
             flatBinTrie::b_rank = rank_support_v<1>(&bTrie);
         }
 
-        // pasar como parametro el universo
+        
         flatBinTrie(int_vector<> &set) {
             uint32_t n = set.size();
             
@@ -325,19 +326,7 @@ class flatBinTrie{
             }
         }
 
-        // uint64_t size_bytes(){
-        //     // Size in bytes of bit_vector of binary trie
-        //     uint64_t size_bit_vector = size_in_bytes(btrie); // 8 bytes to size, 1 byte to width + structure space
-        //     // Size in bytes of rank structure
-        //     uint64_t size_rank = size_in_bytes(b_rank); // +0.25 extra bits
-        //     // return size_bit_vector + size_rank;
-        //     cout << "Size of bit vector: " << size_in_bytes(btrie) << endl;
-        //     cout << "Size of rank structure: " << size_in_bytes(b_rank) << " bytes " << size_in_bytes(b_rank)*8 << endl;
-        //     cout << "Size of rank structure: " << b_rank.size() << " bits" << endl;
-        //     cout << "Verificación rank size: 0.25*n -> " << btrie.size()*1.25 << " bits" << endl;
-        //     return size_bit_vector*8;
-        //     // return (int) btrie.bit_size();
-        // };
+        // Hacer método para decodificar el trie binario
     
 };
 
