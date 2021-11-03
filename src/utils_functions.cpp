@@ -119,16 +119,17 @@ void read_inverted_index(string file_path) {
     cout << "Universe: " << u << endl;
     uint64_t total_size_tries = 0;
     uint64_t total_elements = 0;
-    // for (uint64_t i = 0; i < u; ++i) {
-    for (uint64_t i = 0; i < 2000; ++i){
+    uint64_t number_inverted_list = 0;
+    for (uint64_t i = 0; i < u; ++i) {
+    // for (uint64_t i = 0; i < 2000; ++i){
         uint64_t set_size;
         input_stream >> set_size;
         if (set_size >= 100000) {
             vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
             uint64_t max_value = (*il)[ set_size - 1];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
-            // flatBinTrie trie = flatBinTrie(*il, max_value);
-            binTrie trie = binTrie(*il, max_value);
+            flatBinTrie trie = flatBinTrie(*il, max_value);
+            // binTrie trie = binTrie(*il, max_value);
             // cout << "se creo el trie" << endl;
             // vector<uint64_t> decoded;
             // bit_vector p_result(trie.getHeight(), 0);
@@ -144,6 +145,7 @@ void read_inverted_index(string file_path) {
             cout << "--------------------------------------" << endl;
             total_size_tries += size_trie;
             total_elements += set_size;
+            number_inverted_list ++;
         }
         else {
             input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -152,6 +154,7 @@ void read_inverted_index(string file_path) {
     cout << "Total elements: " << total_elements << endl;
     cout << "Total size: " << total_size_tries << endl;
     cout << "Avg size: " << (float)(total_size_tries*8)/total_elements << endl;
+    cout << "Total number of inverted list" << number_inverted_list << endl;
 }
 
 
