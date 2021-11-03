@@ -5,6 +5,7 @@
 #include <sdsl/bit_vectors.hpp>
 #include <math.h>
 #include <fstream>
+#include <queue>
 
 
 bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
@@ -25,6 +26,7 @@ bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
     cout << "All elements are equal" << endl;
     return true;
 }
+
 
 void decodeBinTrie(binTrie b, vector<uint64_t> &decoded, bit_vector partial_result,
                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
@@ -126,6 +128,7 @@ void read_inverted_index(string file_path) {
             uint64_t max_value = (*il)[ set_size - 1];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
             flatBinTrie trie = flatBinTrie(*il, max_value);
+            // binTrie trie = binTrie(*il, max_value);
             cout << "se creo el trie" << endl;
             vector<uint64_t> decoded;
             bit_vector p_result(trie.getHeight(), 0);
@@ -149,4 +152,33 @@ void read_inverted_index(string file_path) {
     cout << "Total elements: " << total_elements << endl;
     cout << "Total size: " << total_size_tries << endl;
     cout << "Avg size: " << (float)(total_size_tries*8)/total_elements << endl;
+}
+
+
+void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64_t> &intersection) {
+    queue<vector<uint64_t>> q;
+    for (uint64_t i = 0; i < k; ++i) {
+        q.push(Sets[i]);
+    }
+    vector<uint64_t> s1;
+    vector<uint64_t> s2;
+    s1 = q.front();
+    q.pop();
+    while (!q.empty()) {
+        s2 = q.front();
+        q.pop();
+        vector<uint64_t> aux_intersection;
+        for (uint64_t i = 0; i < s1.size(); ++i) {
+            for (uint64_t j = 0; j < s2.size(); ++j){
+                if (s1[i] == s2[j]) {
+                    aux_intersection.push_back(s1[i]);
+                }
+            }
+        }
+        s1 = aux_intersection;
+    }
+    for (uint64_t i = 0; i < s1.size(); ++i) {
+        intersection.push_back(s1[i]);
+    }
+    
 }

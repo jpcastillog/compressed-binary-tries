@@ -20,6 +20,7 @@
 int main() {
     vector<uint64_t> s1 = {1, 3, 7, 8, 9, 11, 12};
     vector<uint64_t> s2 = {2, 3, 5, 7, 12, 15};
+    vector<uint64_t> s3 = {0, 3, 4, 10, 12, 13, 14, 15};
     cout << "s1: ";
     for (uint64_t i = 0; i < s1.size(); ++i) {
         cout << s1[i] << " ";
@@ -39,6 +40,19 @@ int main() {
     cout << "-------------Binary trie s2-------------" << endl;
     trie_s2.print();
 
+    binTrie level_trie_s1 (s1, 12);
+    vector <uint64_t> decoded;
+    bit_vector partial_result(level_trie_s1.getHeight(), 0);
+    decodeBinTrie(level_trie_s1, decoded, partial_result, 0, 0, level_trie_s1.getHeight());
+    cout << "-----------------Decoded s1 per level-----------------" << endl;
+    for (uint64_t i = 0; i < decoded.size(); ++i) {
+        cout << decoded[i] << " ";
+    }
+    cout << endl;
+    cout << "size flat: " << trie_s1.size_in_bytes() << endl;
+    cout << "size level: " << level_trie_s1.size_in_bytes() << endl;
+
+
     vector <uint64_t> intersection;
     vector <uint64_t> positions(2, 0);
     vector <uint64_t> sets[] = {s1, s2};
@@ -46,6 +60,15 @@ int main() {
     cout << "Intersection Barbay and Kenyon: ";
     for (uint64_t i = 0; i < intersection.size(); ++i) {
         cout << intersection[i] << " ";
+    }
+    cout << endl;
+
+    vector<uint64_t> intersection2;
+    vector<uint64_t> Sets[] = {s1, s2, s3};
+    force_brute_intersection(Sets, 3, intersection2);
+    cout << "Intersection Force Brute: ";
+    for (uint64_t i = 0; i < intersection2.size(); ++i) {
+        cout << intersection2[i] << " ";
     }
     cout << endl;
     return 0;
