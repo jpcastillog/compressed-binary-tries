@@ -28,7 +28,7 @@ bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
 }
 
 
-void decodeBinTrie(binTrie b, vector<uint64_t> &decoded, bit_vector partial_result,
+void decodeBinTrie(binTrie &b, vector<uint64_t> &decoded, bit_vector partial_result,
                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
    
     if (curr_level == max_level) {
