@@ -120,7 +120,7 @@ void read_inverted_index(string file_path) {
     uint64_t total_size_tries = 0;
     uint64_t total_elements = 0;
     // for (uint64_t i = 0; i < u; ++i) {
-    for (uint64_t i = 0; i < 10; ++i){    
+    for (uint64_t i = 0; i < 50000; ++i){    
         uint64_t set_size;
         input_stream >> set_size;
         if (set_size >= 100000) {
