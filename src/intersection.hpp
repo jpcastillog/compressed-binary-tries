@@ -10,7 +10,12 @@
 #include "flatBinTrie.hpp"
 
 binTrie intersectTries(vector<binTrie> &Bs);
+
+
 binTrie intersectTriesV2(vector<binTrie> &Bs);
-flatBinTrie intersectFlatTries(vector<flatBinTrie> &Bs);
+
+template<class rankType>
+flatBinTrie<rankType> intersectFlatTries(vector<flatBinTrie<rankType>> &Bs);
+
 
 #endif

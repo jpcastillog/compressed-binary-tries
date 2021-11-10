@@ -178,41 +178,43 @@ binTrie intersectTriesV2(vector<binTrie> &Bs) {
 }
 
 // Overload Function to flat implementation
-void intersectionV2(vector <flatBinTrie> &Bs, uint16_t max_level, uint16_t curr_level, 
+template <class rankType>
+void intersectionV2(vector <flatBinTrie<rankType>> &Bs, uint16_t max_level, uint16_t curr_level, 
                 vector<uint64_t> roots, vector<uint64_t> &last_pos,
                 vector<uint64_t> ones_to_write[], vector<uint64_t> &nodes_per_level) {
+
     // End condition
-	if (curr_level == max_level) {
+	if (curr_level == max_level - 1) {
+        uint16_t n_tries = Bs.size();
+        bit_vector result = bit_vector(2, 1); // vector de 2 bits con 1's
+        // Compute "bitwise and" between nodes of n_tries  
+        for (uint16_t i = 0; i < n_tries; ++i) {
+            bit_vector node_i = Bs[i].getNode(roots[i]);
+            result &= node_i; 
+        }
+
+        if (result[0])
+            ones_to_write[curr_level].push_back(last_pos[curr_level]);
+        if (result[1])
+            ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+        last_pos[curr_level] += 2;
 		return;
 	}
 	
 	uint16_t n_tries = Bs.size();
 	bit_vector result = bit_vector(2, 1); // vector de 2 bits con 1's
-
     // Compute "bitwise and" between nodes of n_tries  
 	for (uint16_t i = 0; i < n_tries; ++i) {
 		bit_vector node_i = Bs[i].getNode(roots[i]);
 		result &= node_i; 
 	}
-    
-    uint64_t pos_to_write[2] = {0, 0};
-    if (result[0] == 1 || result[1] == 1){
-        if (result[0] == 1) {
-            pos_to_write[0] = last_pos[curr_level];
-        }
-        if (result[1] == 1) {
-            pos_to_write[1] = last_pos[curr_level] + 1;
-        }
-        last_pos[curr_level]+=2;
-    }
+    cout << result << endl;
 
 	uint16_t next_level = curr_level + 1;
-    uint64_t pos_next_level_before = 0;
-    if (curr_level < max_level - 1) {
-        uint64_t pos_next_level_before = last_pos[next_level];
-    }
+    uint64_t pos_next_level_before = last_pos[next_level];;
 
-    
+    bool exist_lchild;
+    bool exist_rchild;
 	// Left child
     vector <uint64_t> left_nodes;
 	if (result[0] == 1) {
@@ -221,6 +223,14 @@ void intersectionV2(vector <flatBinTrie> &Bs, uint16_t max_level, uint16_t curr_
 		}
 		intersectionV2(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level);
 	}
+    if (last_pos[next_level] == pos_next_level_before) {
+        exist_lchild = false;
+    }
+    else  {
+        ones_to_write[curr_level].push_back(last_pos[curr_level]);
+        pos_next_level_before = last_pos[next_level];
+        exist_lchild = true;
+    }
 	// Right child
     vector <uint64_t> right_nodes;
 	if (result[1] == 1) {
@@ -235,23 +245,22 @@ void intersectionV2(vector <flatBinTrie> &Bs, uint16_t max_level, uint16_t curr_
 		}
 		intersectionV2(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level);
 	}
-    // if not exist child nodes in intersection, remove current node
-    if (last_pos[next_level] == pos_next_level_before && next_level <= max_level - 1) {
-        last_pos[curr_level] -= 2;
+    if (last_pos[next_level] == pos_next_level_before) {
+        exist_rchild = false;
     }
     else {
-        if (result[0] == 1) {
-            ones_to_write[curr_level].push_back(pos_to_write[0]);
-        }
-        if (result[1] == 1) {
-            ones_to_write[curr_level].push_back(pos_to_write[1]);
-        }
-        nodes_per_level[curr_level]++;
+        ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+        exist_rchild = true;
+    }
+    // mark if node is write
+    if (exist_lchild || exist_rchild) {
+        last_pos[curr_level] += 2;
     }    
 }
 
 // Overload Function to flat implementation
-flatBinTrie intersectFlatTries(vector<flatBinTrie> &Bs) {
+template<class rankType>
+flatBinTrie<rankType> intersectFlatTries(vector<flatBinTrie<rankType>> &Bs) {
     vector<uint64_t> roots;
     // Get max height of trees
     uint16_t max_level = 0;
@@ -265,7 +274,9 @@ flatBinTrie intersectFlatTries(vector<flatBinTrie> &Bs) {
     vector<uint64_t> nodes_per_level(max_level, 0);
 
     intersectionV2(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level);
-    flatBinTrie result = flatBinTrie(ones_to_write, max_level, last_pos);    
+    flatBinTrie<rankType> result = flatBinTrie<rankType>(ones_to_write, max_level, last_pos);    
 
     return result;
 }
+template flatBinTrie<rank_support_v5<1>> intersectFlatTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs);
+template flatBinTrie<rank_support_v<1>> intersectFlatTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs);

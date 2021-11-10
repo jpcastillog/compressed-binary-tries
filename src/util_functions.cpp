@@ -60,9 +60,9 @@ void decodeBinTrie(binTrie &b, vector<uint64_t> &decoded, bit_vector partial_res
 }
 
 
-void decodeBinTrie(flatBinTrie &b, vector<uint64_t> &decoded, bit_vector partial_result,
+template <class rankType>
+void decodeBinTrie(flatBinTrie<rankType> &b, vector<uint64_t> &decoded, bit_vector partial_result,
                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
-   
     if (curr_level == max_level) {
         uint64_t number = 0;
         for (uint16_t i = 0; i <  b.getHeight(); ++i) {
@@ -79,7 +79,7 @@ void decodeBinTrie(flatBinTrie &b, vector<uint64_t> &decoded, bit_vector partial
     bit_vector rightResult = partial_result;
 
     if (node[0] == 1) {
-        leftResult[b.getHeight() - curr_level - 1] = 0; 
+        leftResult[b.getHeight() - curr_level - 1] = 0;
         uint64_t left_child = b.getLeftChild(node_id);
         decodeBinTrie(b, decoded, leftResult, left_child, next_level, max_level);
     }
@@ -90,6 +90,10 @@ void decodeBinTrie(flatBinTrie &b, vector<uint64_t> &decoded, bit_vector partial
         decodeBinTrie(b, decoded, rightResult, right_child, next_level, max_level);
     }
 }
+template void decodeBinTrie<rank_support_v5<1>>(flatBinTrie<rank_support_v5<1>> &b, vector<uint64_t> &decoded, bit_vector partial_result,
+                                                uint64_t node_id, uint16_t curr_level, uint16_t max_level);
+template void decodeBinTrie<rank_support_v<1>>(flatBinTrie<rank_support_v<1>> &b, vector<uint64_t> &decoded, bit_vector partial_result,
+                                                uint64_t node_id, uint16_t curr_level, uint16_t max_level);
 
 
 std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
@@ -128,7 +132,7 @@ void read_inverted_index(string file_path) {
             vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
             uint64_t max_value = (*il)[ set_size - 1];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
-            flatBinTrie trie = flatBinTrie(*il, max_value);
+            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
             // binTrie trie = binTrie(*il, max_value);
             // cout << "se creo el trie" << endl;
             // vector<uint64_t> decoded;
@@ -146,6 +150,7 @@ void read_inverted_index(string file_path) {
             total_size_tries += size_trie;
             total_elements += set_size;
             number_inverted_list ++;
+            delete il;
         }
         else {
             input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
