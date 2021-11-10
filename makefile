@@ -1,4 +1,4 @@
-CFLAGS = -std=c++11 -O
+CFLAGS = -std=c++11 -O -msse4.2
 CC = g++
 
 program: main.o intersection.o util_functions.o barbay_and_kenyon.o
