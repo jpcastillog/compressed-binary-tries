@@ -337,6 +337,10 @@ class flatBinTrie{
             }
         }
 
+        void compress() {
+            return;
+        }
+
         // Hacer método para decodificar el trie binario
     
 };
