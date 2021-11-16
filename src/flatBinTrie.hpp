@@ -16,6 +16,7 @@ template <class rankType>
 class flatBinTrie{
 
     uint16_t height;
+    bool compressed;
 
     public:
         bit_vector *bTrie;
@@ -26,6 +27,7 @@ class flatBinTrie{
         flatBinTrie() = default;
 
         flatBinTrie(vector<uint64_t> &set, uint64_t u) {
+            flatBinTrie::compressed = false;
             uint32_t n = set.size();
 
             uint16_t height = floor(log2(u - 1)) +  1;
@@ -144,6 +146,7 @@ class flatBinTrie{
 
         
         flatBinTrie(int_vector<> &set) {
+            flatBinTrie::compressed = false;
             uint32_t n = set.size();
             
             util::bit_compress(set);
@@ -259,6 +262,7 @@ class flatBinTrie{
 
 
         flatBinTrie(vector<uint64_t> ones_to_write[], uint16_t height, vector<uint64_t> level_pos) {
+            flatBinTrie::compressed = false;
             flatBinTrie::height = height;
             uint64_t bits_n = 0;
             for (uint16_t level = 0; level < height; ++level) {
@@ -322,7 +326,7 @@ class flatBinTrie{
             return bv_size +
                     rank_size +
                     sizeof(uint8_t);
-        }
+        };
 
 
         void print() {
@@ -335,11 +339,87 @@ class flatBinTrie{
                 }
                 cout << endl;
             }
+        };
+
+
+        void writeCompressTrie(vector<uint64_t> ones_to_write[], vector<uint64_t> &level_pos,
+                                uint8_t curr_level, uint64_t node_id, bool &itsOneOne) {
+            
+            bit_vector node = getNode(node_id);
+            uint8_t next_level = curr_level + 1;
+            uint64_t next_level_pos = level_pos[next_level];
+
+            bool itsOneOne_l = false;
+            bool itsOneOne_r = false;
+
+            if (curr_level == flatBinTrie::height - 1) {
+                if (node[0] && node[1]) 
+                   itsOneOne = true;
+                   level_pos[curr_level] += 2;
+                return;
+            }
+            
+            if (node[0] && node[1]) {
+                uint64_t l_child = getLeftChild(node_id);
+                writeCompressTrie(ones_to_write, level_pos, next_level, l_child, itsOneOne_l);
+
+                uint64_t r_child = l_child + 1;
+                writeCompressTrie(ones_to_write, level_pos, next_level, r_child, itsOneOne_r);
+            }
+
+            else {
+                if (node[0]) {
+                    uint64_t l_child = getLeftChild(node_id);
+                    writeCompressTrie(ones_to_write, level_pos, next_level, l_child, itsOneOne_l);
+                    ones_to_write[curr_level].push_back(level_pos[curr_level]);
+                }
+                if (node[1]) {
+                    uint64_t r_child = getRightChild(node_id);
+                    writeCompressTrie(ones_to_write, level_pos, next_level, r_child, itsOneOne_r);
+                    ones_to_write[curr_level].push_back(level_pos[curr_level] + 1);
+                }
+                level_pos[curr_level] += 2;
+            }
+
+            if (itsOneOne_l && itsOneOne_r) {
+                itsOneOne = true;
+                level_pos[curr_level] += 4;
+                level_pos[next_level] -= 4;
+            }
+        };
+
+
+        void writesOnes(vector<uint64_t> ones_to_write[], vector<uint64_t> level_pos){
+            flatBinTrie::compressed = true;
+            uint64_t bits_n = 0;
+            for (uint16_t level = 0; level < flatBinTrie::height; ++level) {
+                bits_n += level_pos[level];
+            }
+            cout << bits_n << endl;
+            bTrie = new bit_vector(bits_n, 0);
+            flatBinTrie::level_pos = vector<uint64_t>(height, 0);
+
+            uint64_t global_level_pos = 0;
+            for (uint16_t level = 0; level < height; ++level) {
+                for (uint64_t i = 0; i < ones_to_write[level].size(); ++i) {
+                    uint64_t pos = global_level_pos + ones_to_write[level][i];
+                    (*flatBinTrie::bTrie)[pos] = 1;
+                }
+                global_level_pos += level_pos[level];
+                flatBinTrie::level_pos[level] = global_level_pos;
+            }
+            b_rank = rankType(flatBinTrie::bTrie);
         }
 
+
         void compress() {
-            return;
-        }
+            // bit_vector new_bv = new bit_vector(flatBinTrie::bTrie -> size(), 0);
+            vector<uint64_t> ones_to_write[flatBinTrie::height];
+            vector<uint64_t> level_pos(flatBinTrie::height, 0);
+            bool itsOneOne = false;
+            flatBinTrie::writeCompressTrie(ones_to_write, level_pos, 0, 0, itsOneOne);
+            writesOnes(ones_to_write, level_pos);
+        };
 
         // Hacer método para decodificar el trie binario
     
