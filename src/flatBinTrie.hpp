@@ -343,23 +343,28 @@ class flatBinTrie{
 
 
         void writeCompressTrie(vector<uint64_t> ones_to_write[], vector<uint64_t> &level_pos, 
-                                uint8_t curr_level, uint64_t node_id, bool &its11, 
-                                bool ancestorIts11){
+                                uint16_t curr_level, uint64_t node_id, bool &its11){
+            // cout << "node_id: " << node_id << " current level: " << curr_level << endl;
             bit_vector node = getNode(node_id);
             // End condition
-            if (curr_level == flatBinTrie::height-1) {
+            if (curr_level == (flatBinTrie::height-1)) {
                 // if node == 11
+                if (node[0] && node[1]) {
+                    its11 = true;
+                }
                 if (node[0]){
                     ones_to_write[curr_level].push_back(level_pos[curr_level]);
                 }
-                level_pos[curr_level]++;
+                level_pos[curr_level] += 1;
                 if (node[1]) {
                     ones_to_write[curr_level].push_back(level_pos[curr_level]);
                 }
-                level_pos[curr_level]++;
+                level_pos[curr_level] += 1;
+                
+                return;
             }
 
-            uint8_t next_level = curr_level + 1;
+            uint16_t next_level = curr_level + 1;
             uint64_t next_level_pos = level_pos[next_level];
 
             bool its11_l = false;
@@ -368,64 +373,44 @@ class flatBinTrie{
 
             if (node[0] && node[1]){
                 actualIts11 = true;
+
                 uint64_t l_child = getLeftChild(node_id);
                 uint64_t r_child = l_child + 1;
-                writeCompressTrie(ones_to_write, level_pos, next_level, l_child, its11_l, actualIts11);
-                writeCompressTrie(ones_to_write, level_pos, next_level, r_child, its11_r, actualIts11);
-
-                if (l_child && r_child)
+                writeCompressTrie(ones_to_write, level_pos, next_level, l_child, its11_l);
+                writeCompressTrie(ones_to_write, level_pos, next_level, r_child, its11_r);
+                
+                its11 = true && its11_l && its11_r;
+                if (its11) {
                     level_pos[next_level] -= 4;
+                    if (curr_level == flatBinTrie::height -2){
+                        for (uint64_t i = 0; i < 4; ++i) {
+                            ones_to_write[next_level].pop_back();
+                        }
+                    }
+                }
+                else {
+                    ones_to_write[curr_level].push_back(level_pos[curr_level]);
+                    ones_to_write[curr_level].push_back(level_pos[curr_level] + 1);      
+                }
+                
+                level_pos[curr_level] += 2;
             }
-            
 
+            else if (node[0] || node[1]){
+                if (node[0]){
+                    uint64_t l_child = getLeftChild(node_id);
+                    ones_to_write[curr_level].push_back(level_pos[curr_level]);
+                    writeCompressTrie(ones_to_write, level_pos, next_level, l_child, its11_l);
+                }
+                level_pos[curr_level] += 1;
+                if (node[1]) {
+                    uint64_t r_child = getRightChild(node_id);
+                    ones_to_write[curr_level].push_back(level_pos[curr_level]);
+                    writeCompressTrie(ones_to_write, level_pos, next_level, r_child, its11_r);
+                }
+                level_pos[curr_level] += 1;
+            }
         }
-
-        // void writeCompressTrie(vector<uint64_t> ones_to_write[], vector<uint64_t> &level_pos,
-        //                         uint8_t curr_level, uint64_t node_id, bool &itsOneOne) {
-            
-        //     bit_vector node = getNode(node_id);
-        //     uint8_t next_level = curr_level + 1;
-        //     uint64_t next_level_pos = level_pos[next_level];
-
-        //     bool itsOneOne_l = false;
-        //     bool itsOneOne_r = false;
-
-        //     if (curr_level == flatBinTrie::height - 1) {
-        //         if (node[0] && node[1]) 
-        //            itsOneOne = true;
-        //            level_pos[curr_level] += 2;
-        //         return;
-        //     }
-            
-        //     if (node[0] && node[1]) {
-        //         uint64_t l_child = getLeftChild(node_id);
-        //         writeCompressTrie(ones_to_write, level_pos, next_level, l_child, itsOneOne_l);
-
-        //         uint64_t r_child = l_child + 1;
-        //         writeCompressTrie(ones_to_write, level_pos, next_level, r_child, itsOneOne_r);
-        //     }
-
-        //     else {
-        //         if (node[0]) {
-        //             uint64_t l_child = getLeftChild(node_id);
-        //             writeCompressTrie(ones_to_write, level_pos, next_level, l_child, itsOneOne_l);
-        //             ones_to_write[curr_level].push_back(level_pos[curr_level]);
-        //         }
-        //         if (node[1]) {
-        //             uint64_t r_child = getRightChild(node_id);
-        //             writeCompressTrie(ones_to_write, level_pos, next_level, r_child, itsOneOne_r);
-        //             ones_to_write[curr_level].push_back(level_pos[curr_level] + 1);
-        //         }
-        //         level_pos[curr_level] += 2;
-        //     }
-
-        //     if (itsOneOne_l && itsOneOne_r) {
-        //         itsOneOne = true;
-        //         level_pos[curr_level] += 4;
-        //         level_pos[next_level] -= 4;
-        //     }
-        // };
-
 
         void writesOnes(vector<uint64_t> ones_to_write[], vector<uint64_t> level_pos){
             flatBinTrie::compressed = true;
@@ -433,8 +418,9 @@ class flatBinTrie{
             for (uint16_t level = 0; level < flatBinTrie::height; ++level) {
                 bits_n += level_pos[level];
             }
-            cout << bits_n << endl;
-            bTrie = new bit_vector(bits_n, 0);
+            // cout << "number of bits: " << bits_n << endl;
+            delete flatBinTrie::bTrie;
+            flatBinTrie::bTrie = new bit_vector(bits_n, 0);
             flatBinTrie::level_pos = vector<uint64_t>(height, 0);
 
             uint64_t global_level_pos = 0;

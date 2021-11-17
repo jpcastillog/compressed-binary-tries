@@ -208,7 +208,7 @@ void intersectionV2(vector <flatBinTrie<rankType>> &Bs, uint16_t max_level, uint
 		bit_vector node_i = Bs[i].getNode(roots[i]);
 		result &= node_i; 
 	}
-    cout << result << endl;
+    // cout << result << endl;
 
 	uint16_t next_level = curr_level + 1;
     uint64_t pos_next_level_before = last_pos[next_level];;
