@@ -128,7 +128,7 @@ void read_inverted_index(string file_path) {
     // for (uint64_t i = 0; i < 2000; ++i){
         uint64_t set_size;
         input_stream >> set_size;
-        if (set_size >= 80000) {
+        if (set_size >= 100000) {
             vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
             uint64_t max_value = (*il)[ set_size - 1];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
