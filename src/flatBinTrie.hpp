@@ -371,7 +371,7 @@ class flatBinTrie{
             bool its11_r = false;
             bool actualIts11 = false;
 
-            if (node[0] && node[1]){
+            if (node[0] && node[1]) {
                 actualIts11 = true;
 
                 uint64_t l_child = getLeftChild(node_id);
