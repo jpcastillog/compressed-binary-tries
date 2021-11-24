@@ -449,10 +449,45 @@ class flatBinTrie{
             }
         };
 
+
+        void recursiveDecode(vector<uint64_t> &decoded, uint64_t partial_int, uint64_t node_id, uint16_t curr_level) {
+            if (curr_level == flatBinTrie::height) {
+                uint64_t number = 0;
+                for (uint16_t i = 0; i < flatBinTrie::height; ++i) {
+                    number += partial_result[i]*pow(2, i);
+                }
+                decoded.push_back(number);
+                return;
+            }
+
+            bit_vector node = getNode(node_id);
+            uint16_t next_level = curr_level + 1;
+
+            bit_vector leftResult = partial_result;
+            bit_vector rightResult = partial_result;
+
+            if (node[0]) {
+                leftResult[getHeight() - curr_level - 1] = 0;
+                uint64_t left_child = getLeftChild(node_id);
+                recursiveDecode(decoded, leftResult, left_child, next_level);
+            }
+            if (node[1]) {
+                rightResult[getHeight() - curr_level - 1] = 1;
+                uint64_t right_child = getRightChild(node_id);
+                recursiveDecode(decoded, rightResult, right_child, next_level);
+            }
+        };
+
         // Hacer método para decodificar el trie binario
         void decode( vector<uint64_t> &decoded) {
-            bit_vector partial_result = bit_vector(flatBinTrie::height, 0);
-            recursiveDecode(decoded, partial_result, 0, 0);
+            if (flatBinTrie::compressed) {
+                bit_vector partial_result = bit_vector(flatBinTrie::height, 0);
+                recursiveDecode(decoded, partial_result, 0, 0);
+            }
+            
+            else {
+                
+            }
         }
     
 };

@@ -225,6 +225,7 @@ void intersectionV2(vector <flatBinTrie<rankType>> &Bs, uint16_t max_level, uint
 		}
 		intersectionV2(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level);
 	}
+
     if (last_pos[next_level] == pos_next_level_before) {
         exist_lchild = false;
     }
@@ -247,6 +248,7 @@ void intersectionV2(vector <flatBinTrie<rankType>> &Bs, uint16_t max_level, uint
 		}
 		intersectionV2(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level);
 	}
+    
     if (last_pos[next_level] == pos_next_level_before) {
         exist_rchild = false;
     }
