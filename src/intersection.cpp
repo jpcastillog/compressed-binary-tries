@@ -192,12 +192,14 @@ void intersectionV2(vector <flatBinTrie<rankType>> &Bs, uint16_t max_level, uint
             bit_vector node_i = Bs[i].getNode(roots[i]);
             result &= node_i; 
         }
-
-        if (result[0])
-            ones_to_write[curr_level].push_back(last_pos[curr_level]);
-        if (result[1])
-            ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
-        last_pos[curr_level] += 2;
+        // Only write when result = 11, 10 or 01
+        if (result[0] || result[1]){
+            if (result[0])
+                ones_to_write[curr_level].push_back(last_pos[curr_level]);
+            if (result[1])
+                ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+            last_pos[curr_level] += 2;
+        }
 		return;
 	}
 	
