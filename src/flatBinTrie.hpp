@@ -420,35 +420,6 @@ class flatBinTrie{
             writesOnes(ones_to_write, level_pos);
         };
 
-
-        // void recursiveDecode(vector<uint64_t> &decoded, bit_vector partial_result, uint64_t node_id, uint16_t curr_level) {
-        //     if (curr_level == flatBinTrie::height) {
-        //         uint64_t number = 0;
-        //         for (uint16_t i = 0; i < flatBinTrie::height; ++i) {
-        //             number += partial_result[i]*pow(2, i);
-        //         }
-        //         decoded.push_back(number);
-        //         return;
-        //     }
-
-        //     bit_vector node = getNode(node_id);
-        //     uint16_t next_level = curr_level + 1;
-
-        //     bit_vector leftResult = partial_result;
-        //     bit_vector rightResult = partial_result;
-
-        //     if (node[0]) {
-        //         leftResult[getHeight() - curr_level - 1] = 0;
-        //         uint64_t left_child = getLeftChild(node_id);
-        //         recursiveDecode(decoded, leftResult, left_child, next_level);
-        //     }
-        //     if (node[1]) {
-        //         rightResult[getHeight() - curr_level - 1] = 1;
-        //         uint64_t right_child = getRightChild(node_id);
-        //         recursiveDecode(decoded, rightResult, right_child, next_level);
-        //     }
-        // };
-
         
         void recursiveDecode(vector<uint64_t> &decoded, uint64_t partial_int, uint64_t node_id, uint16_t curr_level) {
             if (curr_level == flatBinTrie::height) {
@@ -473,6 +444,7 @@ class flatBinTrie{
             }
         };
 
+
         void compressRecursiveDecode(vector<uint64_t> &decoded, uint64_t partial_int, uint64_t node_id, uint16_t curr_level) {
             if (curr_level == flatBinTrie::height) {
                 decoded.push_back(partial_int);
@@ -482,7 +454,14 @@ class flatBinTrie{
             bit_vector node = getNode(node_id);
             uint16_t next_level = curr_level + 1;
 
-            if (node[0] == 0 && node[1] == 0) {
+            if (node[0] == 0 && node[1] == 0) { 
+                uint64_t range = (((1ULL << (curr_level - 1)) - 1) ^ ((1 << (getHeight()-1)) - 1));
+                uint64_t below = partial_int;
+                uint64_t above = (partial_int | range);
+                for (uint64_t i = below; i <= above; ++i) {
+                    decoded.push_back(i);
+                }
+                // decoded.push_back(above);
                 return;
             }
 
@@ -491,26 +470,25 @@ class flatBinTrie{
 
             if (node[0]) {
                 uint64_t left_child = getLeftChild(node_id);
-                recursiveDecode(decoded, leftResult, left_child, next_level);
+                compressRecursiveDecode(decoded, leftResult, left_child, next_level);
             }
             if (node[1]) {
                 rightResult = (rightResult | (1ULL << (getHeight() - curr_level - 1)));
                 uint64_t right_child = getRightChild(node_id);
-                recursiveDecode(decoded, rightResult, right_child, next_level);
+                compressRecursiveDecode(decoded, rightResult, right_child, next_level);
             }
         }
 
 
-        // Hacer método para decodificar el trie binario
         void decode( vector<uint64_t> &decoded) {
-            if (!flatBinTrie::compressed) {
+            if (flatBinTrie::compressed) {
+                uint64_t partial_int = 0x00;
+                compressRecursiveDecode(decoded, partial_int, 0, 0);
+            }
+            else {
                 uint64_t partial_int = 0x00;
                 recursiveDecode(decoded, partial_int, 0, 0);
             }
-            
-            // else {
-                
-            // }
         }
     
 };

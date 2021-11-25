@@ -51,6 +51,13 @@ int main() {
     trie_s1.print();
     cout << "-------------Binary trie s1 compress-------------" << endl;
     trie_s.print();
+    cout << "-------------Decoded trie s1 compressed-------------" << endl;
+    vector<uint64_t> s1_compressed_decoded;
+    trie_s.decode(s1_compressed_decoded);
+    for (uint64_t i = 0; i < s1_compressed_decoded.size(); ++i) {
+        cout << s1_compressed_decoded[i] << " ";
+    }
+    cout << endl;   
     cout << "-------------Binary trie s2-------------" << endl;
     trie_s2.print();
     cout << "-------------Binary trie s3-------------" << endl;
