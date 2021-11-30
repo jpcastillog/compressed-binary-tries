@@ -124,15 +124,20 @@ void read_inverted_index(string file_path) {
     uint64_t total_size_tries = 0;
     uint64_t total_elements = 0;
     uint64_t number_inverted_list = 0;
-    for (uint64_t i = 0; i < u; ++i) {
+
+    uint64_t total_size_tries_compress = 0;
+
+    
+    for (uint64_t i = 0; i < 10; ++i) {
     // for (uint64_t i = 0; i < 2000; ++i){
         uint64_t set_size;
         input_stream >> set_size;
-        if (set_size >= 100000) {
+        if (set_size >= 4096) {
             vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
             uint64_t max_value = (*il)[ set_size - 1];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
             flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+            uint64_t uncompress_size = trie.size_in_bytes();
             trie.compress();
             // binTrie trie = binTrie(*il, max_value);
             // cout << "se creo el trie" << endl;
@@ -142,13 +147,15 @@ void read_inverted_index(string file_path) {
             // cout << "paso decode" << endl;
             // compareVectors(*il, decoded);
             // cout << "paso compare" << endl;
-            uint64_t size_trie = trie.size_in_bytes();
+            uint64_t compress_size_trie = trie.size_in_bytes();
             cout << "height: " << trie.getHeight() << endl;
             cout << "n° elements: " << set_size << endl;
-            cout << "size in bits: " << size_trie*8 << endl;
-            cout << "avg size: " << (float)(size_trie*8)/set_size << endl;
+            cout << "uncompress size in bits" << uncompress_size*8 << endl;
+            cout << "compress size in bits: " << uncompress_size*8 << endl;
+            cout << "avg size: " << (float)(uncompress_size*8)/set_size << endl;
             cout << "--------------------------------------" << endl;
-            total_size_tries += size_trie;
+            total_size_tries_compress += compress_size_trie;
+            total_size_tries += uncompress_size;
             total_elements += set_size;
             number_inverted_list ++;
             delete il;
@@ -158,8 +165,9 @@ void read_inverted_index(string file_path) {
         }
     }
     cout << "Total elements: " << total_elements << endl;
-    cout << "Total size: " << total_size_tries << endl;
-    cout << "Avg size: " << (float)(total_size_tries*8)/total_elements << endl;
+    cout << "Total size uncompress: " << total_size_tries << endl;
+    cout << "Avg size uncompress: " << (float)(total_size_tries*8)/total_elements << endl;
+    cout << "Avg size compress: " << (float)(total_size_tries_compress*8)/total_elements << endl;
     cout << "Total number of inverted list" << number_inverted_list << endl;
 }
 
