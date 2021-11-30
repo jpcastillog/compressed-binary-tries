@@ -168,7 +168,7 @@ void read_inverted_index(string file_path) {
     cout << "Total size uncompress: " << total_size_tries << endl;
     cout << "Avg size uncompress: " << (float)(total_size_tries*8)/total_elements << endl;
     cout << "Avg size compress: " << (float)(total_size_tries_compress*8)/total_elements << endl;
-    cout << "Total number of inverted list" << number_inverted_list << endl;
+    cout << "Total number of inverted list: " << number_inverted_list << endl;
 }
 
 
