@@ -150,9 +150,10 @@ void read_inverted_index(string file_path) {
             uint64_t compress_size_trie = trie.size_in_bytes();
             cout << "height: " << trie.getHeight() << endl;
             cout << "n° elements: " << set_size << endl;
-            cout << "uncompress size in bits" << uncompress_size*8 << endl;
+            cout << "uncompress size in bits: " << uncompress_size*8 << endl;
             cout << "compress size in bits: " << uncompress_size*8 << endl;
-            cout << "avg size: " << (float)(uncompress_size*8)/set_size << endl;
+            cout << "avg size uncompress: " << (float)(uncompress_size*8)/set_size << endl;
+            cout << "avg size compress: " << (float)(compress_size_trie*8)/set_size << endl;
             cout << "--------------------------------------" << endl;
             total_size_tries_compress += compress_size_trie;
             total_size_tries += uncompress_size;
