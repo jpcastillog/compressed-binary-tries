@@ -239,8 +239,8 @@ class flatBinTrie{
         };
 
 
-        flatBinTrie(vector<uint64_t> ones_to_write[], uint16_t height, vector<uint64_t> level_pos) {
-            flatBinTrie::compressed = false;
+        flatBinTrie(vector<uint64_t> ones_to_write[], uint16_t height, vector<uint64_t> level_pos, bool compressed) {
+            flatBinTrie::compressed = compressed;
             flatBinTrie::height = height;
             uint64_t bits_n = 0;
             for (uint16_t level = 0; level < height; ++level) {
@@ -278,6 +278,17 @@ class flatBinTrie{
             bit_vector node = bit_vector(2, 0);
             node[0] = (*bTrie)[2*node_id];
             node[1] = (*bTrie)[(2*node_id) + 1];
+            return node;
+        };
+
+        
+        uint64_t getNode2(uint64_t node_id) {
+            uint64_t node = 0;
+            if ((*bTrie)[2*node_id] == 1)
+                node = (node | (1ULL << 1));
+
+            if ((*bTrie)[(2*node_id) + 1] == 1)
+                node = (node | (1ULL << 0));
             return node;
         };
 
