@@ -455,13 +455,12 @@ class flatBinTrie{
             uint16_t next_level = curr_level + 1;
 
             if (node[0] == 0 && node[1] == 0) { 
-                uint64_t range = (((1ULL << (curr_level - 1)) - 1) ^ ((1 << (getHeight()-1)) - 1));
                 uint64_t below = partial_int;
+                uint64_t range = ((uint64_t)1 << (getHeight() - curr_level)) - 1;
                 uint64_t above = (partial_int | range);
                 for (uint64_t i = below; i <= above; ++i) {
                     decoded.push_back(i);
                 }
-                // decoded.push_back(above);
                 return;
             }
 
