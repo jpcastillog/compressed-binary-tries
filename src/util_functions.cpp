@@ -98,12 +98,14 @@ template void decodeBinTrie<rank_support_v<1>>(flatBinTrie<rank_support_v<1>> &b
 
 std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
     uint64_t x;
+    uint64_t f;
     uint64_t i;
 
     // int_vector<>* inverted_list  = new int_vector<>(n);
     vector<uint64_t>* inverted_list = new vector<uint64_t>;
     for (i = 0; i < n; i++){
         input_stream >> x;
+        input_stream >> f;
         // (*inverted_list)[i] = x;
         inverted_list -> push_back(x);
     }
