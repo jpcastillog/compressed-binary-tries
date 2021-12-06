@@ -133,13 +133,18 @@ void read_inverted_index(string file_path) {
     for (uint64_t i = 0; i < u; ++i) {
     // for (uint64_t i = 0; i < 2000; ++i){
         uint64_t set_size;
+        uint64_t termId;
+
+        input_stream >> termId;
         input_stream >> set_size;
-        if (set_size >= 100000 && set_size != 50564) {
+        
+        if (set_size >= 100000) {
+        // if (set_size >= 100000 && set_size != 11242476) {
         // if (set_size != 50564) {    
             vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
             uint64_t max_value = (*il)[ set_size - 1];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
-            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, u);
             uint64_t uncompress_size = trie.size_in_bytes();
             trie.compress();
             // binTrie trie = binTrie(*il, max_value);
