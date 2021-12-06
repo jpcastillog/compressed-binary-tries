@@ -160,7 +160,7 @@ void read_inverted_index(string file_path) {
             cout << "height: " << trie.getHeight() << endl;
             cout << "n° elements: " << set_size << endl;
             cout << "uncompress size in bits: " << uncompress_size*8 << endl;
-            cout << "compress size in bits: " << uncompress_size*8 << endl;
+            cout << "compress size in bits: " << compress_size_trie*8 << endl;
             cout << "avg size uncompress: " << (float)(uncompress_size*8)/set_size << endl;
             cout << "avg size compress: " << (float)(compress_size_trie*8)/set_size << endl;
             cout << "--------------------------------------" << endl;
