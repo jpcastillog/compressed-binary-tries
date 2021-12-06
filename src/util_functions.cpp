@@ -145,7 +145,7 @@ void read_inverted_index(string file_path) {
             vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
             uint64_t max_value = (*il)[ set_size - 2];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
-            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, set_size);
+            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
             uint64_t uncompress_size = trie.size_in_bytes();
             trie.compress();
             // binTrie trie = binTrie(*il, max_value);
