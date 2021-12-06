@@ -121,8 +121,8 @@ void read_inverted_index(string file_path) {
         return;
     }
     uint64_t u;
-    input_stream >> u;
-    cout << "Universe: " << u << endl;
+    // input_stream >> u;
+    // cout << "Universe: " << u << endl;
     uint64_t total_size_tries = 0;
     uint64_t total_elements = 0;
     uint64_t number_inverted_list = 0;
@@ -130,7 +130,8 @@ void read_inverted_index(string file_path) {
     uint64_t total_size_tries_compress = 0;
 
     
-    for (uint64_t i = 0; i < u; ++i) {
+    // for (uint64_t i = 0; i < u; ++i) {
+    while ( !input_stream.eof() ){
     // for (uint64_t i = 0; i < 2000; ++i){
         uint64_t set_size;
         uint64_t termId;
@@ -142,9 +143,9 @@ void read_inverted_index(string file_path) {
         // if (set_size >= 100000 && set_size != 11242476) {
         // if (set_size != 50564) {    
             vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
-            uint64_t max_value = (*il)[ set_size - 1];
+            uint64_t max_value = (*il)[ set_size - 2];
             // cout << "max value: "<< (*il)[ set_size - 1] << endl;
-            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, u);
+            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, set_size);
             uint64_t uncompress_size = trie.size_in_bytes();
             trie.compress();
             // binTrie trie = binTrie(*il, max_value);
