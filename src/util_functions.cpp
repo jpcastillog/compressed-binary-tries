@@ -174,6 +174,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     std::vector<uint64_t> all_termsId = vector<uint64_t>(std::istream_iterator<uint64_t>(query_stream), 
                                         std::istream_iterator<uint64_t>() );
     query_stream.close();
+    
     cout << "total de terms id en querys (con duplicados): " << all_termsId.size() << endl;
     std::sort(all_termsId.begin(), all_termsId.end());
     all_termsId.erase( unique( all_termsId.begin(), all_termsId.end() ), all_termsId.end() );
@@ -205,11 +206,12 @@ void performQueryLog(string query_log_path, string ii_path) {
     std::string line;
     uint64_t max_number_of_sets = 0;
     uint64_t number_of_queries = 0;
-    while ( getline( query_stream, line ) ) {
+    while ( getline( query_log_stream, line ) ) {
         vector <flatBinTrie<rank_support_v5<1>>> Bs;
         std::istringstream is( line );
         vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
-                                                            std::istream_iterator<int>() );
+                                                        std::istream_iterator<int>()
+                                                        );
         if (termsId.size() <= 16) {
             for (uint16_t i = 0; i < termsId.size(); ++i){
                 Bs.push_back(tries[i]);
@@ -220,7 +222,7 @@ void performQueryLog(string query_log_path, string ii_path) {
             result = joinTries<rank_support_v5<1>>(Bs, true);
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-             cout << "i: " << number_of_queries << " |Time execution: " << elapsed.count() << "[ms]" << endl; 
+            cout << "i: " << number_of_queries << " |Time execution: " << elapsed.count() << "[ms]" << endl; 
             number_of_queries++;
         }
         // if (termsId.size() > max_number_of_sets) {
@@ -238,7 +240,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     cout << "Número total de queries: " << number_of_queries << endl;
 
 
-    query_stream.close();
+    query_log_stream.close();
     ii_stream.close();
 
 }
