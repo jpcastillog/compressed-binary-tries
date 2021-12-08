@@ -227,6 +227,7 @@ void performQueryLog(string query_log_path, string ii_path) {
 
     std::string line;
     uint64_t max_number_of_sets = 0;
+    uint64_t number_of_queries = 0;
     while ( getline( query_stream, line ) ) {
         std::istringstream is( line );
         vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
@@ -239,6 +240,7 @@ void performQueryLog(string query_log_path, string ii_path) {
             cout << termsId[i] << " ";
         }
         cout << endl;
+        number_of_queries++;
     }
     cout << "---------------------------------------" << endl;
     cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
