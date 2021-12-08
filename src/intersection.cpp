@@ -495,7 +495,7 @@ void notCompressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_
 }
 
 template<class rankType>
-flatBinTrie<rankType> joinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed) {
+flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed) {
     
     uint16_t max_level = 0;
     for (uint16_t i = 0; i < Bs.size(); ++i) {
@@ -516,9 +516,9 @@ flatBinTrie<rankType> joinTries(vector<flatBinTrie<rankType>> &Bs, bool compress
         notCompressedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level);
     }
     
-    flatBinTrie<rankType> result (ones_to_write, max_level, last_pos, compressed);
+    flatBinTrie<rankType>* result = new flatBinTrie<rankType>(ones_to_write, max_level, last_pos, compressed);
 
     return result;
 }
-template flatBinTrie<rank_support_v5<1>> joinTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool compressed);
-template flatBinTrie<rank_support_v<1>> joinTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool compressed);
+template flatBinTrie<rank_support_v5<1>>* joinTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool compressed);
+template flatBinTrie<rank_support_v<1>>* joinTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool compressed);

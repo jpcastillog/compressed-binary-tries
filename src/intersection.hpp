@@ -18,7 +18,7 @@ binTrie intersectTriesV2(vector<binTrie> &Bs);
 // flatBinTrie<rankType> intersectFlatTries(vector<flatBinTrie<rankType>> &Bs, bool compressed);
 
 template<class rankType>
-flatBinTrie<rankType> joinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed);
+flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed);
 
 
 #endif

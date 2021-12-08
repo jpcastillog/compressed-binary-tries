@@ -225,13 +225,13 @@ void performQueryLog(string query_log_path, string ii_path) {
                 Bs.push_back(tries[termsId[i]]);
             }
 
-            flatBinTrie<rank_support_v5<1>> result;
+            flatBinTrie<rank_support_v5<1>>* result;
             auto start = std::chrono::high_resolution_clock::now();
             result = joinTries<rank_support_v5<1>>(Bs, true);
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
             total_time += elapsed.count();
-            cout << "i: " << number_of_queries << " |Time execution: " << (float)elapsed.count()*10e-6 << "[ms]" << endl; 
+            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)elapsed.count()*10e-6 << "[ms]" << endl; 
             number_of_queries++;
         }
         // if (termsId.size() > max_number_of_sets) {
@@ -247,7 +247,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     cout << "---------------------------------------" << endl;
     // cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
     cout << "Número total de queries: " << number_of_queries << endl;
-    cout << "Tiempo promedio:" << (float)(total_time*10e-6)/number_of_queries << endl;
+    cout << "Tiempo promedio:" << (float)(total_time*10e-6)/number_of_queries << "[ms]" << endl;
 
 
     query_log_stream.close();
