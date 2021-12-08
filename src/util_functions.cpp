@@ -241,6 +241,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     cout << "total de terms id en querys (con duplicados): " << all_termsId.size() << endl;
     std::sort(all_termsId.begin(), all_termsId.end());
     all_termsId.erase( unique( all_termsId.begin(), all_termsId.end() ), all_termsId.end() );
+    cout << "numero total de terms id (sin duplicar): " << all_termsId.size() << endl;
 
     map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries;
     uint64_t n_il = 0;
@@ -256,6 +257,7 @@ void performQueryLog(string query_log_path, string ii_path) {
             flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
             trie.compress();
             tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie));
+            delete il;
             n_il++;
         }
         else{
@@ -263,8 +265,6 @@ void performQueryLog(string query_log_path, string ii_path) {
         }
         
     }
-
-    cout << "numero total de terms id: " << all_termsId.size() << endl;
 
     // std::string line;
     // uint64_t max_number_of_sets = 0;
