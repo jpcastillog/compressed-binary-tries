@@ -7,6 +7,9 @@
 #include <fstream>
 #include <limits>
 #include <queue>
+#include "intersection.hpp"
+#include <chrono>
+
 
 
 bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
@@ -27,74 +30,6 @@ bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
     cout << "All elements are equal" << endl;
     return true;
 }
-
-
-// void decodeBinTrie(binTrie &b, vector<uint64_t> &decoded, bit_vector partial_result,
-//                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
-   
-//     if (curr_level == max_level) {
-//         uint64_t number = 0;
-//         for (uint16_t i = 0; i <  b.getHeight(); ++i) {
-//             number += partial_result[i]*pow(2, i);  
-//         }
-//         decoded.push_back(number);
-//         return;
-//     }
-
-//     bit_vector node = b.getNode(node_id, curr_level);
-//     uint16_t next_level = curr_level + 1;
-
-//     bit_vector leftResult  = partial_result;
-//     bit_vector rightResult = partial_result;
-
-//     if (node[0] == 1) {
-//         leftResult[b.getHeight() - curr_level - 1] = 0; 
-//         uint64_t left_child = b.getLeftChild(node_id, curr_level);
-//         decodeBinTrie(b, decoded, leftResult, left_child, next_level, max_level);
-//     }
-
-//     if (node[1] == 1) {
-//         rightResult[b.getHeight() - curr_level - 1] = 1;
-//         uint64_t right_child = b.getRightChild(node_id, curr_level);
-//         decodeBinTrie(b, decoded, rightResult, right_child, next_level, max_level);
-//     }
-// }
-
-
-// template <class rankType>
-// void decodeBinTrie(flatBinTrie<rankType> &b, vector<uint64_t> &decoded, bit_vector partial_result,
-//                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
-//     if (curr_level == max_level) {
-//         uint64_t number = 0;
-//         for (uint16_t i = 0; i <  b.getHeight(); ++i) {
-//             number += partial_result[i]*pow(2, i);  
-//         }
-//         decoded.push_back(number);
-//         return;
-//     }
-
-//     bit_vector node = b.getNode(node_id);
-//     uint16_t next_level = curr_level + 1;
-
-//     bit_vector leftResult  = partial_result;
-//     bit_vector rightResult = partial_result;
-
-//     if (node[0] == 1) {
-//         leftResult[b.getHeight() - curr_level - 1] = 0;
-//         uint64_t left_child = b.getLeftChild(node_id);
-//         decodeBinTrie(b, decoded, leftResult, left_child, next_level, max_level);
-//     }
-
-//     if (node[1] == 1) {
-//         rightResult[b.getHeight() - curr_level - 1] = 1;
-//         uint64_t right_child = b.getRightChild(node_id);
-//         decodeBinTrie(b, decoded, rightResult, right_child, next_level, max_level);
-//     }
-// }
-// template void decodeBinTrie<rank_support_v5<1>>(flatBinTrie<rank_support_v5<1>> &b, vector<uint64_t> &decoded, bit_vector partial_result,
-//                                                 uint64_t node_id, uint16_t curr_level, uint16_t max_level);
-// template void decodeBinTrie<rank_support_v<1>>(flatBinTrie<rank_support_v<1>> &b, vector<uint64_t> &decoded, bit_vector partial_result,
-//                                                 uint64_t node_id, uint16_t curr_level, uint16_t max_level);
 
 
 std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
@@ -238,6 +173,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     // Get all terms of queries
     std::vector<uint64_t> all_termsId = vector<uint64_t>(std::istream_iterator<uint64_t>(query_stream), 
                                         std::istream_iterator<uint64_t>() );
+    query_stream.close();
     cout << "total de terms id en querys (con duplicados): " << all_termsId.size() << endl;
     std::sort(all_termsId.begin(), all_termsId.end());
     all_termsId.erase( unique( all_termsId.begin(), all_termsId.end() ), all_termsId.end() );
@@ -263,30 +199,43 @@ void performQueryLog(string query_log_path, string ii_path) {
         else{
             ii_stream.ignore(numeric_limits<streamsize>::max(), '\n');
         }
-        
     }
 
-    // std::string line;
-    // uint64_t max_number_of_sets = 0;
-    // uint64_t number_of_queries = 0;
-    // while ( getline( query_stream, line ) ) {
+    std::ifstream query_log_stream(query_log_path);
+    std::string line;
+    uint64_t max_number_of_sets = 0;
+    uint64_t number_of_queries = 0;
+    while ( getline( query_stream, line ) ) {
+        vector <flatBinTrie<rank_support_v5<1>>> Bs;
+        std::istringstream is( line );
+        vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
+                                                            std::istream_iterator<int>() );
+        if (termsId.size() <= 16) {
+            for (uint16_t i = 0; i < termsId.size(); ++i){
+                Bs.push_back(tries[i]);
+            }
 
-    //     std::istringstream is( line );
-    //     vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
-    //                                                   std::istream_iterator<int>() );
-    //     if (termsId.size() > max_number_of_sets) {
-    //         max_number_of_sets = termsId.size();
-    //     }                                              
-    //     cout << "Number of sets: " << termsId.size() << " ";
-    //     for (uint16_t i= 0; i < termsId.size(); ++i) {
-    //         cout << termsId[i] << " ";
-    //     }
-    //     cout << endl;
-    //     number_of_queries++;
-    // }
-    // cout << "---------------------------------------" << endl;
+            flatBinTrie<rank_support_v5<1>> result;
+            auto start = std::chrono::high_resolution_clock::now();
+            result = joinTries<rank_support_v5<1>>(Bs, true);
+            auto end = std::chrono::high_resolution_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+             cout << "i: " << number_of_queries << " |Time execution: " << elapsed.count() << "[ms]" << endl; 
+            number_of_queries++;
+        }
+        // if (termsId.size() > max_number_of_sets) {
+        //     max_number_of_sets = termsId.size();
+        // }                                              
+        // cout << "Number of sets: " << termsId.size() << " ";
+        // for (uint16_t i= 0; i < termsId.size(); ++i) {
+        //     cout << termsId[i] << " ";
+        // }
+        // cout << endl;
+        // number_of_queries++;
+    }
+    cout << "---------------------------------------" << endl;
     // cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
-    // cout << "Número total de queries: " << number_of_queries << endl;
+    cout << "Número total de queries: " << number_of_queries << endl;
 
 
     query_stream.close();
