@@ -231,7 +231,7 @@ void performQueryLog(string query_log_path, string ii_path) {
         vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
                                                       std::istream_iterator<int>() );
         cout << "Number of sets: " << termsId.size() << " ";
-        for (uint16_t i; i < termsId.size(); ++i) {
+        for (uint16_t i= 0; i < termsId.size(); ++i) {
             cout << termsId[i] << " ";
         }
         cout << endl;
