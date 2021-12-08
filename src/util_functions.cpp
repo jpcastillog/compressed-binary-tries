@@ -244,5 +244,6 @@ void performQueryLog(string query_log_path, string ii_path) {
     }
     cout << "---------------------------------------" << endl;
     cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
+    cout << "Número total de queries: " << number_of_queries << endl;
 
 }
