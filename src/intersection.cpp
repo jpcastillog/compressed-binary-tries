@@ -349,8 +349,8 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     uint16_t next_level = curr_level + 1;
     uint64_t pos_next_level_before = last_pos[next_level];;
 
-    uint64_t left_nodes[16]  = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    uint64_t right_nodes[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint64_t left_nodes[16];
+    uint64_t right_nodes[16];
 
     bool exist_lchild;
     bool exist_rchild;
@@ -358,7 +358,8 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     // Left child
     if (left_one) {
         for (uint64_t i = 0; i < n_tries; ++i) {
-			left_nodes[i] = Bs[i].getLeftChild(roots[i]);
+            if (activeTries[i])
+			    left_nodes[i] = Bs[i].getLeftChild(roots[i]);
 		}
         compressedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
     }
@@ -375,11 +376,12 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     // Right child
     if (right_one) {
         for (uint64_t i = 0; i < n_tries; ++i) {
-            if (left_one) {
+            if (left_one && activeTries[i]) {
                 right_nodes[i] = left_nodes[i] + 1;
             }
             else {
-                right_nodes[i] = Bs[i].getRightChild(roots[i]);
+                if (activeTries[i])
+                    right_nodes[i] = Bs[i].getRightChild(roots[i]);
             } 
         }
         compressedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
