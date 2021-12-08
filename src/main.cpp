@@ -107,11 +107,11 @@ int main() {
 //     vector < flatBinTrie<rank_support_v5<1>> > Bs = {trie_s1, trie_s2, trie_s3};
 //     flatBinTrie<rank_support_v5<1>> result;
 //     // result = intersectFlatTries<rank_support_v5<1>>(Bs);
-//     result = compressJoinTries<rank_support_v5<1>>(Bs, true);
+//     result = joinTries<rank_support_v5<1>>(Bs, true);
+
 
 //     cout << "-------------intersection trie-------------" << endl;
 //     result.print();
-//     cout << *(result.bTrie)<< endl;
     
 //     // bit_vector partial_result = bit_vector(result.getHeight(), 0);
 //     vector<uint64_t> result_decoded;

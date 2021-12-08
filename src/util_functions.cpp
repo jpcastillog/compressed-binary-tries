@@ -28,72 +28,72 @@ bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
 }
 
 
-void decodeBinTrie(binTrie &b, vector<uint64_t> &decoded, bit_vector partial_result,
-                   uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
+// void decodeBinTrie(binTrie &b, vector<uint64_t> &decoded, bit_vector partial_result,
+//                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
    
-    if (curr_level == max_level) {
-        uint64_t number = 0;
-        for (uint16_t i = 0; i <  b.getHeight(); ++i) {
-            number += partial_result[i]*pow(2, i);  
-        }
-        decoded.push_back(number);
-        return;
-    }
+//     if (curr_level == max_level) {
+//         uint64_t number = 0;
+//         for (uint16_t i = 0; i <  b.getHeight(); ++i) {
+//             number += partial_result[i]*pow(2, i);  
+//         }
+//         decoded.push_back(number);
+//         return;
+//     }
 
-    bit_vector node = b.getNode(node_id, curr_level);
-    uint16_t next_level = curr_level + 1;
+//     bit_vector node = b.getNode(node_id, curr_level);
+//     uint16_t next_level = curr_level + 1;
 
-    bit_vector leftResult  = partial_result;
-    bit_vector rightResult = partial_result;
+//     bit_vector leftResult  = partial_result;
+//     bit_vector rightResult = partial_result;
 
-    if (node[0] == 1) {
-        leftResult[b.getHeight() - curr_level - 1] = 0; 
-        uint64_t left_child = b.getLeftChild(node_id, curr_level);
-        decodeBinTrie(b, decoded, leftResult, left_child, next_level, max_level);
-    }
+//     if (node[0] == 1) {
+//         leftResult[b.getHeight() - curr_level - 1] = 0; 
+//         uint64_t left_child = b.getLeftChild(node_id, curr_level);
+//         decodeBinTrie(b, decoded, leftResult, left_child, next_level, max_level);
+//     }
 
-    if (node[1] == 1) {
-        rightResult[b.getHeight() - curr_level - 1] = 1;
-        uint64_t right_child = b.getRightChild(node_id, curr_level);
-        decodeBinTrie(b, decoded, rightResult, right_child, next_level, max_level);
-    }
-}
+//     if (node[1] == 1) {
+//         rightResult[b.getHeight() - curr_level - 1] = 1;
+//         uint64_t right_child = b.getRightChild(node_id, curr_level);
+//         decodeBinTrie(b, decoded, rightResult, right_child, next_level, max_level);
+//     }
+// }
 
 
-template <class rankType>
-void decodeBinTrie(flatBinTrie<rankType> &b, vector<uint64_t> &decoded, bit_vector partial_result,
-                   uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
-    if (curr_level == max_level) {
-        uint64_t number = 0;
-        for (uint16_t i = 0; i <  b.getHeight(); ++i) {
-            number += partial_result[i]*pow(2, i);  
-        }
-        decoded.push_back(number);
-        return;
-    }
+// template <class rankType>
+// void decodeBinTrie(flatBinTrie<rankType> &b, vector<uint64_t> &decoded, bit_vector partial_result,
+//                    uint64_t node_id, uint16_t curr_level, uint16_t max_level) {
+//     if (curr_level == max_level) {
+//         uint64_t number = 0;
+//         for (uint16_t i = 0; i <  b.getHeight(); ++i) {
+//             number += partial_result[i]*pow(2, i);  
+//         }
+//         decoded.push_back(number);
+//         return;
+//     }
 
-    bit_vector node = b.getNode(node_id);
-    uint16_t next_level = curr_level + 1;
+//     bit_vector node = b.getNode(node_id);
+//     uint16_t next_level = curr_level + 1;
 
-    bit_vector leftResult  = partial_result;
-    bit_vector rightResult = partial_result;
+//     bit_vector leftResult  = partial_result;
+//     bit_vector rightResult = partial_result;
 
-    if (node[0] == 1) {
-        leftResult[b.getHeight() - curr_level - 1] = 0;
-        uint64_t left_child = b.getLeftChild(node_id);
-        decodeBinTrie(b, decoded, leftResult, left_child, next_level, max_level);
-    }
+//     if (node[0] == 1) {
+//         leftResult[b.getHeight() - curr_level - 1] = 0;
+//         uint64_t left_child = b.getLeftChild(node_id);
+//         decodeBinTrie(b, decoded, leftResult, left_child, next_level, max_level);
+//     }
 
-    if (node[1] == 1) {
-        rightResult[b.getHeight() - curr_level - 1] = 1;
-        uint64_t right_child = b.getRightChild(node_id);
-        decodeBinTrie(b, decoded, rightResult, right_child, next_level, max_level);
-    }
-}
-template void decodeBinTrie<rank_support_v5<1>>(flatBinTrie<rank_support_v5<1>> &b, vector<uint64_t> &decoded, bit_vector partial_result,
-                                                uint64_t node_id, uint16_t curr_level, uint16_t max_level);
-template void decodeBinTrie<rank_support_v<1>>(flatBinTrie<rank_support_v<1>> &b, vector<uint64_t> &decoded, bit_vector partial_result,
-                                                uint64_t node_id, uint16_t curr_level, uint16_t max_level);
+//     if (node[1] == 1) {
+//         rightResult[b.getHeight() - curr_level - 1] = 1;
+//         uint64_t right_child = b.getRightChild(node_id);
+//         decodeBinTrie(b, decoded, rightResult, right_child, next_level, max_level);
+//     }
+// }
+// template void decodeBinTrie<rank_support_v5<1>>(flatBinTrie<rank_support_v5<1>> &b, vector<uint64_t> &decoded, bit_vector partial_result,
+//                                                 uint64_t node_id, uint16_t curr_level, uint16_t max_level);
+// template void decodeBinTrie<rank_support_v<1>>(flatBinTrie<rank_support_v<1>> &b, vector<uint64_t> &decoded, bit_vector partial_result,
+//                                                 uint64_t node_id, uint16_t curr_level, uint16_t max_level);
 
 
 std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
@@ -148,13 +148,13 @@ void read_inverted_index(string file_path) {
             flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
             uint64_t uncompress_size = trie.size_in_bytes();
             trie.compress();
-            // binTrie trie = binTrie(*il, max_value);
-            // cout << "se creo el trie" << endl;
-            // vector<uint64_t> decoded;
+            vector<uint64_t> decoded;
+            trie.decode(decoded);
+            
             // bit_vector p_result(trie.getHeight(), 0);
             // decodeBinTrie(trie, decoded, p_result, 0, 0, trie.getHeight());
             // cout << "paso decode" << endl;
-            // compareVectors(*il, decoded);
+            compareVectors(*il, decoded);
             // cout << "paso compare" << endl;
             uint64_t compress_size_trie = trie.size_in_bytes();
             cout << "height: " << trie.getHeight() << endl;

@@ -14,11 +14,11 @@ binTrie intersectTries(vector<binTrie> &Bs);
 
 binTrie intersectTriesV2(vector<binTrie> &Bs);
 
-template<class rankType>
-flatBinTrie<rankType> intersectFlatTries(vector<flatBinTrie<rankType>> &Bs, bool compressed);
+// template<class rankType>
+// flatBinTrie<rankType> intersectFlatTries(vector<flatBinTrie<rankType>> &Bs, bool compressed);
 
 template<class rankType>
-flatBinTrie<rankType> compressJoinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed);
+flatBinTrie<rankType> joinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed);
 
 
 #endif

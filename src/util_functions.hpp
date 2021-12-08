@@ -4,10 +4,10 @@
 #include "binTrie.hpp"
 #include "flatBinTrie.hpp"
 
-void decodeBinTrie(binTrie &b, vector<uint64_t> &decoded, bit_vector partial_result, uint64_t node_id, uint16_t curr_level, uint16_t max_level);
+// void decodeBinTrie(binTrie &b, vector<uint64_t> &decoded, bit_vector partial_result, uint64_t node_id, uint16_t curr_level, uint16_t max_level);
 
-template<class rankType>
-void decodeBinTrie(flatBinTrie<rankType> &b, vector<uint64_t> &decoded, bit_vector partial_result, uint64_t node_id, uint16_t curr_level, uint16_t max_level);
+// template<class rankType>
+// void decodeBinTrie(flatBinTrie<rankType> &b, vector<uint64_t> &decoded, bit_vector partial_result, uint64_t node_id, uint16_t curr_level, uint16_t max_level);
 
 vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n);
 
