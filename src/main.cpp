@@ -14,8 +14,8 @@ int main() {
     // string file_path = "./../../../../data/bitvectors/ii/gov2/url/gov2_ii_nofreq_url_dif.txt.B";
     string file_path = "./../../../..//data/GOV2/index/ii/absDocIDS/gov2_url_absolute_freqs.ii";
     string  query_path = "./../../../../data/GOV2/index/queries/queries_gov2.txt";
-    // performQueryLog(query_path, file_path);
-    read_inverted_index(file_path);
+    performQueryLog(query_path, file_path);
+    // read_inverted_index(file_path);
 }
 
 // int main() {
