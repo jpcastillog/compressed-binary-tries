@@ -181,7 +181,8 @@ void performQueryLog(string query_log_path, string ii_path) {
     cout << "numero total de terms id (sin duplicar): " << all_termsId.size() << endl;
 
     // Indexing inverted lists
-    map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries;
+    // map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries;
+    map<uint64_t, flatBinTrie<rank_support_v<1>>> tries;
     uint64_t n_il = 0;
     while (!ii_stream.eof() && n_il < all_termsId.size()) {
         uint64_t termId;
@@ -192,9 +193,11 @@ void performQueryLog(string query_log_path, string ii_path) {
         if (all_termsId[n_il] == termId) {
             vector<uint64_t> *il = read_inverted_list(ii_stream, n);
             uint64_t max_value = (*il)[ n - 2];
-            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+            // flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+            flatBinTrie<rank_support_v<1>> trie = flatBinTrie<rank_support_v<1>>(*il, max_value);
             trie.compress();
-            tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie));
+            // tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie));
+            tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie));
             delete il;
             n_il++;
         }
@@ -215,7 +218,8 @@ void performQueryLog(string query_log_path, string ii_path) {
     uint64_t number_of_queries = 0;
     uint64_t total_time = 0;
     while ( getline( query_log_stream, line ) ) {
-        vector <flatBinTrie<rank_support_v5<1>>> Bs;
+        // vector <flatBinTrie<rank_support_v5<1>>> Bs;
+        vector <flatBinTrie<rank_support_v<1>>> Bs;
         std::istringstream is( line );
         vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
                                                         std::istream_iterator<int>()
@@ -225,9 +229,11 @@ void performQueryLog(string query_log_path, string ii_path) {
                 Bs.push_back(tries[termsId[i]]);
             }
 
-            flatBinTrie<rank_support_v5<1>>* result;
+            // flatBinTrie<rank_support_v5<1>>* result;
+            flatBinTrie<rank_support_v<1>>* result;
             auto start = std::chrono::high_resolution_clock::now();
-            result = joinTries<rank_support_v5<1>>(Bs, true);
+            // result = joinTries<rank_support_v5<1>>(Bs, true);
+            result = joinTries<rank_support_v<1>>(Bs, true);
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
             total_time += elapsed.count();
