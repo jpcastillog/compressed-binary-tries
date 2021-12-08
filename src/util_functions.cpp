@@ -5,6 +5,7 @@
 #include <sdsl/bit_vectors.hpp>
 #include <math.h>
 #include <fstream>
+#include <limits>
 #include <queue>
 
 
@@ -140,6 +141,7 @@ void read_inverted_index(string file_path) {
         input_stream >> set_size;
         
         if (set_size >= 4096) {
+            cout << "termId: " << termId << endl;
         // if (set_size >= 100000 && set_size != 11242476) {
         // if (set_size != 50564) {    
             vector<uint64_t> *il = read_inverted_list(input_stream, set_size);
@@ -211,6 +213,15 @@ void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64
 }
 
 
+std::fstream& GotoLine(std::fstream& file, unsigned int num){
+    file.seekg(std::ios::beg);
+    for(int i=0; i < num - 1; ++i){
+        file.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+    }
+    return file;
+}
+
+
 void performQueryLog(string query_log_path, string ii_path) {
     std::ifstream query_stream(query_log_path);
     std::ifstream ii_stream(ii_path);
@@ -245,5 +256,8 @@ void performQueryLog(string query_log_path, string ii_path) {
     cout << "---------------------------------------" << endl;
     cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
     cout << "Número total de queries: " << number_of_queries << endl;
+
+    query_stream.close();
+    ii_stream.close();
 
 }
