@@ -235,11 +235,40 @@ void performQueryLog(string query_log_path, string ii_path) {
         cout << "Can't open inverted index file: " << ii_path << endl;
         return;
     }
+    // Get all terms of queries
+    std::vector<uint64_t> all_termsId = vector<uint64_t>(std::istream_iterator<uint64_t>(query_stream), 
+                                        std::istream_iterator<uint64_t>() );
+
+    std::sort(all_termsId.begin(), all_termsId.end());
+    all_termsId.erase( unique( all_termsId.begin(), all_termsId.end() ), all_termsId.end() );
+
+    map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries;
+    uint64_t n_il = 0;
+    while (!ii_stream.eof() && n_il < all_termsId.size()) {
+        uint64_t termId;
+        uint64_t n;
+
+        ii_stream >> termId;
+        ii_stream >> n;
+        if (all_termsId[n_il] == termId) {
+            vector<uint64_t> *il = read_inverted_list(ii_stream, n);
+            uint64_t max_value = (*il)[ n - 2];
+            flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+            trie.compress();
+            tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie));
+            n_il++;
+        }
+        else{
+            ii_stream.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        
+    }
 
     std::string line;
     uint64_t max_number_of_sets = 0;
     uint64_t number_of_queries = 0;
     while ( getline( query_stream, line ) ) {
+
         std::istringstream is( line );
         vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
                                                       std::istream_iterator<int>() );
@@ -256,6 +285,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     cout << "---------------------------------------" << endl;
     cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
     cout << "Número total de queries: " << number_of_queries << endl;
+
 
     query_stream.close();
     ii_stream.close();
