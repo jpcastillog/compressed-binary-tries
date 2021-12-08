@@ -209,3 +209,32 @@ void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64
     }
     
 }
+
+
+void performQueryLog(string query_log_path, string ii_path) {
+    std::ifstream query_stream(query_log_path);
+    std::ifstream ii_stream(ii_path);
+
+    if (!query_stream.is_open()) {
+        cout << "Can't open queries file: " << query_log_path << endl;
+        return;
+    }
+
+    if (!ii_stream.is_open()) {
+        cout << "Can't open inverted index file: " << ii_path << endl;
+        return;
+    }
+
+    std::string line;
+    while ( getline( query_stream, line ) ) {
+        std::istringstream is( line );
+        vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
+                                                      std::istream_iterator<int>() );
+        cout << "Number of sets: " << termsId.size() << " ";
+        for (uint16_t i; i < termsId.size(); ++i) {
+            cout << termsId[i] << " ";
+        }
+        cout << endl;
+    }
+
+}
