@@ -238,7 +238,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     // Get all terms of queries
     std::vector<uint64_t> all_termsId = vector<uint64_t>(std::istream_iterator<uint64_t>(query_stream), 
                                         std::istream_iterator<uint64_t>() );
-
+    cout << "total de terms id en querys (con duplicados): " << all_termsId.size() << endl;
     std::sort(all_termsId.begin(), all_termsId.end());
     all_termsId.erase( unique( all_termsId.begin(), all_termsId.end() ), all_termsId.end() );
 
@@ -264,27 +264,29 @@ void performQueryLog(string query_log_path, string ii_path) {
         
     }
 
-    std::string line;
-    uint64_t max_number_of_sets = 0;
-    uint64_t number_of_queries = 0;
-    while ( getline( query_stream, line ) ) {
+    cout << "numero total de terms id: " << all_termsId.size() << endl;
 
-        std::istringstream is( line );
-        vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
-                                                      std::istream_iterator<int>() );
-        if (termsId.size() > max_number_of_sets) {
-            max_number_of_sets = termsId.size();
-        }                                              
-        cout << "Number of sets: " << termsId.size() << " ";
-        for (uint16_t i= 0; i < termsId.size(); ++i) {
-            cout << termsId[i] << " ";
-        }
-        cout << endl;
-        number_of_queries++;
-    }
-    cout << "---------------------------------------" << endl;
-    cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
-    cout << "Número total de queries: " << number_of_queries << endl;
+    // std::string line;
+    // uint64_t max_number_of_sets = 0;
+    // uint64_t number_of_queries = 0;
+    // while ( getline( query_stream, line ) ) {
+
+    //     std::istringstream is( line );
+    //     vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
+    //                                                   std::istream_iterator<int>() );
+    //     if (termsId.size() > max_number_of_sets) {
+    //         max_number_of_sets = termsId.size();
+    //     }                                              
+    //     cout << "Number of sets: " << termsId.size() << " ";
+    //     for (uint16_t i= 0; i < termsId.size(); ++i) {
+    //         cout << termsId[i] << " ";
+    //     }
+    //     cout << endl;
+    //     number_of_queries++;
+    // }
+    // cout << "---------------------------------------" << endl;
+    // cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
+    // cout << "Número total de queries: " << number_of_queries << endl;
 
 
     query_stream.close();
