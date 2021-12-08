@@ -226,15 +226,21 @@ void performQueryLog(string query_log_path, string ii_path) {
     }
 
     std::string line;
+    uint64_t max_number_of_sets = 0;
     while ( getline( query_stream, line ) ) {
         std::istringstream is( line );
         vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
                                                       std::istream_iterator<int>() );
+        if (termsId.size() > max_number_of_sets) {
+            max_number_of_sets = termsId.size();
+        }                                              
         cout << "Number of sets: " << termsId.size() << " ";
         for (uint16_t i= 0; i < termsId.size(); ++i) {
             cout << termsId[i] << " ";
         }
         cout << endl;
     }
+    cout << "---------------------------------------" << endl;
+    cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
 
 }
