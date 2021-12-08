@@ -174,12 +174,13 @@ void performQueryLog(string query_log_path, string ii_path) {
     std::vector<uint64_t> all_termsId = vector<uint64_t>(std::istream_iterator<uint64_t>(query_stream), 
                                         std::istream_iterator<uint64_t>() );
     query_stream.close();
-    
+
     cout << "total de terms id en querys (con duplicados): " << all_termsId.size() << endl;
     std::sort(all_termsId.begin(), all_termsId.end());
     all_termsId.erase( unique( all_termsId.begin(), all_termsId.end() ), all_termsId.end() );
     cout << "numero total de terms id (sin duplicar): " << all_termsId.size() << endl;
 
+    // Indexing inverted lists
     map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries;
     uint64_t n_il = 0;
     while (!ii_stream.eof() && n_il < all_termsId.size()) {
@@ -202,7 +203,13 @@ void performQueryLog(string query_log_path, string ii_path) {
         }
     }
 
+    // Procesing queries
     std::ifstream query_log_stream(query_log_path);
+    if (!query_log_stream.is_open()) {
+        cout << "Can't open queries file: " << query_log_path << endl;
+        return;
+    }
+
     std::string line;
     uint64_t max_number_of_sets = 0;
     uint64_t number_of_queries = 0;
@@ -212,9 +219,9 @@ void performQueryLog(string query_log_path, string ii_path) {
         vector <uint64_t> termsId = std::vector<uint64_t>( std::istream_iterator<int>(is),
                                                         std::istream_iterator<int>()
                                                         );
-        if (termsId.size() <= 16) {
+        if (termsId.size() <= 16 && termsId.size() > 1) {
             for (uint16_t i = 0; i < termsId.size(); ++i){
-                Bs.push_back(tries[i]);
+                Bs.push_back(tries[termsId[i]]);
             }
 
             flatBinTrie<rank_support_v5<1>> result;
