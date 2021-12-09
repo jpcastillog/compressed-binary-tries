@@ -358,7 +358,7 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     // Left child
     if (left_one) {
         for (uint64_t i = 0; i < n_tries; ++i) {
-            if (activeTries[i])
+            // if (activeTries[i])
 			    left_nodes[i] = Bs[i].getLeftChild(roots[i]);
 		}
         compressedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
@@ -376,11 +376,11 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     // Right child
     if (right_one) {
         for (uint64_t i = 0; i < n_tries; ++i) {
-            if (left_one && activeTries[i]) {
+            if (left_one) {
                 right_nodes[i] = left_nodes[i] + 1;
             }
             else {
-                if (activeTries[i])
+                // if (activeTries[i])
                     right_nodes[i] = Bs[i].getRightChild(roots[i]);
             } 
         }
@@ -497,7 +497,7 @@ void notCompressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_
 }
 
 template<class rankType>
-flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed) {
+flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed, uint64_t &time) {
     
     uint16_t max_level = 0;
     for (uint16_t i = 0; i < Bs.size(); ++i) {
@@ -511,6 +511,8 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compres
     vector<uint64_t> ones_to_write[max_level];
     vector<uint64_t> nodes_per_level(max_level, 0);
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     if (compressed) {
         compressedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level, activeTries);
     }
@@ -518,9 +520,14 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compres
         notCompressedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level);
     }
     
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    time = elapsed.count();
+    cout <<"|Time execution: " << (float)time*10e-6 << "[ms]" << endl;
+
     flatBinTrie<rankType>* result = new flatBinTrie<rankType>(ones_to_write, max_level, last_pos, compressed);
 
     return result;
 }
-template flatBinTrie<rank_support_v5<1>>* joinTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool compressed);
-template flatBinTrie<rank_support_v<1>>* joinTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool compressed);
+template flatBinTrie<rank_support_v5<1>>* joinTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool compressed, uint64_t &time);
+template flatBinTrie<rank_support_v<1>>* joinTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool compressed, uint64_t &time);

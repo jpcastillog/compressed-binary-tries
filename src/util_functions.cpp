@@ -231,13 +231,16 @@ void performQueryLog(string query_log_path, string ii_path) {
 
             // flatBinTrie<rank_support_v5<1>>* result;
             flatBinTrie<rank_support_v<1>>* result;
-            auto start = std::chrono::high_resolution_clock::now();
+            // auto start = std::chrono::high_resolution_clock::now();
             // result = joinTries<rank_support_v5<1>>(Bs, true);
-            result = joinTries<rank_support_v<1>>(Bs, true);
-            auto end = std::chrono::high_resolution_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-            total_time += elapsed.count();
-            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)elapsed.count()*10e-6 << "[ms]" << endl; 
+            uint64_t time;
+            result = joinTries<rank_support_v<1>>(Bs, true, time);
+            // auto end = std::chrono::high_resolution_clock::now();
+            // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+            // total_time += elapsed.count();
+            total_time += time;
+            // cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)elapsed.count()*10e-6 << "[ms]" << endl;
+            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" << endl; 
             number_of_queries++;
         }
         // if (termsId.size() > max_number_of_sets) {

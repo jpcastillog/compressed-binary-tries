@@ -107,18 +107,18 @@ int main() {
 //     trie_s3.print();
 
 //     vector < flatBinTrie<rank_support_v5<1>> > Bs = {trie_s1, trie_s2, trie_s3};
-//     flatBinTrie<rank_support_v5<1>> result;
+//     flatBinTrie<rank_support_v5<1>>* result;
 //     // result = intersectFlatTries<rank_support_v5<1>>(Bs);
 //     result = joinTries<rank_support_v5<1>>(Bs, true);
 
 
 //     cout << "-------------intersection trie-------------" << endl;
-//     result.print();
+//     result->print();
     
 //     // bit_vector partial_result = bit_vector(result.getHeight(), 0);
 //     vector<uint64_t> result_decoded;
 //     // decodeBinTrie<rank_support_v5<1>>(result, result_decoded, partial_result, 0, 0, result.getHeight());
-//     result.decode(result_decoded);
+//     result->decode(result_decoded);
 //     cout << "Intersection Binary Implementation: ";
 //     for (uint64_t i = 0; i < result_decoded.size(); ++i) {
 //         cout << result_decoded[i] << " ";
