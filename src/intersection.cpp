@@ -349,8 +349,8 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     uint16_t next_level = curr_level + 1;
     uint64_t pos_next_level_before = last_pos[next_level];;
 
-    uint64_t left_nodes[16];
-    uint64_t right_nodes[16];
+    uint64_t left_nodes[16] = {0};
+    uint64_t right_nodes[16] = {0};
 
     bool exist_lchild;
     bool exist_rchild;
