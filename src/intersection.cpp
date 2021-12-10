@@ -288,7 +288,7 @@ binTrie intersectTriesV2(vector<binTrie> &Bs) {
 template <class rankType>
 void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_level, uint16_t curr_level, 
                 uint64_t *roots, vector<uint64_t> &last_pos,
-                vector<uint64_t> ones_to_write[], vector<uint64_t> &nodes_per_level, bool *activeTries) {
+                vector<uint64_t> *ones_to_write, vector<uint64_t> &nodes_per_level, bool *activeTries) {
 	
 	uint16_t n_tries = Bs.size();
 	uint64_t result = 3; // 0....11

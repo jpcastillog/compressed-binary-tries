@@ -109,7 +109,8 @@ int main() {
 //     vector < flatBinTrie<rank_support_v5<1>> > Bs = {trie_s1, trie_s2, trie_s3};
 //     flatBinTrie<rank_support_v5<1>>* result;
 //     // result = intersectFlatTries<rank_support_v5<1>>(Bs);
-//     result = joinTries<rank_support_v5<1>>(Bs, true);
+//     uint64_t time;
+//     result = joinTries<rank_support_v5<1>>(Bs, true, time);
 
 
 //     cout << "-------------intersection trie-------------" << endl;
