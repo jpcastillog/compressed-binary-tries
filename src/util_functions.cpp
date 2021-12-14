@@ -225,6 +225,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     uint64_t max_number_of_sets = 0;
     uint64_t number_of_queries = 0;
     uint64_t total_time = 0;
+    uint64_t total_time_bk = 0;
     while ( getline( query_log_stream, line ) ) {
         // vector <flatBinTrie<rank_support_v5<1>>> Bs;
         vector <flatBinTrie<rank_support_v<1>>> Bs;
@@ -259,6 +260,7 @@ void performQueryLog(string query_log_path, string ii_path) {
             barbayKenyon(sets, termsId.size(), intersection_bk);
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+            total_time_bk += elapsed.count();
             cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)elapsed.count()*10e-6 << "[ms]" << endl;
              
             number_of_queries++;
@@ -277,6 +279,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     // cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
     cout << "Número total de queries: " << number_of_queries << endl;
     cout << "Tiempo promedio:" << (float)(total_time*10e-6)/number_of_queries << "[ms]" << endl;
+    cout << "Tiempo promedio B&K: " << (float)(total_time_bk*10e-6)/number_of_queries << "[ms]" << endl;
 
 
     query_log_stream.close();
