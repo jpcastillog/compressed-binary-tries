@@ -531,3 +531,57 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compres
 }
 template flatBinTrie<rank_support_v5<1>>* joinTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool compressed, uint64_t &time);
 template flatBinTrie<rank_support_v<1>>* joinTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool compressed, uint64_t &time);
+
+
+template <class rankType>
+void loopIntersection(vector<flatBinTrie<rankType>> &Bs, uint16_t max_level){
+    vector<uint64_t> roots(16, 0);
+    vector<vector<uint64_t>> s;
+    s.push_back(roots);
+    
+    vector<uint64_t> last_nodes_visited(16, 0);
+    uint16_t level = 0;
+
+    while (!s.empty()) {
+        uint64_t r = 0b11;
+        for (uint16_t i = 0; i < Bs.size(); ++i) {
+            uint64_t node = Bs[i].getNode(roots[i]);
+            r &= node;
+        }
+
+        bool left = false;
+        bool right = false;
+        
+        switch(r){
+            case 0b10:  left = true;
+                        break;
+            case 0b01:  right = true;
+                        break;
+            case 0b11:  left = true;
+                        right = true;
+                        break;
+        }
+
+        vector<uint64_t> left_roots(16, 0);
+        if (left) {
+            for (uint16_t i = 0; i < Bs.size(); ++i) {
+                uint64_t node = Bs[i].getLeftChild(roots[i]);
+                left_roots[i] = node;
+            }
+            // while (level < max_level) {
+
+            // }
+            s.push_back(left_roots);
+        }
+
+        vector<uint64_t> right_roots(16, 0);
+        if (right) {
+            for (uint16_t i = 0; i < Bs.size(); ++i) {
+                uint64_t node = Bs[i].getRightChild(roots[i]);
+                right_roots[i] = node;
+            }
+            s.push_back(right_roots);
+        }
+    }
+    return;
+}

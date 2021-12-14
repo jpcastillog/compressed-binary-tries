@@ -45,7 +45,8 @@ uint64_t exponentialSearch(vector<uint64_t> &arr, uint64_t n, uint64_t x, uint64
 }
 
 
-void barbayKenyon(vector<uint64_t> sets[], uint16_t k, vector<uint64_t> &positions, vector<uint64_t> &intersection){
+void barbayKenyon(vector<vector<uint64_t>> sets, uint16_t k, vector<uint64_t> &intersection){
+    vector<uint64_t> positions(k, 0);
     // eliminator element in [0,0], first element of first set
     uint64_t e = sets[0][0];
     // Set index

@@ -6,6 +6,6 @@
 
 using namespace std;
 
-void barbayKenyon(vector<uint64_t> sets[], uint16_t k, vector<uint64_t> &positions, vector<uint64_t> &intersection);
+void barbayKenyon(vector<vector<uint64_t>> sets, uint16_t k, vector<uint64_t> &intersection);
 
 #endif
