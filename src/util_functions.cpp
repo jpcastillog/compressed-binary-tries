@@ -197,10 +197,10 @@ void performQueryLog(string query_log_path, string ii_path) {
             vector<uint64_t> *il = read_inverted_list(ii_stream, n);
             uint64_t max_value = (*il)[ n - 2];
             // flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
-            // flatBinTrie<rank_support_v<1>> trie = flatBinTrie<rank_support_v<1>>(*il, max_value);
+            flatBinTrie<rank_support_v<1>> trie = flatBinTrie<rank_support_v<1>>(*il, max_value);
             // trie.compress();
             // tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie));
-            // tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie));
+            tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie));
             il_vectors.insert(std::pair<uint64_t, vector<uint64_t>>(termId, *il));
             // delete il;
             n_il++;
@@ -238,21 +238,22 @@ void performQueryLog(string query_log_path, string ii_path) {
         // if (termsId.size() <= 16 && termsId.size() > 1) {
         if (termsId.size() <= 3 && termsId.size() > 1) {
             for (uint16_t i = 0; i < termsId.size(); ++i){
-                // Bs.push_back(tries[termsId[i]]);
+                Bs.push_back(tries[termsId[i]]);
                 sets.push_back(il_vectors[termsId[i]]);
             }
 
             // flatBinTrie<rank_support_v5<1>>* result;
-            // flatBinTrie<rank_support_v<1>>* result;
+            flatBinTrie<rank_support_v<1>>* result;
             // auto start = std::chrono::high_resolution_clock::now();
-            // result = joinTries<rank_support_v5<1>>(Bs, true);
-            // uint64_t time;
-            // result = joinTries<rank_support_v<1>>(Bs, true, time);
+            
+            uint64_t time;
+            // result = joinTries<rank_support_v5<1>>(Bs, true, time);
+            result = joinTries<rank_support_v<1>>(Bs, true, time);
             // auto end = std::chrono::high_resolution_clock::now();
             // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
             // total_time += elapsed.count();
-            // total_time += time;
-            // cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" << endl;
+            total_time += time;
+            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" << endl;
 
             // Barbay and Kenyon
             vector<uint64_t> intersection_bk;
@@ -261,7 +262,7 @@ void performQueryLog(string query_log_path, string ii_path) {
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
             total_time_bk += elapsed.count();
-            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)elapsed.count()*10e-6 << "[ms]" << endl;
+            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution B&K: " << (float)elapsed.count()*10e-6 << "[ms]" << endl;
              
             number_of_queries++;
         }
