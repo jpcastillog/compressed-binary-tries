@@ -263,6 +263,7 @@ void performQueryLog(string query_log_path, string ii_path) {
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
             total_time_bk += elapsed.count();
             cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution B&K: " << (float)elapsed.count()*10e-6 << "[ms]" << endl;
+            cout << "----------------------------------------------------------"<< endl;
              
             number_of_queries++;
         }
