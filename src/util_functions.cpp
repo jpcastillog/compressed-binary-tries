@@ -162,6 +162,7 @@ void randomQueries(string file_path) {
         }
     }
     input_stream.close();
+    cout << "-> Get all terms > 4096" << endl;
     
     vector<tuple<uint64_t, uint64_t>> queries;
     vector<uint64_t> allTermsId;
@@ -179,7 +180,7 @@ void randomQueries(string file_path) {
         tuple<uint64_t, uint64_t> query(termId1, termId2);
         queries.push_back(query);
     }
-
+    cout << "-> Generate all queries" << endl;
     allTermsId.erase( unique( allTermsId.begin(), allTermsId.end() ), allTermsId.end() );
     std::sort(allTermsId.begin(), allTermsId.end());
 
@@ -224,6 +225,7 @@ void randomQueries(string file_path) {
             input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
         }
     }
+    cout << "-> Indexed all terms" << endl;
 
     uint64_t total_time_v = 0;
     uint64_t total_time_v5 = 0;
