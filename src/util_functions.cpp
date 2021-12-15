@@ -193,6 +193,7 @@ void randomQueries(string file_path) {
     std::ifstream ii_stream(file_path);
     uint64_t nil = 0;
     cout << "Number of distinct inverted lists: " << allTermsId.size() << endl;
+    int count = 0;
     while ( !ii_stream.eof() && nil < allTermsId.size() ){
         uint64_t set_size;
         uint64_t termId;
@@ -218,12 +219,13 @@ void randomQueries(string file_path) {
             
             delete il;
             nil++;
+            count ++;
         }
         else {
             ii_stream.ignore(numeric_limits<streamsize>::max(), '\n');
         }
     }
-    cout << "-> Indexed all terms" << endl;
+    cout << "-> Indexed all terms, #il: "<< count << endl;
 
     uint64_t total_time_v = 0;
     uint64_t total_time_v5 = 0;
