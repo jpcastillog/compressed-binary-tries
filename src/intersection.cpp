@@ -291,9 +291,9 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
                 vector<uint64_t> *ones_to_write, vector<uint64_t> &nodes_per_level, bool *activeTries) {
 	
 	uint16_t n_tries = Bs.size();
-	uint64_t result = 3; // 0....11
-    uint64_t node00 = 0; // 0....00
-    bool tempActiveTries[16];
+	uint64_t result = 0b11; // 0....11
+    uint64_t node00 = 0b00; // 0....00
+    bool tempActiveTries[16] = {false};
     //  = {false, false, false, false,
     //                             false, false, false, false,
     //                             false, false, false, false,
@@ -349,8 +349,8 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     uint16_t next_level = curr_level + 1;
     uint64_t pos_next_level_before = last_pos[next_level];;
 
-    uint64_t left_nodes[16] = {0};
-    uint64_t right_nodes[16] = {0};
+    uint64_t left_nodes[16];
+    uint64_t right_nodes[16];
 
     bool exist_lchild;
     bool exist_rchild;
@@ -404,7 +404,7 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
 template <class rankType>
 void notCompressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_level, uint16_t curr_level, 
                                uint64_t *roots, vector<uint64_t> &last_pos,
-                               vector<uint64_t> ones_to_write[], vector<uint64_t> &nodes_per_level) {
+                               vector<uint64_t> *ones_to_write, vector<uint64_t> &nodes_per_level) {
 	
 	uint16_t n_tries = Bs.size();
 	uint64_t result = 0b11; // 0...11
@@ -505,8 +505,12 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compres
     }
 
     // max 16 relations
-    bool activeTries[16] = {true}; // active tries in compressed implementation
-    uint64_t roots[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    bool activeTries[16] = { true, true, true, true, true, true, true, true,
+                             true, true, true, true, true, true, true, true 
+                            }; // active tries in compressed implementation
+    uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+                           0, 0, 0, 0, 0, 0, 0, 0 };
+    
     vector<uint64_t> last_pos(max_level, 0);
     vector<uint64_t> ones_to_write[max_level];
     vector<uint64_t> nodes_per_level(max_level, 0);
