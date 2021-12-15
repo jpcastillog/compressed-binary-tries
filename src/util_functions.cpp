@@ -162,8 +162,8 @@ void randomQueries(string file_path) {
         }
     }
     input_stream.close();
-    cout << "-> Get all terms > 4096" << endl;
-    
+    cout << "-> Get all terms >= 4096" << endl;
+
     vector<tuple<uint64_t, uint64_t>> queries;
     vector<uint64_t> allTermsId;
     for (uint64_t i = 0; i < 1000; ++i){
@@ -240,8 +240,8 @@ void randomQueries(string file_path) {
         flatBinTrie <rank_support_v5<1>> trie1_v5 = tries_v5[termId1];
         flatBinTrie <rank_support_v5<1>> trie2_v5 = tries_v5[termId2];
 
-        vector <flatBinTrie<rank_support_v<1>>> Bs_v    = {trie1_v, trie2_v};
-        vector <flatBinTrie<rank_support_v5<1>>> Bs_v5  = {trie1_v5, trie2_v5};
+        vector <flatBinTrie<rank_support_v<1>>> Bs_v {trie1_v, trie2_v};
+        vector <flatBinTrie<rank_support_v5<1>>> Bs_v5 {trie1_v5, trie2_v5};
 
         flatBinTrie <rank_support_v<1>>* result_v;
         uint64_t time_v;
