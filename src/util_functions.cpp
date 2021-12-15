@@ -192,6 +192,7 @@ void randomQueries(string file_path) {
 
     std::ifstream ii_stream(file_path);
     uint64_t nil = 0;
+    cout << "Number of distinct inverted lists: " << allTermsId.size() << endl;
     while ( !ii_stream.eof() && nil < allTermsId.size() ){
         uint64_t set_size;
         uint64_t termId;
@@ -239,7 +240,7 @@ void randomQueries(string file_path) {
         cout << "Creación de tries OK" << endl;
         vector <flatBinTrie<rank_support_v<1>>> Bs_v {trie1_v, trie2_v};
         vector <flatBinTrie<rank_support_v5<1>>> Bs_v5 {trie1_v5, trie2_v5};
-        cout << "Comienzo de intersección" << Bs_v.size() << endl;
+        cout << "Comienzo de intersección " << Bs_v.size() << endl;
         flatBinTrie <rank_support_v<1>>* result_v;
         uint64_t time_v;
         result_v = joinTries<rank_support_v<1>>(Bs_v, true, time_v);
