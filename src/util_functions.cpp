@@ -181,9 +181,9 @@ void randomQueries(string file_path) {
         queries.push_back(query);
     }
     cout << "-> Generate all queries" << endl;
-    allTermsId.erase( unique( allTermsId.begin(), allTermsId.end() ), allTermsId.end() );
     std::sort(allTermsId.begin(), allTermsId.end());
-
+    allTermsId.erase( unique( allTermsId.begin(), allTermsId.end() ), allTermsId.end() );
+    
     map<uint64_t, flatBinTrie<rank_support_v<1>>> tries_v;
     map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries_v5;
 
