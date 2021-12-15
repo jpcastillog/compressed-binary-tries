@@ -222,7 +222,7 @@ void randomQueries(string file_path) {
             nil++;
         }
         else {
-            input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
+            ii_stream.ignore(numeric_limits<streamsize>::max(), '\n');
         }
     }
     cout << "-> Indexed all terms" << endl;
