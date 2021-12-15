@@ -218,6 +218,7 @@ void randomQueries(string file_path) {
             run_tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
             
             delete il;
+            nil++;
         }
         else {
             input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
