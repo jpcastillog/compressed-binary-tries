@@ -242,12 +242,12 @@ void randomQueries(string file_path) {
         cout << "Comienzo de intersección" << Bs_v.size() << endl;
         flatBinTrie <rank_support_v<1>>* result_v;
         uint64_t time_v;
-        result_v = joinTries<rank_support_v<1>>(Bs_v, false, time_v);
+        result_v = joinTries<rank_support_v<1>>(Bs_v, true, time_v);
         cout << "Time execution, rank V: " << (float) time_v*10e-6 << endl;
 
         flatBinTrie <rank_support_v5<1>>* result_v5;
         uint64_t time_v5;
-        result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, false, time_v5);
+        result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, true, time_v5);
         cout << "Time execution, rank V5: " << (float) time_v5*10e-6 << endl;
         cout << "--------------------------------------------------"<< endl;
 
