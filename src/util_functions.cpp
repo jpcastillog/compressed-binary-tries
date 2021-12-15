@@ -78,7 +78,7 @@ void read_inverted_index(string file_path) {
         input_stream >> termId;
         input_stream >> set_size;
         
-        if (set_size >= 4096) {
+        if (set_size >= 100000) {
             cout << "termId: " << termId << endl;
         // if (set_size >= 100000 && set_size != 11242476) {
         // if (set_size != 50564) {    
