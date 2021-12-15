@@ -209,8 +209,8 @@ void randomQueries(string file_path) {
             tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
             tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
             
-            // trie_v.compress();
-            // trie_v5.compress();
+            trie_v.compress();
+            trie_v5.compress();
 
             run_tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
             run_tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
@@ -231,11 +231,11 @@ void randomQueries(string file_path) {
         tuple<uint64_t, uint64_t> q = queries[i];
         std::tie(termId1, termId2) = q;
         cout << "Desacople de tuplas ok" << endl;
-        flatBinTrie <rank_support_v<1>> trie1_v = tries_v[termId1];
-        flatBinTrie <rank_support_v<1>> trie2_v = tries_v[termId2];
+        flatBinTrie <rank_support_v<1>> trie1_v = run_tries_v[termId1];
+        flatBinTrie <rank_support_v<1>> trie2_v = run_tries_v[termId2];
 
-        flatBinTrie <rank_support_v5<1>> trie1_v5 = tries_v5[termId1];
-        flatBinTrie <rank_support_v5<1>> trie2_v5 = tries_v5[termId2];
+        flatBinTrie <rank_support_v5<1>> trie1_v5 = run_tries_v5[termId1];
+        flatBinTrie <rank_support_v5<1>> trie2_v5 = run_tries_v5[termId2];
         cout << "Creación de tries OK" << endl;
         vector <flatBinTrie<rank_support_v<1>>> Bs_v {trie1_v, trie2_v};
         vector <flatBinTrie<rank_support_v5<1>>> Bs_v5 {trie1_v5, trie2_v5};
