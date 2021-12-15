@@ -239,7 +239,7 @@ void randomQueries(string file_path) {
         cout << "Creación de tries OK" << endl;
         vector <flatBinTrie<rank_support_v<1>>> Bs_v {trie1_v, trie2_v};
         vector <flatBinTrie<rank_support_v5<1>>> Bs_v5 {trie1_v5, trie2_v5};
-        cout << "Comienzo de intersección" << endl;
+        cout << "Comienzo de intersección" << Bs_v.size() << endl;
         flatBinTrie <rank_support_v<1>>* result_v;
         uint64_t time_v;
         result_v = joinTries<rank_support_v<1>>(Bs_v, false, time_v);
