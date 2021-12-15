@@ -206,7 +206,7 @@ void randomQueries(string file_path) {
             
             flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
             flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, max_value);
-
+            cout << "Height: " << trie_v.getHeight() << endl;
             tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
             tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
             
