@@ -15,7 +15,8 @@ int main() {
     string file_path = "./../../../..//data/GOV2/index/ii/absDocIDS/gov2_url_absolute_freqs.ii";
     string  query_path = "./../../../../data/GOV2/index/queries/queries_gov2.txt";
     // performQueryLog(query_path, file_path);
-    read_inverted_index(file_path);
+    // read_inverted_index(file_path);
+    randomQueries(file_path);
 }
 
 // int main() {

@@ -17,4 +17,6 @@ void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64
 
 void performQueryLog(string query_log_path, string ii_path);
 
+void randomQueries(string file_path);
+
 #endif

@@ -139,6 +139,129 @@ void read_inverted_index(string file_path) {
 }
 
 
+void randomQueries(string file_path) {
+    std::ifstream input_stream(file_path);
+    if (!input_stream.is_open()) {
+        cout << "No se pudo abrir el archivo: " << file_path << endl;
+        return;
+    }
+    vector<uint64_t> termsId;
+    while ( !input_stream.eof() ){
+        uint64_t set_size;
+        uint64_t termId;
+
+        input_stream >> termId;
+        input_stream >> set_size;
+        
+        if (set_size >= 4096) {
+            termsId.push_back(termId);    
+            input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        else {
+            input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
+    input_stream.close();
+    
+    vector<tuple<uint64_t, uint64_t>> queries;
+    vector<uint64_t> allTermsId;
+    for (uint64_t i = 0; i < 1000; ++i){
+        
+        uint64_t termId1 = termsId[rand() % termsId.size()];
+        uint64_t termId2 = termsId[rand() % termsId.size()];
+        
+        while (termId1 == termId2) {
+            termId2 = termsId[rand() % termsId.size()];
+        }
+        allTermsId.push_back(termId1);
+        allTermsId.push_back(termId2);
+
+        tuple<uint64_t, uint64_t> query(termId1, termId2);
+        queries.push_back(query);
+    }
+
+    allTermsId.erase( unique( allTermsId.begin(), allTermsId.end() ), allTermsId.end() );
+    std::sort(allTermsId.begin(), allTermsId.end());
+
+    map<uint64_t, flatBinTrie<rank_support_v<1>>> tries_v;
+    map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries_v5;
+
+    map<uint64_t, flatBinTrie<rank_support_v<1>>> run_tries_v;
+    map<uint64_t, flatBinTrie<rank_support_v5<1>>> run_tries_v5;
+
+    std::ifstream ii_stream(file_path);
+    uint64_t nil = 0;
+    while ( !ii_stream.eof() && nil < allTermsId.size() ){
+        uint64_t set_size;
+        uint64_t termId;
+
+        ii_stream >> termId;
+        ii_stream >> set_size;
+        
+        if (allTermsId[nil] == termId) {    
+            vector<uint64_t> *il = read_inverted_list(ii_stream, set_size);
+            uint64_t max_value = (*il)[ set_size - 2];
+            
+            flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
+            flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+
+            tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
+            tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
+
+            uint64_t uncompress_size_v = trie_v.size_in_bytes();
+            uint64_t uncompress_size_v5 = trie_v5.size_in_bytes();
+            
+            trie_v.compress();
+            trie_v5.compress();
+
+            run_tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
+            run_tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
+            
+            delete il;
+        }
+        else {
+            input_stream.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
+
+    uint64_t total_time_v = 0;
+    uint64_t total_time_v5 = 0;
+    for (uint64_t i = 0; i < queries.size(); ++i) {
+        uint64_t termId1, termId2;
+        tuple<uint64_t, uint64_t> q = queries[i];
+        std::tie(termId1, termId2) = q;
+
+        flatBinTrie <rank_support_v<1>> trie1_v = tries_v[termId1];
+        flatBinTrie <rank_support_v<1>> trie2_v = tries_v[termId2];
+
+        flatBinTrie <rank_support_v5<1>> trie1_v5 = tries_v5[termId1];
+        flatBinTrie <rank_support_v5<1>> trie2_v5 = tries_v5[termId2];
+
+        vector <flatBinTrie<rank_support_v<1>>> Bs_v    = {trie1_v, trie2_v};
+        vector <flatBinTrie<rank_support_v5<1>>> Bs_v5  = {trie1_v5, trie2_v5};
+
+        flatBinTrie <rank_support_v<1>>* result_v;
+        uint64_t time_v;
+        result_v = joinTries<rank_support_v<1>>(Bs_v, false, time_v);
+        cout << "Time execution, rank V: " << (float) time_v*10e-6 << endl;
+
+        flatBinTrie <rank_support_v5<1>>* result_v5;
+        uint64_t time_v5;
+        result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, false, time_v5);
+        cout << "Time execution, rank V5: " << (float) time_v5*10e-6 << endl;
+        cout << "--------------------------------------------------"<< endl;
+
+        total_time_v += time_v;
+        total_time_v5 += time_v;
+
+    }
+    cout <<  "Avg time, rank V: " << (float) (total_time_v*10e-6)/1000 << "[ms]"<< endl;
+    cout <<  "Avg time, rank V5: " << (float) (total_time_v5*10e-6)/1000 << "[ms]"<< endl;
+
+
+}
+
+
 void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64_t> &intersection) {
     queue<vector<uint64_t>> q;
     for (uint64_t i = 0; i < k; ++i) {
