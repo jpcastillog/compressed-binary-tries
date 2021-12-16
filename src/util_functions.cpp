@@ -255,7 +255,7 @@ void randomQueries(string file_path) {
         cout << "--------------------------------------------------"<< endl;
 
         total_time_v += time_v;
-        total_time_v5 += time_v;
+        total_time_v5 += time_v5;
     }
     cout <<  "Avg time, rank V: " << (float) (total_time_v*10e-6)/1000 << "[ms]"<< endl;
     cout <<  "Avg time, rank V5: " << (float) (total_time_v5*10e-6)/1000 << "[ms]"<< endl;
