@@ -293,11 +293,10 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
 	uint16_t n_tries = Bs.size();
 	uint64_t result = 0b11; // 0....11
     uint64_t node00 = 0b00; // 0....00
-    bool tempActiveTries[16] = {false};
-    //  = {false, false, false, false,
-    //                             false, false, false, false,
-    //                             false, false, false, false,
-    //                             false, false, false, false};
+    bool tempActiveTries[16] = {false, false, false, false,
+                                false, false, false, false,
+                                false, false, false, false,
+                                false, false, false, false};
 
 	for (uint16_t i = 0; i < n_tries; ++i) {
         if (activeTries[i]){
@@ -505,9 +504,10 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compres
     }
 
     // max 16 relations
-    bool activeTries[16] = { true, true, true, true, true, true, true, true,
-                             true, true, true, true, true, true, true, true 
-                            }; // active tries in compressed implementation
+    bool activeTries[16] = { true, true, true, true,
+                             true, true, true, true,
+                             true, true, true, true,
+                             true, true, true, true }; // active tries in compressed implementation
     uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
     
