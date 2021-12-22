@@ -206,7 +206,7 @@ void randomQueries(string file_path) {
             vector<uint64_t> *il = read_inverted_list(ii_stream, set_size);
             uint64_t max_value = (*il)[ set_size - 2];
             
-            flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, 24622347);
+            flatBinTrie<rank_support_v<1>> trie_v   = flatBinTrie<rank_support_v<1>>(*il, 24622347);
             flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, 24622347);
 
             tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
@@ -237,10 +237,10 @@ void randomQueries(string file_path) {
         // cout << "Desacople de tuplas ok" << endl;
         flatBinTrie <rank_support_v<1>> trie1_v = tries_v[termId1];
         flatBinTrie <rank_support_v<1>> trie2_v = tries_v[termId2];
-
+        cout << "Tries V Load  OK" << endl;
         flatBinTrie <rank_support_v5<1>> trie1_v5 = tries_v5[termId1];
         flatBinTrie <rank_support_v5<1>> trie2_v5 = tries_v5[termId2];
-        // cout << "Creación de tries OK" << endl;
+        cout << "Tries V5 Load  OK" << endl;
         vector <flatBinTrie<rank_support_v<1>>> Bs_v {trie1_v, trie2_v};
         vector <flatBinTrie<rank_support_v5<1>>> Bs_v5 {trie1_v5, trie2_v5};
         // cout << "Comienzo de intersección " << Bs_v.size() << endl;

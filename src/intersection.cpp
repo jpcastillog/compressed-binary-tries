@@ -527,7 +527,7 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compres
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
     time = elapsed.count();
-    cout <<"|Time execution: " << (float)time*10e-6 << "[ms]" << endl;
+    // cout <<"|Time execution: " << (float)time*10e-6 << "[ms]" << endl;
 
     flatBinTrie<rankType>* result = new flatBinTrie<rankType>(ones_to_write, max_level, last_pos, compressed);
 
