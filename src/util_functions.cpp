@@ -237,26 +237,36 @@ void randomQueries(string file_path) {
         // cout << "Desacople de tuplas ok" << endl;
         flatBinTrie <rank_support_v<1>> trie1_v = tries_v[termId1];
         flatBinTrie <rank_support_v<1>> trie2_v = tries_v[termId2];
-        cout << "Tries V Load  OK" << endl;
+        // cout << "Tries V Load  OK" << endl;
         flatBinTrie <rank_support_v5<1>> trie1_v5 = tries_v5[termId1];
         flatBinTrie <rank_support_v5<1>> trie2_v5 = tries_v5[termId2];
-        cout << "Tries V5 Load  OK" << endl;
+        // cout << "Tries V5 Load  OK" << endl;
         vector <flatBinTrie<rank_support_v<1>>> Bs_v {trie1_v, trie2_v};
         vector <flatBinTrie<rank_support_v5<1>>> Bs_v5 {trie1_v5, trie2_v5};
         // cout << "Comienzo de intersección " << Bs_v.size() << endl;
-        flatBinTrie <rank_support_v<1>>* result_v;
-        uint64_t time_v;
-        result_v = joinTries<rank_support_v<1>>(Bs_v, false, time_v);
-        cout << "Time execution, rank V: " << (float) time_v*10e-6 << endl;
-
-        flatBinTrie <rank_support_v5<1>>* result_v5;
-        uint64_t time_v5;
-        result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, false, time_v5);
-        cout << "Time execution, rank V5: " << (float) time_v5*10e-6 << endl;
+        
+        uint64_t avg_time_v = 0;
+        for (uint16_t i = 0; i < 10; ++i) {
+            flatBinTrie <rank_support_v<1>>* result_v;
+            uint64_t time_v;
+            result_v = joinTries<rank_support_v<1>>(Bs_v, false, time_v);
+            avg_time_v += time_v;
+        }
+        cout << "Time execution, rank V: " << (float) (avg_time_v/10)*10e-6 << endl;
+        
+        uint64_t avg_time_v5 = 0;
+        for (uint16_t i = 0; i < 10; ++i) {
+            flatBinTrie <rank_support_v5<1>>* result_v5;
+            uint64_t time_v5;
+            result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, false, time_v5);
+            avg_time_v5 += time_v5;
+        }
+        
+        cout << "Time execution, rank V5: " << (float) (avg_time_v5/10)*10e-6 << endl;
         cout << "--------------------------------------------------"<< endl;
 
-        total_time_v += time_v;
-        total_time_v5 += time_v5;
+        total_time_v += avg_time_v;
+        total_time_v5 += avg_time_v5;
     }
     cout <<  "Avg time, rank V: " << (float) (total_time_v*10e-6)/1000 << "[ms]"<< endl;
     cout <<  "Avg time, rank V5: " << (float) (total_time_v5*10e-6)/1000 << "[ms]"<< endl;
