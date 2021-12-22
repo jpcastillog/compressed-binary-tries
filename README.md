@@ -1,2 +1,2 @@
-# binary-tries-compresion
+# Compressed binary tries
  
