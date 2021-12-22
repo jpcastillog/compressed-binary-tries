@@ -212,8 +212,8 @@ void randomQueries(string file_path) {
             tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
             tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
             
-            // trie_v.compress();
-            // trie_v5.compress();
+            trie_v.compress();
+            trie_v5.compress();
 
             run_tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
             run_tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
@@ -235,11 +235,11 @@ void randomQueries(string file_path) {
         tuple<uint64_t, uint64_t> q = queries[i];
         std::tie(termId1, termId2) = q;
         // cout << "Desacople de tuplas ok" << endl;
-        flatBinTrie <rank_support_v<1>> trie1_v = tries_v[termId1];
-        flatBinTrie <rank_support_v<1>> trie2_v = tries_v[termId2];
+        flatBinTrie <rank_support_v<1>> trie1_v = run_tries_v[termId1];
+        flatBinTrie <rank_support_v<1>> trie2_v = run_tries_v[termId2];
         // cout << "Tries V Load  OK" << endl;
-        flatBinTrie <rank_support_v5<1>> trie1_v5 = tries_v5[termId1];
-        flatBinTrie <rank_support_v5<1>> trie2_v5 = tries_v5[termId2];
+        flatBinTrie <rank_support_v5<1>> trie1_v5 = run_tries_v5[termId1];
+        flatBinTrie <rank_support_v5<1>> trie2_v5 = run_tries_v5[termId2];
         // cout << "Tries V5 Load  OK" << endl;
         vector <flatBinTrie<rank_support_v<1>>> Bs_v {trie1_v, trie2_v};
         vector <flatBinTrie<rank_support_v5<1>>> Bs_v5 {trie1_v5, trie2_v5};
@@ -249,7 +249,7 @@ void randomQueries(string file_path) {
         for (uint16_t i = 0; i < 10; ++i) {
             flatBinTrie <rank_support_v<1>>* result_v;
             uint64_t time_v;
-            result_v = joinTries<rank_support_v<1>>(Bs_v, false, time_v);
+            result_v = joinTries<rank_support_v<1>>(Bs_v, true, time_v);
             avg_time_v += time_v;
         }
         cout << "Time execution, rank V: " << (float) (avg_time_v/10)*10e-6 << endl;
@@ -258,7 +258,7 @@ void randomQueries(string file_path) {
         for (uint16_t i = 0; i < 10; ++i) {
             flatBinTrie <rank_support_v5<1>>* result_v5;
             uint64_t time_v5;
-            result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, false, time_v5);
+            result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, true, time_v5);
             avg_time_v5 += time_v5;
         }
         
