@@ -140,6 +140,7 @@ void read_inverted_index(string file_path) {
 
 
 void randomQueries(string file_path) {
+    srand(time(0));
     std::ifstream input_stream(file_path);
     if (!input_stream.is_open()) {
         cout << "No se pudo abrir el archivo: " << file_path << endl;
