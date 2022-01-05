@@ -9,16 +9,8 @@
 #include "binTrie.hpp"
 #include "flatBinTrie.hpp"
 
-binTrie intersectTries(vector<binTrie> &Bs);
-
-
-binTrie intersectTriesV2(vector<binTrie> &Bs);
-
-// template<class rankType>
-// flatBinTrie<rankType> intersectFlatTries(vector<flatBinTrie<rankType>> &Bs, bool compressed);
-
 template<class rankType>
-flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool compressed, uint64_t &time);
+flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded, uint64_t &time);
 
 
 #endif
