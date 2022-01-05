@@ -396,7 +396,7 @@ void performQueryLog(string query_log_path, string ii_path) {
                                                         std::istream_iterator<int>()
                                                         );
         // if (termsId.size() <= 16 && termsId.size() > 1) {
-        if (termsId.size() <= 3 && termsId.size() > 1) {
+        if (termsId.size() <= 16 && termsId.size() > 1) {
             for (uint16_t i = 0; i < termsId.size(); ++i){
                 Bs_v.push_back(tries_v[termsId[i]]);
                 Bs_v5.push_back(tries_v5[termsId[i]]);
