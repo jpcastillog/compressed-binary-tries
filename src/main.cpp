@@ -77,9 +77,9 @@ int main() {
 
 
 //     // vector < flatBinTrie<rank_support_v<1>> > Bs = {trie_s1, trie_s2, trie_s3};
-//     // trie_s1.compress();
-//     // trie_s2.compress();
-//     // trie_s3.compress();
+//     trie_s1.compress();
+//     trie_s2.compress();
+//     trie_s3.compress();
 
 //     // vector<uint64_t> s11_compressed_decoded;
 //     // trie_s1.decode(s11_compressed_decoded);
@@ -111,7 +111,7 @@ int main() {
 //     flatBinTrie<rank_support_v5<1>>* result;
 //     // result = intersectFlatTries<rank_support_v5<1>>(Bs);
 //     uint64_t time;
-//     result = joinTries<rank_support_v5<1>>(Bs, false, time);
+//     result = joinTries<rank_support_v5<1>>(Bs, true, time);
 
 
 //     cout << "-------------intersection trie-------------" << endl;

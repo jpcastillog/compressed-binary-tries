@@ -357,7 +357,7 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     // Left child
     if (left_one) {
         for (uint64_t i = 0; i < n_tries; ++i) {
-            // if (activeTries[i])
+            if (activeTries[i])
 			    left_nodes[i] = Bs[i].getLeftChild(roots[i]);
 		}
         compressedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
@@ -379,7 +379,7 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
                 right_nodes[i] = left_nodes[i] + 1;
             }
             else {
-                // if (activeTries[i])
+                if (activeTries[i])
                     right_nodes[i] = Bs[i].getRightChild(roots[i]);
             } 
         }
