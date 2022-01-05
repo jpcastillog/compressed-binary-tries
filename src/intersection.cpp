@@ -375,7 +375,7 @@ void compressedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_lev
     // Right child
     if (right_one) {
         for (uint64_t i = 0; i < n_tries; ++i) {
-            if (left_one) {
+            if (left_one && activeTries[i]) {
                 right_nodes[i] = left_nodes[i] + 1;
             }
             else {
