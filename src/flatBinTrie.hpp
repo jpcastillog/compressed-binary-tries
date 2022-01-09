@@ -268,7 +268,7 @@ class flatBinTrie{
         };
 
 
-        uint16_t getHeight(){
+        inline uint16_t getHeight(){
             return flatBinTrie::height;
         };
         
@@ -281,7 +281,7 @@ class flatBinTrie{
         // };
 
         
-        uint64_t getNode(uint64_t node_id) {
+        inline uint64_t getNode(uint64_t node_id) {
             uint64_t node = 0;
             if ((*bTrie)[2*node_id] == 1)
                 node = (node | (1ULL << 1));
@@ -292,19 +292,19 @@ class flatBinTrie{
         };
 
 
-        uint64_t getLeftChild(uint64_t node_id) {
+        inline uint64_t getLeftChild(uint64_t node_id) {
             uint64_t left_child_id = flatBinTrie::b_rank((2*node_id) + 1);
             return left_child_id;
         };
 
 
-        uint64_t getRightChild(uint64_t node_id) {
+        inline uint64_t getRightChild(uint64_t node_id) {
             uint64_t right_child_id = b_rank((2*node_id) + 2) ;
             return right_child_id;
         };
 
 
-        uint64_t size_in_bytes() {
+        inline uint64_t size_in_bytes() {
             uint64_t bv_size = sdsl::size_in_bytes(*(flatBinTrie::bTrie));
             uint64_t rank_size = sdsl::size_in_bytes(flatBinTrie::b_rank);
             return bv_size +
