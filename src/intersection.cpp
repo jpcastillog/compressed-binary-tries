@@ -109,7 +109,7 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
         }
 		return;
 	}
-    // all nodes are 00
+    // all nodes are 00..0
     if (node00 == 0b00) {
         last_pos[curr_level] += 2;
         return;

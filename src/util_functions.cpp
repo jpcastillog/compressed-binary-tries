@@ -337,7 +337,8 @@ void performQueryLog(string query_log_path, string ii_path) {
 
     // Indexing inverted lists
     // map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries;
-    map<uint64_t, flatBinTrie<rank_support_v<1>>> tries;
+    map<uint64_t, flatBinTrie<rank_support_v<1>>> tries_v;
+    map<uint64_t, flatBinTrie<rank_support_v5<1>>> tries_v5;
     map<uint64_t, vector<uint64_t>> il_vectors;
     uint64_t n_il = 0;
     while (!ii_stream.eof() && n_il < all_termsId.size()) {
@@ -349,11 +350,15 @@ void performQueryLog(string query_log_path, string ii_path) {
         if (all_termsId[n_il] == termId) {
             vector<uint64_t> *il = read_inverted_list(ii_stream, n);
             uint64_t max_value = (*il)[ n - 2];
-            // flatBinTrie<rank_support_v5<1>> trie = flatBinTrie<rank_support_v5<1>>(*il, max_value);
-            flatBinTrie<rank_support_v<1>> trie = flatBinTrie<rank_support_v<1>>(*il, max_value);
-            // trie.compress();
-            // tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie));
-            tries.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie));
+            
+            flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
+            flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+
+            trie_v.compress();
+            trie_v5.compress();
+            
+            tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
+            tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
             il_vectors.insert(std::pair<uint64_t, vector<uint64_t>>(termId, *il));
             // delete il;
             n_il++;
@@ -377,11 +382,13 @@ void performQueryLog(string query_log_path, string ii_path) {
     std::string line;
     uint64_t max_number_of_sets = 0;
     uint64_t number_of_queries = 0;
-    uint64_t total_time = 0;
+    uint64_t total_time_v = 0;
+    uint64_t total_time_v5 = 0;
     uint64_t total_time_bk = 0;
     while ( getline( query_log_stream, line ) ) {
-        // vector <flatBinTrie<rank_support_v5<1>>> Bs;
-        vector <flatBinTrie<rank_support_v<1>>> Bs;
+        vector <flatBinTrie<rank_support_v<1>>> Bs_v;
+        vector <flatBinTrie<rank_support_v5<1>>> Bs_v5;
+        
         vector <vector<uint64_t>> sets;
 
         std::istringstream is( line );
@@ -391,31 +398,33 @@ void performQueryLog(string query_log_path, string ii_path) {
         // if (termsId.size() <= 16 && termsId.size() > 1) {
         if (termsId.size() <= 16 && termsId.size() > 1) {
             for (uint16_t i = 0; i < termsId.size(); ++i){
-                Bs.push_back(tries[termsId[i]]);
+                Bs_v.push_back(tries_v[termsId[i]]);
+                Bs_v5.push_back(tries_v5[termsId[i]]);
                 sets.push_back(il_vectors[termsId[i]]);
             }
-
-            // flatBinTrie<rank_support_v5<1>>* result;
-            flatBinTrie<rank_support_v<1>>* result;
-            // auto start = std::chrono::high_resolution_clock::now();
             
-            uint64_t time;
-            // result = joinTries<rank_support_v5<1>>(Bs, true, time);
-            result = joinTries<rank_support_v<1>>(Bs, true, time);
-            // auto end = std::chrono::high_resolution_clock::now();
-            // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-            // total_time += elapsed.count();
-            total_time += time;
-            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" << endl;
+            flatBinTrie<rank_support_v<1>>* result_v;
+            flatBinTrie<rank_support_v5<1>>* result_v5;
+            
+            uint64_t time_v;
+            uint64_t time_v5;
+            result_v = joinTries<rank_support_v<1>>(Bs_v, true, time_v);
+            result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, true, time_v5);
+
+            total_time_v += time_v;
+            total_time_v5 += time_v5;
+            
+            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution rank v: " << (float)time_v*10e-6 << "[ms]" << endl;
+            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution rank v5: " << (float)time_v5*10e-6 << "[ms]" << endl;
 
             // Barbay and Kenyon
-            vector<uint64_t> intersection_bk;
-            auto start = std::chrono::high_resolution_clock::now();
-            barbayKenyon(sets, termsId.size(), intersection_bk);
-            auto end = std::chrono::high_resolution_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-            total_time_bk += elapsed.count();
-            cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution B&K: " << (float)elapsed.count()*10e-6 << "[ms]" << endl;
+            // vector<uint64_t> intersection_bk;
+            // auto start = std::chrono::high_resolution_clock::now();
+            // barbayKenyon(sets, termsId.size(), intersection_bk);
+            // auto end = std::chrono::high_resolution_clock::now();
+            // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+            // total_time_bk += elapsed.count();
+            // cout << "i: " << number_of_queries << " |n: " << termsId.size() << " |Time execution B&K: " << (float)elapsed.count()*10e-6 << "[ms]" << endl;
             cout << "----------------------------------------------------------"<< endl;
              
             number_of_queries++;
@@ -433,8 +442,9 @@ void performQueryLog(string query_log_path, string ii_path) {
     cout << "---------------------------------------" << endl;
     // cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
     cout << "Número total de queries: " << number_of_queries << endl;
-    cout << "Tiempo promedio:" << (float)(total_time*10e-6)/number_of_queries << "[ms]" << endl;
-    cout << "Tiempo promedio B&K: " << (float)(total_time_bk*10e-6)/number_of_queries << "[ms]" << endl;
+    cout << "Tiempo promedio rank v:" << (float)(total_time_v*10e-6)/number_of_queries << "[ms]" << endl;
+    cout << "Tiempo promedio rank v5:" << (float)(total_time_v5*10e-6)/number_of_queries << "[ms]" << endl;
+    // cout << "Tiempo promedio B&K: " << (float)(total_time_bk*10e-6)/number_of_queries << "[ms]" << endl;
 
 
     query_log_stream.close();
