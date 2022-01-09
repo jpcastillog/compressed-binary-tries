@@ -92,8 +92,8 @@ void read_inverted_index(string file_path) {
             uint64_t uncompress_size_v = trie_v.size_in_bytes();
             uint64_t uncompress_size_v5 = trie_v5.size_in_bytes();
             
-            trie_v.compress();
-            trie_v5.compress();
+            trie_v.encodeRuns();
+            trie_v5.encodeRuns();
             uint64_t compress_size_trie_v = trie_v.size_in_bytes();
             uint64_t compress_size_trie_v5 = trie_v5.size_in_bytes();
             
@@ -212,8 +212,8 @@ void randomQueries(string file_path) {
             tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
             tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
             
-            trie_v.compress();
-            trie_v5.compress();
+            trie_v.encodeRuns();
+            trie_v5.encodeRuns();
 
             run_tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
             run_tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
@@ -302,15 +302,6 @@ void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64
 }
 
 
-std::fstream& GotoLine(std::fstream& file, unsigned int num){
-    file.seekg(std::ios::beg);
-    for(int i=0; i < num - 1; ++i){
-        file.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-    }
-    return file;
-}
-
-
 void performQueryLog(string query_log_path, string ii_path) {
     
     std::ifstream query_stream(query_log_path);
@@ -354,8 +345,8 @@ void performQueryLog(string query_log_path, string ii_path) {
             flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
             flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, max_value);
 
-            trie_v.compress();
-            trie_v5.compress();
+            trie_v.encodeRuns();
+            trie_v5.encodeRuns();
             
             tries_v.insert(std::pair<uint64_t, flatBinTrie<rank_support_v<1>>>(termId, trie_v));
             tries_v5.insert(std::pair<uint64_t, flatBinTrie<rank_support_v5<1>>>(termId, trie_v5));
