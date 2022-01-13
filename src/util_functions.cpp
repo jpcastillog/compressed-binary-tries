@@ -33,6 +33,34 @@ bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
 }
 
 
+void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64_t> &intersection) {
+    queue<vector<uint64_t>> q;
+    for (uint64_t i = 0; i < k; ++i) {
+        q.push(Sets[i]);
+    }
+    vector<uint64_t> s1;
+    vector<uint64_t> s2;
+    s1 = q.front();
+    q.pop();
+    while (!q.empty()) {
+        s2 = q.front();
+        q.pop();
+        vector<uint64_t> aux_intersection;
+        for (uint64_t i = 0; i < s1.size(); ++i) {
+            for (uint64_t j = 0; j < s2.size(); ++j){
+                if (s1[i] == s2[j]) {
+                    aux_intersection.push_back(s1[i]);
+                }
+            }
+        }
+        s1 = aux_intersection;
+    }
+    for (uint64_t i = 0; i < s1.size(); ++i) {
+        intersection.push_back(s1[i]);
+    } 
+}
+
+
 std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
     uint64_t x;
     uint64_t f;
@@ -51,7 +79,7 @@ std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t 
 }
 
 
-void read_inverted_index(string file_path) {
+void testSpaceII(string file_path) {
     std::ifstream input_stream(file_path);
     if (!input_stream.is_open()) {
         cout << "No se pudo abrir el archivo: " << file_path << endl;
@@ -270,35 +298,6 @@ void randomQueries(string file_path) {
     }
     cout <<  "Avg time, rank V: " << (float) (total_time_v*10e-6)/1000 << "[ms]"<< endl;
     cout <<  "Avg time, rank V5: " << (float) (total_time_v5*10e-6)/1000 << "[ms]"<< endl;
-}
-
-
-void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64_t> &intersection) {
-    queue<vector<uint64_t>> q;
-    for (uint64_t i = 0; i < k; ++i) {
-        q.push(Sets[i]);
-    }
-    vector<uint64_t> s1;
-    vector<uint64_t> s2;
-    s1 = q.front();
-    q.pop();
-    while (!q.empty()) {
-        s2 = q.front();
-        q.pop();
-        vector<uint64_t> aux_intersection;
-        for (uint64_t i = 0; i < s1.size(); ++i) {
-            for (uint64_t j = 0; j < s2.size(); ++j){
-                if (s1[i] == s2[j]) {
-                    aux_intersection.push_back(s1[i]);
-                }
-            }
-        }
-        s1 = aux_intersection;
-    }
-    for (uint64_t i = 0; i < s1.size(); ++i) {
-        intersection.push_back(s1[i]);
-    }
-    
 }
 
 
