@@ -33,6 +33,35 @@ bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
 }
 
 
+void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64_t> &intersection) {
+    queue<vector<uint64_t>> q;
+    for (uint64_t i = 0; i < k; ++i) {
+        q.push(Sets[i]);
+    }
+    vector<uint64_t> s1;
+    vector<uint64_t> s2;
+    s1 = q.front();
+    q.pop();
+    while (!q.empty()) {
+        s2 = q.front();
+        q.pop();
+        vector<uint64_t> aux_intersection;
+        for (uint64_t i = 0; i < s1.size(); ++i) {
+            for (uint64_t j = 0; j < s2.size(); ++j){
+                if (s1[i] == s2[j]) {
+                    aux_intersection.push_back(s1[i]);
+                }
+            }
+        }
+        s1 = aux_intersection;
+    }
+    for (uint64_t i = 0; i < s1.size(); ++i) {
+        intersection.push_back(s1[i]);
+    }
+    
+}
+
+
 std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n){
     uint64_t x;
     uint64_t f;
@@ -273,34 +302,6 @@ void randomQueries(string file_path) {
 }
 
 
-void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64_t> &intersection) {
-    queue<vector<uint64_t>> q;
-    for (uint64_t i = 0; i < k; ++i) {
-        q.push(Sets[i]);
-    }
-    vector<uint64_t> s1;
-    vector<uint64_t> s2;
-    s1 = q.front();
-    q.pop();
-    while (!q.empty()) {
-        s2 = q.front();
-        q.pop();
-        vector<uint64_t> aux_intersection;
-        for (uint64_t i = 0; i < s1.size(); ++i) {
-            for (uint64_t j = 0; j < s2.size(); ++j){
-                if (s1[i] == s2[j]) {
-                    aux_intersection.push_back(s1[i]);
-                }
-            }
-        }
-        s1 = aux_intersection;
-    }
-    for (uint64_t i = 0; i < s1.size(); ++i) {
-        intersection.push_back(s1[i]);
-    }
-    
-}
-
 
 void performQueryLog(string query_log_path, string ii_path) {
     
@@ -340,10 +341,10 @@ void performQueryLog(string query_log_path, string ii_path) {
         ii_stream >> n;
         if (all_termsId[n_il] == termId) {
             vector<uint64_t> *il = read_inverted_list(ii_stream, n);
-            uint64_t max_value = (*il)[ n - 2];
+            // uint64_t max_value = (*il)[ n - 2];
             
-            flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
-            flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+            flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, 24622347);
+            flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, 24622347);
 
             trie_v.encodeRuns();
             trie_v5.encodeRuns();
@@ -376,6 +377,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     uint64_t total_time_v = 0;
     uint64_t total_time_v5 = 0;
     uint64_t total_time_bk = 0;
+    uint64_t total_elem = 0;
     while ( getline( query_log_stream, line ) ) {
         vector <flatBinTrie<rank_support_v<1>>> Bs_v;
         vector <flatBinTrie<rank_support_v5<1>>> Bs_v5;
@@ -401,6 +403,11 @@ void performQueryLog(string query_log_path, string ii_path) {
             uint64_t time_v5;
             result_v = joinTries<rank_support_v<1>>(Bs_v, true, time_v);
             result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, true, time_v5);
+
+            vector<uint64_t> intersect;
+            result_v->decode(intersect);
+            total_elem += intersect.size();
+            cout << "Intersection Size: " << intersect.size() << endl;
 
             total_time_v += time_v;
             total_time_v5 += time_v5;
@@ -433,6 +440,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     cout << "---------------------------------------" << endl;
     // cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
     cout << "Número total de queries: " << number_of_queries << endl;
+    cout << "Número total elementos: " << total_elem << endl;
     cout << "Tiempo promedio rank v:" << (float)(total_time_v*10e-6)/number_of_queries << "[ms]" << endl;
     cout << "Tiempo promedio rank v5:" << (float)(total_time_v5*10e-6)/number_of_queries << "[ms]" << endl;
     // cout << "Tiempo promedio B&K: " << (float)(total_time_bk*10e-6)/number_of_queries << "[ms]" << endl;

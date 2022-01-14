@@ -71,13 +71,14 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
 	for (uint16_t i = 0; i < n_tries; ++i) {
         if (activeTries[i]){
             uint64_t node_i = Bs[i].getNode(roots[i]);
-            if (node_i == 0b00)
-                tempActiveTries[i] = false;
-            else {
+            if (node_i != 0b00){
                 tempActiveTries[i] = true;
                 result &= node_i;
                 node00 |= node_i;
             }
+        }
+        else {
+           tempActiveTries[i] = false;
         }
 	}
 
@@ -85,16 +86,20 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
     bool right_one = false;
 
     switch (result) {
-        case 0b00:  left_one = false;
-                    right_one = false;
-                    break;
-        case 0b01:  right_one = true;
-                    break;
-        case 0b10:  left_one = true;
-                    break;
-        case 0b11:  left_one = true;
-                    right_one = true;
-                    break;
+        case 0b00:  
+            // left_one = false;
+            // right_one = false;
+            break;
+        case 0b01:  
+            right_one = true;
+            break;
+        case 0b10:  
+            left_one = true;
+            break;
+        case 0b11:
+            left_one = true;
+            right_one = true;
+            break;
     }
 
     // End condition
@@ -123,6 +128,18 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
 
     bool exist_lchild;
     bool exist_rchild;
+
+    // for (uint16_t i = 0; i < n_tries; ++i){
+    //     if (left_one && activeTries[i])
+    //         left_nodes[i] = Bs[i].getLeftChild(roots[i]);
+
+    //     if (right_one && activeTries[i]){
+    //         if (left_one)
+    //             right_nodes[i] = left_nodes[i] + 1;
+    //         else
+    //             right_nodes[i] = Bs[i].getRightChild(roots[i]);
+    //     }
+    // }
 	
     // Left child
     if (left_one) {
@@ -132,6 +149,8 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
 		}
         runsEncodedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
     }
+    // if (left_one)
+    //     runsEncodedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
 
     if (last_pos[next_level] == pos_next_level_before) {
         exist_lchild = false;
@@ -155,6 +174,8 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
         }
         runsEncodedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
     }
+    // if (right_one)
+    //     runsEncodedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
     
     if (last_pos[next_level] == pos_next_level_before) {
         exist_rchild = false;

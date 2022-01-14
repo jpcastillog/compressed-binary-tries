@@ -1,4 +1,4 @@
-CFLAGS = -std=c++11 -msse4.2 -O3
+CFLAGS = -std=c++11 -msse4.2 -O3 -march=native
 CC = g++
 
 program: main.o intersection.o util_functions.o barbay_and_kenyon.o

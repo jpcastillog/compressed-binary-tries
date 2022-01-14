@@ -241,7 +241,7 @@ class flatBinTrie{
         };
 
 
-        flatBinTrie(vector<uint64_t> ones_to_write[], uint16_t height, vector<uint64_t> level_pos, bool runs_encoded) {
+        flatBinTrie(vector<uint64_t> ones_to_write[], uint16_t height, vector<uint64_t> &level_pos, bool runs_encoded) {
             flatBinTrie::runs_encoded = runs_encoded;
             flatBinTrie::height = height;
             uint64_t bits_n = 0;
@@ -278,6 +278,27 @@ class flatBinTrie{
         
         inline uint64_t getNode(uint64_t node_id) {
             uint64_t node = 0;
+            // uint64_t left_bit;
+            // uint64_t right_bit;
+            // switch ((*bTrie)[2*node_id]){
+            //     case(1):
+            //         left_bit = 0b10;
+            //         break;
+            //     case(0):
+            //         left_bit = 0b00;
+            //         break;
+            // }
+            // switch((*bTrie)[(2*node_id) + 1]) {
+            //     case(1):
+            //         right_bit = 0b01;
+            //         break;
+            //     case(0):
+            //         right_bit = 0b00;
+
+            // }
+
+            // return left_bit|right_bit;
+
             if ((*bTrie)[2*node_id] == 1)
                 node = (node | (1ULL << 1));
 
@@ -288,14 +309,16 @@ class flatBinTrie{
 
 
         inline uint64_t getLeftChild(uint64_t node_id) {
-            uint64_t left_child_id = flatBinTrie::b_rank((2*node_id) + 1);
-            return left_child_id;
+            // uint64_t left_child_id = flatBinTrie::b_rank((2*node_id) + 1);
+            // return left_child_id;
+            return flatBinTrie::b_rank((2*node_id) + 1);
         };
 
 
         inline uint64_t getRightChild(uint64_t node_id) {
-            uint64_t right_child_id = b_rank((2*node_id) + 2) ;
-            return right_child_id;
+            // uint64_t right_child_id = b_rank((2*node_id) + 2) ;
+            // return right_child_id;
+            return flatBinTrie::b_rank((2*node_id) + 2);
         };
 
 
