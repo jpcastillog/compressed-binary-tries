@@ -80,7 +80,7 @@ std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t 
 }
 
 
-void read_inverted_index(string file_path) {
+void testSpaceII(string file_path) {
     std::ifstream input_stream(file_path);
     if (!input_stream.is_open()) {
         cout << "No se pudo abrir el archivo: " << file_path << endl;
@@ -300,7 +300,6 @@ void randomQueries(string file_path) {
     cout <<  "Avg time, rank V: " << (float) (total_time_v*10e-6)/1000 << "[ms]"<< endl;
     cout <<  "Avg time, rank V5: " << (float) (total_time_v5*10e-6)/1000 << "[ms]"<< endl;
 }
-
 
 
 void performQueryLog(string query_log_path, string ii_path) {

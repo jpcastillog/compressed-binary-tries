@@ -15,8 +15,8 @@ using namespace std;
 template <class rankType>
 class flatBinTrie{
     private:
-        uint16_t height;
-        uint16_t height_with_runs;
+        uint16_t height; // original height of trie
+        uint16_t height_with_runs; // height with runs encoded
         bool runs_encoded;
 
     public:
@@ -414,20 +414,30 @@ class flatBinTrie{
             }
         };
 
-
-        inline void writesOnes(vector<uint64_t> ones_to_write[], vector<uint64_t> level_pos){
+        // Method write ones in bit vector
+        inline void writeOnes(vector<uint64_t> ones_to_write[], vector<uint64_t> level_pos){
             flatBinTrie::runs_encoded = true;
             uint64_t bits_n = 0;
+            uint16_t last_level = 0;
+            uint16_t bits_before_last_level;
             for (uint16_t level = 0; level < flatBinTrie::height; ++level) {
                 bits_n += level_pos[level];
+                if (level_pos[level] > 0) {
+                    last_level = level; 
+                }
+                else {
+                    bits_before_last_level = bits_n - level_pos[level - 1];
+                }
+                
             }
-            // cout << "number of bits: " << bits_n << endl;
+            flatBinTrie::height_with_runs = last_level + 1;
             delete flatBinTrie::bTrie;
+            
             flatBinTrie::bTrie = new bit_vector(bits_n, 0);
             flatBinTrie::level_pos = vector<uint64_t>(height, 0);
 
             uint64_t global_level_pos = 0;
-            for (uint16_t level = 0; level < height; ++level) {
+            for (uint16_t level = 0; level < height_with_runs; ++level) {
                 for (uint64_t i = 0; i < ones_to_write[level].size(); ++i) {
                     uint64_t pos = global_level_pos + ones_to_write[level][i];
                     (*flatBinTrie::bTrie)[pos] = 1;
@@ -444,8 +454,10 @@ class flatBinTrie{
             vector<uint64_t> ones_to_write[flatBinTrie::height];
             vector<uint64_t> level_pos(flatBinTrie::height, 0);
             bool itsOneOne = false;
+
             flatBinTrie::writeCompressTrie(ones_to_write, level_pos, 0, 0, itsOneOne);
-            writesOnes(ones_to_write, level_pos);
+            
+            writeOnes(ones_to_write, level_pos);
         };
 
         
