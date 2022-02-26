@@ -13,6 +13,8 @@ vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t n);
 
 void testSpaceII(string file_path);
 
+void testSpaceInvertedIndex(std::string ii_path);
+
 void force_brute_intersection(vector<uint64_t> Sets[], uint16_t k, vector<uint64_t> &intersection);
 
 void performQueryLog(string query_log_path, string ii_path);

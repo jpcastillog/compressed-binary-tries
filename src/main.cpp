@@ -14,11 +14,20 @@ int main() {
     // string file_path = "./../../../../data/bitvectors/ii/gov2/url/gov2_ii_nofreq_url_dif.txt.B";
     // string file_path = "./../../../..//data/GOV2/index/ii/absDocIDS/gov2_url_absolute_freqs.ii";
     // string  query_path = "./../../../../data/GOV2/index/queries/queries_gov2.txt";
-    string file_path = "../Investigacion/data/GOV2_ii_1000/ii_random_1000.txt";
-    string  query_path = "../Investigacion/data/GOV2_ii_1000/queryLog_1000pairs.txt";
-    performQueryLog(query_path, file_path);
+    // string file_path = "../Investigacion/data/GOV2_ii_1000/ii_random_1000.txt";
+    // string  query_path = "../Investigacion/data/GOV2_ii_1000/queryLog_1000pairs.txt";
+    // string file_path = "/mnt/d/data/ClueWeb12/cw12b-complete-20200309.pisa.docs";
+    // string file_path = "/mnt/d/data/CC-News/cc-news-en.pisa.docs";
+    // string file_path = "/mnt/d/data/Gov2Flat/gov2.sorted";
+    string file_path = "/mnt/d/data/ClueWeb09Flat/clueweb09.sorted";
+    // string file_path = "/mnt/d/data/CC-News/cc-news-en-url-sorted.docs";
+
+
+    // performQueryLog(query_path, file_path);
     // read_inverted_index(file_path);
     // randomQueries(file_path);
+
+    testSpaceInvertedIndex(file_path);
 }
 
 // int main() {

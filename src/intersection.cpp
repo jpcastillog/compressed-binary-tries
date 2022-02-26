@@ -58,7 +58,7 @@ void intersection(vector <binTrie> &Bs, uint16_t max_level, uint16_t curr_level,
 template <class rankType>
 void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_level, uint16_t curr_level, 
                 uint64_t *roots, vector<uint64_t> &last_pos,
-                vector<uint64_t> *ones_to_write, vector<uint64_t> &nodes_per_level, bool *activeTries) {
+                vector<uint64_t> *ones_to_write, bool *activeTries) {
 	
 	uint16_t n_tries = Bs.size();
 	uint64_t result = 0b11; // 0....11
@@ -87,14 +87,16 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
 
     switch (result) {
         case 0b00:  
-            // left_one = false;
-            // right_one = false;
+            left_one = false;
+            right_one = false;
             break;
-        case 0b01:  
+        case 0b01:
+            left_one = false;  
             right_one = true;
             break;
         case 0b10:  
             left_one = true;
+            right_one = false;
             break;
         case 0b11:
             left_one = true;
@@ -114,7 +116,7 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
         }
 		return;
 	}
-    // all nodes are 00..0
+    // all nodes are 00...0
     if (node00 == 0b00) {
         last_pos[curr_level] += 2;
         return;
@@ -147,7 +149,7 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
             if (activeTries[i])
 			    left_nodes[i] = Bs[i].getLeftChild(roots[i]);
 		}
-        runsEncodedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
+        runsEncodedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, tempActiveTries);
     }
     // if (left_one)
     //     runsEncodedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
@@ -172,7 +174,7 @@ void runsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max_le
                     right_nodes[i] = Bs[i].getRightChild(roots[i]);
             } 
         }
-        runsEncodedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
+        runsEncodedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, tempActiveTries);
     }
     // if (right_one)
     //     runsEncodedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
@@ -299,7 +301,8 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_en
     bool activeTries[16] = { true, true, true, true,
                              true, true, true, true,
                              true, true, true, true,
-                             true, true, true, true }; // active tries in compressed implementation
+                             true, true, true, true }; 
+                            // active tries in runs encode implementation
     uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
     
@@ -307,18 +310,18 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_en
     vector<uint64_t> ones_to_write[max_level];
     vector<uint64_t> nodes_per_level(max_level, 0);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    // auto start = std::chrono::high_resolution_clock::now();
 
     if (runs_encoded) {
-        runsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level, activeTries);
+        runsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, activeTries);
     }
     else {
         notRunsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level);
     }
     
-    auto end = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    time = elapsed.count();
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    // time = elapsed.count();
     // cout <<"|Time execution: " << (float)time*10e-6 << "[ms]" << endl;
 
     flatBinTrie<rankType>* result = new flatBinTrie<rankType>(ones_to_write, max_level, last_pos, runs_encoded);

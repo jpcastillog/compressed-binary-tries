@@ -12,7 +12,6 @@
 #include "barbay_and_kenyon.hpp"
 
 
-
 bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
     uint64_t size1 = v1.size();
     uint64_t size2 = v2.size();
@@ -30,6 +29,19 @@ bool compareVectors(vector<uint64_t> &v1, vector<uint64_t> &v2) {
 
     cout << "All elements are equal" << endl;
     return true;
+}
+
+
+void writeVector(vector<uint64_t> &v, string path) {
+    ofstream o;
+    o.open(path);
+
+    vector<uint64_t>::iterator it;
+    for (it = v.begin(); it != v.end(); ++it) {
+        o << *it << endl;
+    }
+
+    o.close();
 }
 
 
@@ -77,6 +89,77 @@ std::vector<uint64_t>* read_inverted_list(std::ifstream &input_stream, uint64_t 
     }
 
     return inverted_list;
+}
+
+
+vector<uint64_t>* read_inverted_list_B(std::ifstream &input_stream, uint32_t n) {
+
+    vector <uint64_t>* il = new vector<uint64_t>();
+    il -> reserve(n);
+    for (uint32_t i = 0; i < n; ++i) {
+        uint32_t x;
+        input_stream.read(reinterpret_cast<char *>(&x), 4);
+        il -> push_back((uint64_t)x);
+    }
+    return il;
+}
+
+
+void testSpaceInvertedIndex(std::string ii_path) {
+    std::ifstream input_stream;
+    input_stream.open(ii_path, std::ios::binary | std::ios::in);
+    if (!input_stream.is_open()) {
+        cout << "No se pudo abrir el archivo: " << ii_path << endl;
+        return;
+    }
+
+    // std::ifstream sizes(sizes_path, std::ios::binary);
+    // if (!input_stream.is_open()) {
+    //     cout << "No se pudo abrir el archivo: " << sizes_path << endl;
+    //     return;
+    // }
+
+    uint32_t a, u;
+
+    input_stream.read(reinterpret_cast<char *>(&a), sizeof(a));
+    input_stream.read(reinterpret_cast<char *>(&u), sizeof(u));
+    
+    cout << "Universe: " << u << endl;
+
+    uint64_t total_size = 0;
+    uint64_t total_elements = 0;
+    uint64_t n_il = 0;
+    for (uint32_t i = 0; i < u; ++i) {
+        
+        uint32_t n;
+        input_stream.read(reinterpret_cast<char *>(&n), 4);
+        if (n > 4096){
+            vector <uint64_t> *il;
+            il = read_inverted_list_B(input_stream, n);
+            uint64_t max_value = (*il)[ n - 1];
+            flatBinTrie<rank_support_v5<1>> trie_v (*il, max_value);
+            trie_v.encodeRuns();
+
+            uint64_t trie_bytes_size = trie_v.size_in_bytes();
+            total_size += trie_bytes_size;
+            total_elements += n;
+            n_il++;
+
+            cout << "#Elements: " << n << " | Bpi: " << (float)(trie_bytes_size*8)/n << endl;
+            
+            delete il;
+        }
+
+        else {
+            input_stream.seekg(4*n, ios::cur);
+        }
+        
+    }
+    input_stream.close();
+
+    cout << "Total inverted lists: " << n_il << "| Bpi: " << (float)(total_size*8)/total_elements << endl;
+    
+    return;
 }
 
 
@@ -303,7 +386,6 @@ void randomQueries(string file_path) {
 
 
 void performQueryLog(string query_log_path, string ii_path) {
-    
     std::ifstream query_stream(query_log_path);
     std::ifstream ii_stream(ii_path);
 
@@ -377,6 +459,7 @@ void performQueryLog(string query_log_path, string ii_path) {
     uint64_t total_time_v5 = 0;
     uint64_t total_time_bk = 0;
     uint64_t total_elem = 0;
+    vector<uint64_t> intersections_elements;
     while ( getline( query_log_stream, line ) ) {
         vector <flatBinTrie<rank_support_v<1>>> Bs_v;
         vector <flatBinTrie<rank_support_v5<1>>> Bs_v5;
@@ -400,13 +483,25 @@ void performQueryLog(string query_log_path, string ii_path) {
             
             uint64_t time_v;
             uint64_t time_v5;
+            auto start_v = std::chrono::high_resolution_clock::now();
             result_v = joinTries<rank_support_v<1>>(Bs_v, true, time_v);
+            auto end_v = std::chrono::high_resolution_clock::now();
+            auto elapsed_v = std::chrono::duration_cast<std::chrono::nanoseconds>(end_v - start_v);
+            time_v = elapsed_v.count();
+            
+            auto start_v5 = std::chrono::high_resolution_clock::now();
             result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, true, time_v5);
-
+            auto end_v5 = std::chrono::high_resolution_clock::now();
+            auto elapsed_v5 = std::chrono::duration_cast<std::chrono::nanoseconds>(end_v5 - start_v5);
+            time_v5 = elapsed_v5.count();
+            
             vector<uint64_t> intersect;
+            // force_brute_intersection(sets.data(), 2, intersect);
             result_v->decode(intersect);
             total_elem += intersect.size();
             cout << "Intersection Size: " << intersect.size() << endl;
+            
+            intersections_elements.push_back(intersect.size());
 
             total_time_v += time_v;
             total_time_v5 += time_v5;
@@ -436,6 +531,7 @@ void performQueryLog(string query_log_path, string ii_path) {
         // cout << endl;
         // number_of_queries++;
     }
+    writeVector(intersections_elements, "./elements_compress_structure.txt");
     cout << "---------------------------------------" << endl;
     // cout << "Número maximo de conjuntos por query: " << max_number_of_sets << endl;
     cout << "Número total de queries: " << number_of_queries << endl;
