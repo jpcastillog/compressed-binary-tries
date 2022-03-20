@@ -1,25 +1,34 @@
-CFLAGS = -std=c++11 -msse4.2 -O3 -march=native
+CFLAGS = -std=c++11 -msse4.2 -O3 -march=native 
 CC = g++
+OBJDIR = obj
+SDSLFLAGS = -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
+vpath %.cpp src
+vpath %.hpp src
 
-program: main.o intersection.o util_functions.o barbay_and_kenyon.o
-	$(CC) $(CFLAGS) -o program main.o intersection.o util_functions.o barbay_and_kenyon.o -O3 -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
+program: $(OBJDIR)/main.o $(OBJDIR)/intersection.o $(OBJDIR)/util_functions.o $(OBJDIR)/barbay_and_kenyon.o
+	$(CC) $(CFLAGS) -o program $(OBJDIR)/main.o $(OBJDIR)/intersection.o $(OBJDIR)/util_functions.o $(OBJDIR)/barbay_and_kenyon.o -O3 -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
 
-intersection.o: src/intersection.cpp
-	$(CC) $(CFLAGS) -c src/intersection.cpp -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
+build: test/build_tries.cpp
+	$(CC) $(CFLAGS) test/build_tries.cpp -o build $(SDSLFLAGS)
 
-util_functions.o: src/util_functions.cpp
-	$(CC) $(CFLAGS) -c src/util_functions.cpp -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
+$(OBJDIR)/intersection.o: src/intersection.cpp src/intersection.hpp
+	mkdir -p obj
+	$(CC) $(CFLAGS) -c -o $@ src/intersection.cpp $(SDSLFLAGS)
 
-barbay_and_kenyon.o: src/barbay_and_kenyon.cpp
-	$(CC) $(CFLAGS) -c src/barbay_and_kenyon.cpp
+$(OBJDIR)/util_functions.o: src/util_functions.cpp src/util_functions.hpp
+	mkdir -p obj
+	$(CC) $(CFLAGS) -c -o $@ src/util_functions.cpp $(SDSLFLAGS)
 
-main.o: src/main.cpp
-	$(CC) $(CFLAGS) -c src/main.cpp  -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
-	
+$(OBJDIR)/barbay_and_kenyon.o: src/barbay_and_kenyon.cpp src/barbay_and_kenyon.hpp
+	mkdir -p obj
+	$(CC) $(CFLAGS) -c -o $@ src/barbay_and_kenyon.cpp
+
+$(OBJDIR)/main.o: src/main.cpp
+	mkdir -p obj
+	$(CC) $(CFLAGS) -c -o $@ src/main.cpp $(SDSLFLAGS)
+
 clean:
-	rm -f core *.o program
+	rm -f core $(OBJDIR)/*.o program build
 
 run: 
 	./program
-
-# g++ -std=c++11 -O3 -DNDEBUG -I ~/include -L ~/lib src/main.cpp -o program -lsdsl -ldivsufsort -ldivsufsort64

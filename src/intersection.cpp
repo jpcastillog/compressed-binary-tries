@@ -203,8 +203,11 @@ void notRunsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max
     // Compute "bitwise and" between nodes of n_tries  
 	for (uint16_t i = 0; i < n_tries; ++i) {
 		uint64_t node_i = Bs[i].getNode(roots[i]);
+        cout << node_i << " ";
 		result &= node_i;
 	}
+
+    cout  << endl;
 
     bool left_one = false;
     bool right_one = false;
@@ -294,7 +297,8 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_en
     
     uint16_t max_level = 0;
     for (uint16_t i = 0; i < Bs.size(); ++i) {
-        if (Bs[i].getHeight() > max_level) max_level = Bs[i].getHeight();
+        if (Bs[i].getHeight() > max_level) 
+            max_level = Bs[i].getHeight();
     }
 
     // max 16 relations
