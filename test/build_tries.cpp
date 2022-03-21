@@ -30,12 +30,18 @@ void buildCollection(std::string input_path, std::string out_path,
         cout << "Can't open file:  " << input_path << endl;
         return;
     }
+    std::ofstream out(out_path, ios::out | ios::binary);
 
-    uint32_t a, u;
+    uint32_t _1, u;
     // Read universe of collection
-    input_stream.read(reinterpret_cast<char *>(&a), sizeof(a));
+    input_stream.read(reinterpret_cast<char *>(&_1), sizeof(_1));
     input_stream.read(reinterpret_cast<char *>(&u), sizeof(u));
-
+    
+    // Write universe in out file
+    if (out_path != "") {
+        out.write(reinterpret_cast<char *> (&_1), sizeof(_1));
+        out.write(reinterpret_cast<char *> (&u), sizeof(u));
+    }
     cout << "Universe: " << u << endl;
 
     uint64_t total_size = 0;
@@ -62,7 +68,9 @@ void buildCollection(std::string input_path, std::string out_path,
                 flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
                 if (runs)
                     trie_v.encodeRuns();
-                
+                if (out_path != "") {
+                    trie_v.serialize(out);
+                }
                 trie_bytes_size = trie_v.size_in_bytes();
                 trie_v.free();
             }
@@ -71,8 +79,9 @@ void buildCollection(std::string input_path, std::string out_path,
                 flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, max_value);
                 if (runs)
                     trie_v5.encodeRuns();
-                // Write trie in file here!!
-                //
+                if (out_path != "") {
+                    trie_v5.serialize(out);
+                }
                 trie_bytes_size = trie_v5.size_in_bytes();
                 trie_v5.free();
             }
@@ -81,7 +90,10 @@ void buildCollection(std::string input_path, std::string out_path,
             n_il++;
 
             // cout << "#Elements: " << n << " | Bpi: " << (float)(trie_bytes_size*8)/n << endl;
-            
+            if ((n_il % 1000) == 0) {
+                cout << n_il  <<" lists processed " << endl;
+            }
+
             delete il;
         }
 
@@ -91,6 +103,7 @@ void buildCollection(std::string input_path, std::string out_path,
         
     }
     input_stream.close();
+    out.close();
 
     cout << "Total inverted lists: " << n_il << "| Bpi: " << (float)(total_size*8)/total_elements << endl;
     cout << "Total ints: " << total_elements << endl;
@@ -118,7 +131,7 @@ int main(int argc, char** argv) {
     bool runs;
     std::string output_filename = "";
     std::string input_filename = std::string(argv[1]);
-    cout << argv[0] << endl;
+    
     for (int i = 1; i < argc; ++i){
         if (std::string(argv[i]) == "--min_size") {
             ++i;
@@ -140,7 +153,7 @@ int main(int argc, char** argv) {
             else
                 runs = false;
         }
-        if (std::string(argv[i]) == "--output_filename") {
+        if (std::string(argv[i]) == "--out") {
             ++i;
             output_filename = std::string(argv[i]);
         }
@@ -149,6 +162,7 @@ int main(int argc, char** argv) {
     // std::cout << "Min size: " << min_size << std::endl;
     // std::cout << "Rank: " << rank << std::endl;
     // std::cout << "Runs: " << runs << std::endl;
+    std::cout << output_filename << endl;
     
     // Call function here
     buildCollection(input_filename, output_filename, min_size, rank, runs);
