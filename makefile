@@ -11,6 +11,9 @@ program: $(OBJDIR)/main.o $(OBJDIR)/intersection.o $(OBJDIR)/util_functions.o $(
 build: test/build_tries.cpp
 	$(CC) $(CFLAGS) test/build_tries.cpp -o build $(SDSLFLAGS)
 
+queries: test/intersection_query_log.cpp
+	$(CC) $(CFLAGS) test/intersection_query_log.cpp -o queries $(SDSLFLAGS)
+
 $(OBJDIR)/intersection.o: src/intersection.cpp src/intersection.hpp
 	mkdir -p obj
 	$(CC) $(CFLAGS) -c -o $@ src/intersection.cpp $(SDSLFLAGS)

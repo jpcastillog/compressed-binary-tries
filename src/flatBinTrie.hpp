@@ -20,12 +20,12 @@ class flatBinTrie{
         bool empty_trie = false;
         bool runs_encoded;
 
-    public:
         sdsl::bit_vector *bTrie;
         sdsl::bit_vector *lastLevel;     
         rankType b_rank;
         vector<uint64_t> level_pos;
 
+    public:
         flatBinTrie() = default;
 
         // ~flatBinTrie() {
