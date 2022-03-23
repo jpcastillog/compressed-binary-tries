@@ -48,26 +48,60 @@ vector<vector<uint32_t>>* loadQueryLog(std::string path) {
     std::string line;
     while(std::getline(in, line)) {
         std::vector<uint32_t> query;
-        std::string line;
 
         std::istringstream iss(line);
         for (std::string s; iss >> s;) {
-            cout << "entra al for " << endl;
             uint32_t id = (uint32_t)stoi(s);
             query.push_back(id);
             // cout << (uint32_t)id << " ";
-            cout << s << " ";
+            cout << id << " ";
 
         }
         cout << endl;
         queries->push_back(query);
-        break;
+        // break;
     }
+    cout << "# queries: " << queries->size() << endl;
     return queries;
 }
 
 
 int main(int argc, char const *argv[]) {
-    loadQueryLog("/mnt/d/Data/IntegerCompression2014.3april2014/Gov2Flat/aol.txt");
+    vector<vector<uint32_t>>* queries;
+    queries = loadQueryLog("/mnt/d/Data/IntegerCompression2014.3april2014/Gov2Flat/aol.txt");
+
+    int mandatory = 3;
+
+    if (argc < mandatory){
+        std::cout   << "collection filename"
+                        "query log"
+                        "[--rank v]"
+                    <<
+        std::endl;
+        return 1;
+    }
+
+    int rank;
+    uint64_t min_size;
+    bool runs;
+    std::string collection_filename = std::string(argv[1]);
+    std::string querylog_filename   = std::string(argv[2]);
+    
+    for (int i = 1; i < argc; ++i){
+        if (std::string(argv[i]) == "--rank") {
+            ++i;
+            if (std::string(argv[i]) == "v") {
+                rank = 0;
+            }
+            else {
+                rank = 1;
+            }
+        }
+        if (std::string(argv[i]) == "--out") {
+            ++i;
+            output_filename = std::string(argv[i]);
+        }
+    }
+    
     return 0;
 }
