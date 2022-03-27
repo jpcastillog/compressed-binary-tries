@@ -309,7 +309,7 @@ class flatBinTrie{
                     // (*flatBinTrie::bTrie)[pos] = 1;
                     // new_bv[pos] = 1;
                     // uint64_t pos;
-                    cout << ones_to_write[level][i]<< " ";
+                    // cout << ones_to_write[level][i]<< " ";
                     if (level == max_level_not_empty) {
                         uint64_t pos = ones_to_write[level][i];
                         (*flatBinTrie::lastLevel)[pos] = 1;
@@ -319,7 +319,7 @@ class flatBinTrie{
                         (*flatBinTrie::bTrie)[pos] = 1;
                     }
                 }
-                cout << endl;
+                // cout << endl;
                 if (level == max_level_not_empty) {
                     flatBinTrie::level_pos[level] = level_pos[level];
                 }
@@ -426,9 +426,12 @@ class flatBinTrie{
             in.read(reinterpret_cast<char*>(&empty_trie)      , sizeof(empty_trie));
             in.read(reinterpret_cast<char*>(&runs_encoded)    , sizeof(runs_encoded));
 
+            bTrie = new sdsl::bit_vector();
+            lastLevel = new sdsl::bit_vector();
+
             bTrie     -> load(in);
-            lastLevel -> load(in);
-            b_rank.load(in, *bTrie);
+            lastLevel -> load(in);\
+            b_rank.load(in, bTrie);
         }
 
 

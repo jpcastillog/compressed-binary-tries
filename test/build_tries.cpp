@@ -65,7 +65,8 @@ void buildCollection(std::string input_path, std::string out_path,
             uint64_t max_value = (*il)[n - 1];
             
             if (rank_type == 0) {
-                flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
+                // flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
+                flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, u);
                 if (runs)
                     trie_v.encodeRuns();
                 if (out_path != "") {
@@ -76,7 +77,7 @@ void buildCollection(std::string input_path, std::string out_path,
             }
 
             else {
-                flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, max_value);
+                flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, u);
                 if (runs)
                     trie_v5.encodeRuns();
                 if (out_path != "") {
@@ -127,7 +128,7 @@ int main(int argc, char** argv) {
     }
 
     int rank;
-    uint64_t min_size;
+    uint64_t min_size = 0;
     bool runs;
     std::string output_filename = "";
     std::string input_filename = std::string(argv[1]);

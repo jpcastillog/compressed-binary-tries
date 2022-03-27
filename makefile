@@ -11,8 +11,11 @@ program: $(OBJDIR)/main.o $(OBJDIR)/intersection.o $(OBJDIR)/util_functions.o $(
 build: test/build_tries.cpp
 	$(CC) $(CFLAGS) test/build_tries.cpp -o build $(SDSLFLAGS)
 
-queries: test/intersection_query_log.cpp
-	$(CC) $(CFLAGS) test/intersection_query_log.cpp -o queries $(SDSLFLAGS)
+# queries: test/intersection_query_log.cpp
+# 	$(CC) $(CFLAGS) test/intersection_query_log.cpp -o queries $(SDSLFLAGS)
+
+queries: $(OBJDIR)/intersection_query_log.o $(OBJDIR)/intersection.o
+	$(CC) $(CFLAGS) -o queries $(OBJDIR)/intersection_query_log.o $(OBJDIR)/intersection.o $(SDSLFLAGS)
 
 $(OBJDIR)/intersection.o: src/intersection.cpp src/intersection.hpp
 	mkdir -p obj
@@ -29,6 +32,10 @@ $(OBJDIR)/barbay_and_kenyon.o: src/barbay_and_kenyon.cpp src/barbay_and_kenyon.h
 $(OBJDIR)/main.o: src/main.cpp
 	mkdir -p obj
 	$(CC) $(CFLAGS) -c -o $@ src/main.cpp $(SDSLFLAGS)
+
+$(OBJDIR)/intersection_query_log.o: test/intersection_query_log.cpp
+	mkdir -p obj
+	$(CC) $(CFLAGS) -c -o $@ test/intersection_query_log.cpp $(SDSLFLAGS)
 
 clean:
 	rm -f core $(OBJDIR)/*.o program build
