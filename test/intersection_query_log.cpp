@@ -23,7 +23,7 @@ vector<flatBinTrie<rankType>>* loadSequences(std::string input_path){
     in.read(reinterpret_cast<char*>(&_1), 4);
     in.read(reinterpret_cast<char*>(&u), 4);
     cout << "universe: "<< u << endl;
-    // vector<flatBinTrie<rankType>>* sequences = new vector<flatBinTrie<rankType>>();
+    
     while (true) {
         if (in.eof()){
             break;
@@ -57,15 +57,10 @@ vector<vector<uint32_t>>* loadQueryLog(std::string path) {
         for (std::string s; iss >> s;) {
             uint32_t id = (uint32_t)stoi(s);
             query.push_back(id);
-            // cout << (uint32_t)id << " ";
-            // cout << id << " ";
-
         }
-        // cout << endl;
         queries->push_back(query);
-        // break;
     }
-    // cout << "# queries: " << queries->size() << endl;
+    
     return queries;
 }
 
@@ -124,8 +119,8 @@ void performIntersections( std::string sequences_path, std::string query_path,
 
     cout <<"|Avg time execution: " << (float)(total_time*10e-6)/nq << "[ms]" << endl;
 }
-template void performIntersections<sdsl::rank_support_v<1>> ( std::string sequences_path, std::string query_path, bool runs_encoded);
-template void performIntersections<sdsl::rank_support_v5<1>> ( std::string sequences_path, std::string query_path, bool runs_encoded);
+template void performIntersections<sdsl::rank_support_v<1>> ( std::string sequences_path, std::string query_path, std::string out_path,bool runs_encoded);
+template void performIntersections<sdsl::rank_support_v5<1>> ( std::string sequences_path, std::string query_path, std::string out_path,bool runs_encoded);
 
 
 int main(int argc, char const *argv[]) {

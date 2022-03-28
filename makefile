@@ -38,7 +38,7 @@ $(OBJDIR)/intersection_query_log.o: test/intersection_query_log.cpp
 	$(CC) $(CFLAGS) -c -o $@ test/intersection_query_log.cpp $(SDSLFLAGS)
 
 clean:
-	rm -f core $(OBJDIR)/*.o program build
+	rm -f core $(OBJDIR)/*.o program build queries
 
 run: 
 	./program
