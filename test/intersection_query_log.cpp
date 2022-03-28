@@ -95,14 +95,11 @@ void performIntersections( std::string sequences_path, std::string query_path,
         }
 
         if (Bs.size() <= 16){
-            // cout << Bs[0].getHeight() << " " << Bs[1].getHeight() << endl;
             flatBinTrie<rankType>* intersection;
-
             auto start = std::chrono::high_resolution_clock::now();
             intersection = joinTries<rankType>(Bs, runs_encoded);
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-            // auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
             auto time = elapsed.count();
             
             total_time += time;
@@ -120,29 +117,26 @@ void performIntersections( std::string sequences_path, std::string query_path,
             ++nq;
         }
     }
-
     out.close();
+
     delete sequences;
     delete queries;
 
     cout <<"|Avg time execution: " << (float)(total_time*10e-6)/nq << "[ms]" << endl;
-    // cout <<"|Avg time execution: " << (float)(total_time)/nq << "[ms]" << endl;
 }
 template void performIntersections<sdsl::rank_support_v<1>> ( std::string sequences_path, std::string query_path, bool runs_encoded);
 template void performIntersections<sdsl::rank_support_v5<1>> ( std::string sequences_path, std::string query_path, bool runs_encoded);
 
 
 int main(int argc, char const *argv[]) {
-    vector<vector<uint32_t>>* queries;
-    // queries = loadQueryLog("/mnt/d/Data/IntegerCompression2014.3april2014/Gov2Flat/aol.txt");
-
-    int mandatory = 3;
-
+    int mandatory = 5;
+    // (*) mandatory parameters
     if (argc < mandatory){
-        std::cout   << "collection filename"
-                        "query log"
-                        "[--runs r]"
-                        "[--rank v]"
+        std::cout   << "collection filename" // (*)
+                        "query log"          // (*)
+                        "[--runs r]"         // (*)
+                        "[--rank v]"         // (*)
+                        "[--out results_filename]"
                     <<
         std::endl;
         return 1;
@@ -176,14 +170,12 @@ int main(int argc, char const *argv[]) {
             output_filename = std::string(argv[i]);
         }
     }
-    cout << "rank: " << rank << endl;
-    cout << "runs: " << runs << endl;
 
     if (rank == 0) {
-        performIntersections<sdsl::rank_support_v<1>>(sequences_filename, querylog_filename, runs);
+        performIntersections<sdsl::rank_support_v<1>>(sequences_filename, querylog_filename, output_filename,runs);
     }
     else {
-        performIntersections<sdsl::rank_support_v5<1>>(sequences_filename, querylog_filename, runs);
+        performIntersections<sdsl::rank_support_v5<1>>(sequences_filename, querylog_filename, output_filename, runs);
     }
     
     return 0;
