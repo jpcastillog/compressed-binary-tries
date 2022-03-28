@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 #include "../src/flatBinTrie.hpp"
 #include "../src/intersection.hpp"
 
@@ -69,8 +70,13 @@ vector<vector<uint32_t>>* loadQueryLog(std::string path) {
 }
 
 template <class rankType>
-void performIntersections( std::string sequences_path, 
-                           std::string query_path, bool runs_encoded) {
+void performIntersections( std::string sequences_path, std::string query_path,
+                           std::string out_path, bool runs_encoded) {
+    std::ofstream out;
+    if (out_path != "") {
+        out.open(out_path, std::ios::out);
+        out << "elements_per_query,time execution,size_intersection" << std::endl; 
+    }
 
     vector<vector<uint32_t>>* queries;
     vector<flatBinTrie<rankType>>* sequences;
@@ -87,28 +93,35 @@ void performIntersections( std::string sequences_path,
         for(int j = 0; j < (*queries)[i].size(); ++j) {
             Bs.push_back((*sequences)[(*queries)[i][j]]);
         }
+
         if (Bs.size() <= 16){
-            cout << Bs[0].getHeight() << " " << Bs[1].getHeight() << endl;
+            // cout << Bs[0].getHeight() << " " << Bs[1].getHeight() << endl;
             flatBinTrie<rankType>* intersection;
-            cout << "Query size: " << Bs.size() << endl;
-            uint64_t time2;
+
             auto start = std::chrono::high_resolution_clock::now();
-            intersection = joinTries<rankType>(Bs, runs_encoded, time2);
+            intersection = joinTries<rankType>(Bs, runs_encoded);
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
             // auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
             auto time = elapsed.count();
+            
             total_time += time;
             vector<uint64_t> decode_r;
             intersection -> decode(decode_r);
-            // cout << nq << " |Time execution: " << (float)time*10e-6 << "[ms]" << endl;
-            cout << nq << " |Time execution: " << time*10e-6 << "[ms] |" << decode_r.size()<< endl;
+            cout << nq << "Query size: "<< Bs.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" << endl;
             
+            // Write results in a out file
+            if (out.is_open()) {
+                out << Bs.size() << "," << (float)time*10e-6 << "," << decode_r.size() << std::endl;
+            }
+
             intersection -> free();
             delete intersection;
             ++nq;
         }
     }
+
+    out.close();
     delete sequences;
     delete queries;
 

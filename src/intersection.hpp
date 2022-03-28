@@ -10,7 +10,7 @@
 #include "flatBinTrie.hpp"
 
 template<class rankType>
-flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded, uint64_t &time);
+flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded);
 
 
 #endif

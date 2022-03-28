@@ -348,6 +348,16 @@ class flatBinTrie{
             return flatBinTrie::height;
         };
 
+        // Return number of elements coded in a trie
+        inline uint64_t elements_coded() {
+            uint64_t counter_ones = 0;
+            for (uint64_t i = 0; i < flatBinTrie::lastLevel -> size(); ++i) {
+                if ((*flatBinTrie::lastLevel)[i] == 1) 
+                    counter_ones++;
+            }
+            return counter_ones;
+        }
+
         
         inline uint64_t getNode(uint64_t node_id) {
             // uint64_t node = 0;

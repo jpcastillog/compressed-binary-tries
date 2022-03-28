@@ -293,7 +293,7 @@ void notRunsEncodedIntersection(vector <flatBinTrie<rankType>> &Bs, uint16_t max
 
 
 template<class rankType>
-flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded, uint64_t &time) {
+flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded) {
     
     uint16_t max_level = 0;
     for (uint16_t i = 0; i < Bs.size(); ++i) {
@@ -333,5 +333,5 @@ flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_en
 
     return result;
 }
-template flatBinTrie<rank_support_v5<1>>* joinTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool runs_encoded, uint64_t &time);
-template flatBinTrie<rank_support_v<1>>* joinTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool runs_encoded, uint64_t &time);
+template flatBinTrie<rank_support_v5<1>>* joinTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool runs_encoded);
+template flatBinTrie<rank_support_v<1>>* joinTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool runs_encoded);
