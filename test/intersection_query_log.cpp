@@ -82,13 +82,14 @@ void performIntersections( std::string sequences_path, std::string query_path,
     cout << "Queries loaded succefully" << endl;
 
     uint64_t nq = 0;
-    auto total_time = 0;
+    long unsigned int total_time = 0;
     for (int i = 0; i < queries -> size(); ++i) {
         vector<flatBinTrie<rankType>> Bs;
         for(int j = 0; j < (*queries)[i].size(); ++j) {
             Bs.push_back((*sequences)[(*queries)[i][j]]);
+            // cout << (*sequences)[(*queries)[i][j]].getHeight() << endl;
         }
-
+        // cout << "Query size: " << Bs.size() << endl;
         if (Bs.size() <= 16){
             flatBinTrie<rankType>* intersection;
             auto start = std::chrono::high_resolution_clock::now();
@@ -97,18 +98,18 @@ void performIntersections( std::string sequences_path, std::string query_path,
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
             auto time = elapsed.count();
             
-            total_time += time;
             vector<uint64_t> decode_r;
             intersection -> decode(decode_r);
-            cout << nq << "Query size: "<< Bs.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" << endl;
+            cout << nq << " |Query size: "<< Bs.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" 
+                 << "| intersection size: " << decode_r.size() << endl;
             
             // Write results in a out file
             if (out.is_open()) {
                 out << Bs.size() << "," << (float)time*10e-6 << "," << decode_r.size() << std::endl;
             }
-
-            intersection -> free();
-            delete intersection;
+             total_time += time;
+            // intersection -> free();
+            // delete intersection;
             ++nq;
         }
     }

@@ -392,12 +392,18 @@ class flatBinTrie{
 
 
         inline uint64_t getLeftChild(uint64_t node_id) {
-            return flatBinTrie::b_rank((2*node_id) + 1);
+            if (2*node_id + 1 <= flatBinTrie::bTrie -> size() -1)
+                return flatBinTrie::b_rank((2*node_id) + 1);
+            else 
+                return 0;
         };
 
 
         inline uint64_t getRightChild(uint64_t node_id) {
-            return flatBinTrie::b_rank((2*node_id) + 2);
+            if (2*node_id + 2 <= flatBinTrie::bTrie -> size() -1)
+                return flatBinTrie::b_rank((2*node_id) + 2);
+            else 
+                return 0;
         };
 
 
@@ -639,7 +645,9 @@ class flatBinTrie{
 
         inline void runsRecursiveDecode(vector<uint64_t> &decoded, uint64_t partial_int, uint64_t node_id, uint16_t curr_level) {
             if (curr_level == flatBinTrie::height) {
+                // cout << "antes" << endl;
                 decoded.push_back(partial_int);
+                // cout << "despues" << endl;
                 return;
             }
 
@@ -673,9 +681,9 @@ class flatBinTrie{
 
         inline void decode( vector<uint64_t> &decoded) {
             if (flatBinTrie::runs_encoded) {
-                
-                if (flatBinTrie::empty_trie)
+                if (flatBinTrie::empty_trie) {
                     return;
+                }
                 else {
                     uint64_t partial_int = 0x00;
                     runsRecursiveDecode(decoded, partial_int, 0, 0);
