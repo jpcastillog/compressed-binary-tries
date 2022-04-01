@@ -15,6 +15,10 @@ using namespace std;
 template <class rankType>
 class flatBinTrie{
     private:
+        
+
+    public:
+
         uint16_t height; // original height of trie
         uint16_t height_with_runs; // height with runs encoded
         bool empty_trie = false;
@@ -25,7 +29,6 @@ class flatBinTrie{
         rankType b_rank;
         vector<uint64_t> level_pos;
 
-    public:
         flatBinTrie() = default;
 
         // ~flatBinTrie() {

@@ -3,14 +3,16 @@
 #include <fstream>
 #include "../src/flatBinTrie.hpp"
 #include "../src/intersection.hpp"
+#include "../src/binTrie_il.hpp"
+#include <sdsl/bit_vectors.hpp>
 
 using namespace std;
 using namespace sdsl;
 
-template <class rankType>
-vector<flatBinTrie<rankType>>* loadSequences(std::string input_path){
+template <typename trieType>
+vector<trieType>* loadSequences(std::string input_path){
 
-    vector<flatBinTrie<rankType>>* sequences = new vector<flatBinTrie<rankType>>();
+    vector<trieType>* sequences = new vector<trieType>();
     std::ifstream in;
     in.open(input_path, std::ios::binary | std::ios::in);
     if (!in.is_open()) {
@@ -28,15 +30,16 @@ vector<flatBinTrie<rankType>>* loadSequences(std::string input_path){
         if (in.eof()){
             break;
         }
-        flatBinTrie <rankType> b;
+        trieType b;
         b.load(in);
         sequences -> push_back(b);
     }
 
     return sequences;
 }
-template vector<flatBinTrie<sdsl::rank_support_v<1>>>* loadSequences<sdsl::rank_support_v<1>>(std::string input_path);
-template vector<flatBinTrie<sdsl::rank_support_v5<1>>>* loadSequences<sdsl::rank_support_v5<1>>(std::string input_path);
+template vector<flatBinTrie<sdsl::rank_support_v<1>>>* loadSequences<flatBinTrie<sdsl::rank_support_v<1>>>(std::string input_path);
+template vector<flatBinTrie<sdsl::rank_support_v5<1>>>* loadSequences<flatBinTrie<sdsl::rank_support_v5<1>>>(std::string input_path);
+template vector<binTrie_il<512,sdsl::rank_support_il<1,512>>>* loadSequences<binTrie_il<512,sdsl::rank_support_il<1,512>>>(std::string input_path);
 
 
 
@@ -64,7 +67,7 @@ vector<vector<uint32_t>>* loadQueryLog(std::string path) {
     return queries;
 }
 
-template <class rankType>
+template <class trieType>
 void performIntersections( std::string sequences_path, std::string query_path,
                            std::string out_path, bool runs_encoded) {
     std::ofstream out;
@@ -74,9 +77,9 @@ void performIntersections( std::string sequences_path, std::string query_path,
     }
 
     vector<vector<uint32_t>>* queries;
-    vector<flatBinTrie<rankType>>* sequences;
+    vector<trieType>* sequences;
 
-    sequences = loadSequences<rankType>(sequences_path);
+    sequences = loadSequences<trieType>(sequences_path);
     cout << "Sequences loaded succefully" << endl;
     queries   = loadQueryLog(query_path);
     cout << "Queries loaded succefully" << endl;
@@ -84,16 +87,16 @@ void performIntersections( std::string sequences_path, std::string query_path,
     uint64_t nq = 0;
     long unsigned int total_time = 0;
     for (int i = 0; i < queries -> size(); ++i) {
-        vector<flatBinTrie<rankType>> Bs;
+        vector<trieType> Bs;
         for(int j = 0; j < (*queries)[i].size(); ++j) {
             Bs.push_back((*sequences)[(*queries)[i][j]]);
             // cout << (*sequences)[(*queries)[i][j]].getHeight() << endl;
         }
         // cout << "Query size: " << Bs.size() << endl;
         if (Bs.size() <= 16){
-            flatBinTrie<rankType>* intersection;
+            trieType* intersection;
             auto start = std::chrono::high_resolution_clock::now();
-            intersection = joinTries<rankType>(Bs, runs_encoded);
+            intersection = joinTries<trieType>(Bs, runs_encoded);
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
             auto time = elapsed.count();
@@ -120,8 +123,9 @@ void performIntersections( std::string sequences_path, std::string query_path,
 
     cout <<"|Avg time execution: " << (float)(total_time*10e-6)/nq << "[ms]" << endl;
 }
-template void performIntersections<sdsl::rank_support_v<1>> ( std::string sequences_path, std::string query_path, std::string out_path,bool runs_encoded);
-template void performIntersections<sdsl::rank_support_v5<1>> ( std::string sequences_path, std::string query_path, std::string out_path,bool runs_encoded);
+template void performIntersections<flatBinTrie<sdsl::rank_support_v<1>>> ( std::string sequences_path, std::string query_path, std::string out_path,bool runs_encoded);
+template void performIntersections<flatBinTrie<sdsl::rank_support_v5<1>>> ( std::string sequences_path, std::string query_path, std::string out_path,bool runs_encoded);
+template void performIntersections<binTrie_il<512,sdsl::rank_support_il<1,512>>> ( std::string sequences_path, std::string query_path, std::string out_path,bool runs_encoded);
 
 
 int main(int argc, char const *argv[]) {
@@ -168,10 +172,10 @@ int main(int argc, char const *argv[]) {
     }
 
     if (rank == 0) {
-        performIntersections<sdsl::rank_support_v<1>>(sequences_filename, querylog_filename, output_filename,runs);
+        performIntersections<flatBinTrie<sdsl::rank_support_v<1>>>(sequences_filename, querylog_filename, output_filename,runs);
     }
     else {
-        performIntersections<sdsl::rank_support_v5<1>>(sequences_filename, querylog_filename, output_filename, runs);
+        performIntersections<flatBinTrie<sdsl::rank_support_v5<1>>>(sequences_filename, querylog_filename, output_filename, runs);
     }
     
     return 0;

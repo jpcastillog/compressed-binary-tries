@@ -130,7 +130,7 @@ int main() {
     flatBinTrie<rank_support_v5<1>> *result;
     // result = intersectFlatTries<rank_support_v5<1>>(Bs);
     uint64_t time;
-    result = joinTries<rank_support_v5<1>>(Bs, true, time);
+    result = joinTries<flatBinTrie<rank_support_v5<1>>>(Bs, true);
 
 
     cout << "-------------intersection trie-------------" << endl;

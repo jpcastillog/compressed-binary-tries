@@ -9,8 +9,10 @@
 #include "binTrie.hpp"
 #include "flatBinTrie.hpp"
 
-template<class rankType>
-flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded);
+// template<class rankType>
+// flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded);
+template<class trieType>
+trieType* joinTries(vector<trieType> &Bs, bool runs_encoded);
 
 
 #endif

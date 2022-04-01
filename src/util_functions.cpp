@@ -361,7 +361,7 @@ void randomQueries(string file_path) {
         for (uint16_t i = 0; i < 10; ++i) {
             flatBinTrie <rank_support_v<1>>* result_v;
             uint64_t time_v;
-            result_v = joinTries<rank_support_v<1>>(Bs_v, true, time_v);
+            result_v = joinTries<flatBinTrie<rank_support_v<1>>>(Bs_v, true);
             avg_time_v += time_v;
         }
         cout << "Time execution, rank V: " << (float) (avg_time_v/10)*10e-6 << endl;
@@ -370,7 +370,7 @@ void randomQueries(string file_path) {
         for (uint16_t i = 0; i < 10; ++i) {
             flatBinTrie <rank_support_v5<1>>* result_v5;
             uint64_t time_v5;
-            result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, true, time_v5);
+            result_v5 = joinTries<flatBinTrie<rank_support_v5<1>>>(Bs_v5, true);
             avg_time_v5 += time_v5;
         }
         
@@ -484,13 +484,13 @@ void performQueryLog(string query_log_path, string ii_path) {
             uint64_t time_v;
             uint64_t time_v5;
             auto start_v = std::chrono::high_resolution_clock::now();
-            result_v = joinTries<rank_support_v<1>>(Bs_v, true, time_v);
+            result_v = joinTries<flatBinTrie<rank_support_v<1>>>(Bs_v, true);
             auto end_v = std::chrono::high_resolution_clock::now();
             auto elapsed_v = std::chrono::duration_cast<std::chrono::nanoseconds>(end_v - start_v);
             time_v = elapsed_v.count();
             
             auto start_v5 = std::chrono::high_resolution_clock::now();
-            result_v5 = joinTries<rank_support_v5<1>>(Bs_v5, true, time_v5);
+            result_v5 = joinTries<flatBinTrie<rank_support_v5<1>>>(Bs_v5, true);
             auto end_v5 = std::chrono::high_resolution_clock::now();
             auto elapsed_v5 = std::chrono::duration_cast<std::chrono::nanoseconds>(end_v5 - start_v5);
             time_v5 = elapsed_v5.count();
