@@ -43,22 +43,26 @@ template <uint32_t block_size=512>
 float testRankOp(vector<sdsl::bit_vector> &bvs, int rankType){
     uint64_t total_ranks = 0;
     uint64_t total_time = 0;
+    uint64_t total_ranks_r = 0;
     for (uint32_t i = 0; i < bvs.size(); ++i) {
         uint64_t size_bv = bvs[i].size();
         std::srand(static_cast<unsigned int>(std::time(nullptr)));
         uint64_t n_ranks = size_bv/100;
         total_ranks += n_ranks;
+        cout << size_bv << endl;
         // Rank v
         if (rankType == 0){
             sdsl::rank_support_v<1>rank_v(&bvs[i]);
             for (uint32_t j = 0; j < n_ranks; ++j) {
                 uint64_t pos_to_rank = std::rand()%size_bv;
                 auto start = std::chrono::high_resolution_clock::now();
-                rank_v(pos_to_rank);
+                int r = rank_v(pos_to_rank);
                 auto end = std::chrono::high_resolution_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
                 auto time = elapsed.count();
-                total_time += time; 
+                total_time += time;
+                total_ranks_r += r;
+
             }
         }
         // Rank v5
@@ -67,11 +71,12 @@ float testRankOp(vector<sdsl::bit_vector> &bvs, int rankType){
             for (uint32_t j = 0; j < n_ranks; ++j) {
                 uint64_t pos_to_rank = std::rand()%size_bv;
                 auto start = std::chrono::high_resolution_clock::now();
-                rank_v5(pos_to_rank);
+                int r = rank_v5(pos_to_rank);
                 auto end = std::chrono::high_resolution_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
                 auto time = elapsed.count();
-                total_time += time; 
+                total_time += time;
+                total_ranks_r += r;
             }
         }
         // Rank il
@@ -81,14 +86,16 @@ float testRankOp(vector<sdsl::bit_vector> &bvs, int rankType){
             for (uint32_t j = 0; j < n_ranks; ++j) {
                 uint64_t pos_to_rank = std::rand()%size_bv;
                 auto start = std::chrono::high_resolution_clock::now();
-                rank_il(pos_to_rank);
+                int r = rank_il(pos_to_rank);
                 auto end = std::chrono::high_resolution_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
                 auto time = elapsed.count();
-                total_time += time; 
+                total_time += time;
+                total_ranks_r += r;
             }
         }        
     }
+    cout << "Total ranks: " << total_ranks_r << endl;
     return (float) total_time/total_ranks;
 }
 
