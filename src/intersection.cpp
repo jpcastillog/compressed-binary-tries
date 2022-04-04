@@ -58,9 +58,9 @@ void intersection(vector <binTrie> &Bs, uint16_t max_level, uint16_t curr_level,
 
 
 template <class trieType>
-void runsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint16_t curr_level, 
-                uint64_t *roots, vector<uint64_t> &last_pos,
-                vector<uint64_t> *ones_to_write, bool *activeTries) {
+void runsEncodedIntersection(vector <trieType> &Bs, uint16_t &max_level, uint16_t &curr_level, 
+                uint64_t roots[], vector<uint64_t> &last_pos,
+                vector<uint64_t> ones_to_write[], bool activeTries[]) {
 	
 	uint16_t n_tries = Bs.size();
 	uint64_t result = 0b11; // 0....11
@@ -132,18 +132,6 @@ void runsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint16_t
 
     bool exist_lchild;
     bool exist_rchild;
-
-    // for (uint16_t i = 0; i < n_tries; ++i){
-    //     if (left_one && activeTries[i])
-    //         left_nodes[i] = Bs[i].getLeftChild(roots[i]);
-
-    //     if (right_one && activeTries[i]){
-    //         if (left_one)
-    //             right_nodes[i] = left_nodes[i] + 1;
-    //         else
-    //             right_nodes[i] = Bs[i].getRightChild(roots[i]);
-    //     }
-    // }
 	
     // Left child
     if (left_one) {
@@ -342,11 +330,11 @@ void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint1
 template<class trieType>
 trieType* joinTries(vector<trieType> &Bs, bool runs_encoded) {
     
-    uint16_t max_level = 0;
-    for (uint16_t i = 0; i < Bs.size(); ++i) {
-        if (Bs[i].getHeight() > max_level) 
-            max_level = Bs[i].getHeight();
-    }
+    uint16_t max_level = Bs[0].getHeight();
+    // for (uint16_t i = 0; i < Bs.size(); ++i) {
+    //     if (Bs[i].getHeight() > max_level) 
+    //         max_level = Bs[i].getHeight();
+    // }
 
     // max 16 relations
     bool activeTries[16] = { true, true, true, true,
@@ -361,10 +349,15 @@ trieType* joinTries(vector<trieType> &Bs, bool runs_encoded) {
     vector<uint64_t> ones_to_write[max_level];
     vector<uint64_t> nodes_per_level(max_level, 0);
 
-    // auto start = std::chrono::high_resolution_clock::now();
+    for (uint16_t i = 0; i < max_level; ++i) {
+        ones_to_write[i].reserve(pow(2, i));
+    }
+    
 
+    // auto start = std::chrono::high_resolution_clock::now();
+    uint16_t curr_level = 0;
     if (runs_encoded) {
-        runsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, activeTries);
+        runsEncodedIntersection(Bs, max_level, curr_level, roots, last_pos, ones_to_write, activeTries);
     }
     else {
         notRunsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level);
@@ -377,8 +370,8 @@ trieType* joinTries(vector<trieType> &Bs, bool runs_encoded) {
 
     // flatBinTrie<rankType>* result;
     // result = new flatBinTrie<rankType>(ones_to_write, max_level, last_pos, runs_encoded);
-    trieType* result;
-    result = new trieType(ones_to_write, max_level, last_pos, runs_encoded);
+    trieType* result = new trieType();
+    // result = new trieType(ones_to_write, max_level, last_pos, runs_encoded);
 
     return result;
 }
@@ -386,5 +379,11 @@ template flatBinTrie<rank_support_v5<1>>*
 joinTries<flatBinTrie<rank_support_v5<1>>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool runs_encoded);
 template flatBinTrie<rank_support_v<1>>* 
 joinTries<flatBinTrie<rank_support_v<1>>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool runs_encoded);
-// template binTrie_il<512>* 
-// joinTries<binTrie_il<512>>(vector<binTrie_il<512>> &Bs, bool runs_encoded);
+template binTrie_il<512>* 
+joinTries<binTrie_il<512>>(vector<binTrie_il<512>> &Bs, bool runs_encoded);
+template binTrie_il<256>* 
+joinTries<binTrie_il<256>>(vector<binTrie_il<256>> &Bs, bool runs_encoded);
+template binTrie_il<128>* 
+joinTries<binTrie_il<128>>(vector<binTrie_il<128>> &Bs, bool runs_encoded);
+template binTrie_il<64>* 
+joinTries<binTrie_il<64>>(vector<binTrie_il<64>> &Bs, bool runs_encoded);

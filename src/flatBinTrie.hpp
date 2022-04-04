@@ -1,5 +1,5 @@
-#ifndef BINTRIE_BV
-#define BINTRIE_BV
+#ifndef FLAT_BINTRIE_BV
+#define FLAT_BINTRIE_BV
 
 #include <iostream>
 #include <sdsl/bit_vectors.hpp>
@@ -15,10 +15,6 @@ using namespace std;
 template <class rankType>
 class flatBinTrie{
     private:
-        
-
-    public:
-
         uint16_t height; // original height of trie
         uint16_t height_with_runs; // height with runs encoded
         bool empty_trie = false;
@@ -28,6 +24,9 @@ class flatBinTrie{
         sdsl::bit_vector *lastLevel;     
         rankType b_rank;
         vector<uint64_t> level_pos;
+        
+
+    public:
 
         flatBinTrie() = default;
 
@@ -375,7 +374,7 @@ class flatBinTrie{
             uint64_t pos;
             if ((2*node_id) >= (flatBinTrie::bTrie -> size())) {
                 pos = (2*node_id) - (flatBinTrie::bTrie -> size());
-                if ((*lastLevel)[pos] == 1)
+                if ((*lastLevel)[pos])
                     node = (node | (1ULL << 1));
 
                 if ((*lastLevel)[pos + 1] == 1)
@@ -383,7 +382,7 @@ class flatBinTrie{
             }
             else { 
                 pos = 2*node_id;
-                if ((*bTrie)[pos] == 1)
+                if ((*bTrie)[pos])
                     node = (node | (1ULL << 1));
 
                 if ((*bTrie)[pos + 1] == 1)
@@ -395,8 +394,15 @@ class flatBinTrie{
 
 
         inline uint64_t getLeftChild(uint64_t node_id) {
-            if (2*node_id + 1 <= flatBinTrie::bTrie -> size() -1)
-                return flatBinTrie::b_rank((2*node_id) + 1);
+            if (2*node_id + 1 <= flatBinTrie::bTrie -> size() -1){
+                // auto start = std::chrono::high_resolution_clock::now();
+                uint64_t rank = flatBinTrie::b_rank((2*node_id) + 1);
+                // auto end = std::chrono::high_resolution_clock::now();
+                // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+                // auto time = elapsed.count();
+                // cout << "Tiempo por rank: "<< time <<" [ns]" << endl;
+                return rank;}
+                // return flatBinTrie::b_rank((2*node_id) + 1);
             else 
                 return 0;
         };
@@ -445,11 +451,11 @@ class flatBinTrie{
             in.read(reinterpret_cast<char*>(&empty_trie)      , sizeof(empty_trie));
             in.read(reinterpret_cast<char*>(&runs_encoded)    , sizeof(runs_encoded));
 
-            bTrie = new sdsl::bit_vector();
-            lastLevel = new sdsl::bit_vector();
+            flatBinTrie::bTrie = new sdsl::bit_vector();
+            flatBinTrie::lastLevel = new sdsl::bit_vector();
 
-            bTrie     -> load(in);
-            lastLevel -> load(in);\
+            flatBinTrie::bTrie     -> load(in);
+            flatBinTrie::lastLevel -> load(in);
             b_rank.load(in, bTrie);
         }
 

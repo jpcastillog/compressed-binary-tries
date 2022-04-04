@@ -2,6 +2,7 @@
 #include <fstream>
 #include "../src/flatBinTrie.hpp"
 #include <sdsl/bit_vectors.hpp>
+#include "../src/binTrie_il.hpp"
 
 using namespace std;
 using namespace sdsl;
@@ -18,6 +19,7 @@ vector<uint64_t>* read_inv_list(std::ifstream &input_stream, uint32_t n) {
     return il;
 }
 
+template <uint32_t block_size>
 void buildCollection(std::string input_path, std::string out_path,
                      uint64_t min_size, int rank_type, bool runs) {
 
@@ -76,6 +78,17 @@ void buildCollection(std::string input_path, std::string out_path,
                 trie_v.free();
             }
 
+            if (rank_type == 1) {
+                binTrie_il<block_size> trie_il(*il, u);
+                if (runs)
+                    trie_il.encodeRuns();
+                if (out_path != "") {
+                    trie_il.serialize(out);
+                }
+                trie_bytes_size = trie_il.size_in_bytes();
+                trie_il.free();
+            }
+
             else {
                 flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, u);
                 if (runs)
@@ -129,6 +142,7 @@ int main(int argc, char** argv) {
 
     int rank;
     uint64_t min_size = 0;
+    uint32_t block_size = 512;
     bool runs;
     std::string output_filename = "";
     std::string input_filename = std::string(argv[1]);
@@ -143,8 +157,13 @@ int main(int argc, char** argv) {
             if (std::string(argv[i]) == "v") {
                 rank = 0;
             }
-            else {
+            if (std::string(argv[i]) == "il") {
                 rank = 1;
+                i++;
+                block_size = std::atoi(argv[i]);
+            }
+            else {
+                rank = 2;
             }
         }
         if (std::string(argv[i]) == "--runs") {
@@ -166,6 +185,13 @@ int main(int argc, char** argv) {
     std::cout << output_filename << endl;
     
     // Call function here
-    buildCollection(input_filename, output_filename, min_size, rank, runs);
+    if (block_size == 512)
+        buildCollection<512>(input_filename, output_filename, min_size, rank, runs);
+    else if (block_size == 256)
+        buildCollection<256>(input_filename, output_filename, min_size, rank, runs);
+    else if (block_size == 128)
+        buildCollection<128>(input_filename, output_filename, min_size, rank, runs);
+    else
+        buildCollection<64>(input_filename, output_filename, min_size, rank, runs);
 
 }
