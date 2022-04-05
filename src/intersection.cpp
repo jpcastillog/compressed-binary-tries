@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 #include "binTrie.hpp"
 #include "flatBinTrie.hpp"
 #include "binTrie_il.hpp"
@@ -281,51 +282,58 @@ void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint1
     } 
 }
 
+template<class trieType>
+void* iterativeJoin(vector<trieType> &Bs, bool runs_encoded){
+    uint64_t n_tries = Bs.size();
+    bool activeTries[16] = { true, true, true, true,
+                             true, true, true, true,
+                             true, true, true, true,
+                             true, true, true, true };
+    uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+                           0, 0, 0, 0, 0, 0, 0, 0 };
+    stack<uint64_t> stack;
+    stack.push(0);
+    while (!stack.empty) {
 
-// template<class rankType>
-// flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded) {
-    
-//     uint16_t max_level = 0;
-//     for (uint16_t i = 0; i < Bs.size(); ++i) {
-//         if (Bs[i].getHeight() > max_level) 
-//             max_level = Bs[i].getHeight();
-//     }
+        uint64_t result = 0b11;
+        for (uint16_t = 0; i < n_tries; ++i) {
+            uint64_t node_i = Bs[i].getNode(roots[i]);}
+            result &= node_i;
+        }
 
-//     // max 16 relations
-//     bool activeTries[16] = { true, true, true, true,
-//                              true, true, true, true,
-//                              true, true, true, true,
-//                              true, true, true, true }; 
-//                             // active tries in runs encode implementation
-//     uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
-//                            0, 0, 0, 0, 0, 0, 0, 0 };
-    
-//     vector<uint64_t> last_pos(max_level, 0);
-//     vector<uint64_t> ones_to_write[max_level];
-//     vector<uint64_t> nodes_per_level(max_level, 0);
+        if (result == 0b11) {
+            uint64_t leftNodes[16];
+            uint64_t rightNodes[16];
+            for (uint16_t i = 0; i < n_tries; ++i){
+                uint64_t leftNode = B[i].getLeftChild(roots[i]);
+                leftNodes[i] = leftNode;
+                rightNodes[i] = leftNode + 1;
+            }
+        }
+        else if (result == 0b10) {
+            uint64_t leftNodes[16];
+            for (uint16_t i = 0; i < n_tries; ++i){
+                uint64_t leftNode = B[i].getLeftChild(roots[i]);
+                leftNodes[i] = leftNode;
+            }
+        }
+        else if (result == 0b01) {
+            uint64_t rightNodes[16];
+            for (uint16_t i = 0; i < n_tries; ++i){
+                uint64_t rightNode = B[i].getRightChild(roots[i]);
+                rightNodes[i] = rightNode;
+            }
 
-//     // auto start = std::chrono::high_resolution_clock::now();
+        }
+        else {
 
-//     if (runs_encoded) {
-//         runsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, activeTries);
-//     }
-//     else {
-//         notRunsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level);
-//     }
-    
-//     // auto end = std::chrono::high_resolution_clock::now();
-//     // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-//     // time = elapsed.count();
-//     // cout <<"|Time execution: " << (float)time*10e-6 << "[ms]" << endl;
+        }
 
-//     flatBinTrie<rankType>* result;
-//     result = new flatBinTrie<rankType>(ones_to_write, max_level, last_pos, runs_encoded);
+    }
 
-//     return result;
-// }
-// template flatBinTrie<rank_support_v5<1>>* joinTries<rank_support_v5<1>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool runs_encoded);
-// template flatBinTrie<rank_support_v<1>>* joinTries<rank_support_v<1>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool runs_encoded);
 
+
+}
 
 template<class trieType>
 trieType* joinTries(vector<trieType> &Bs, bool runs_encoded) {
