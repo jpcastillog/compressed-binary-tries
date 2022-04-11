@@ -38,3 +38,6 @@ queries
 
 # visual studio code files
 .vscode/
+
+# gproof
+analysis.txt

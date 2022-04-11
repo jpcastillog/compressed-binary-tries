@@ -1,12 +1,20 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <chrono>
 #include "binTrie.hpp"
 #include "flatBinTrie.hpp"
 #include "binTrie_il.hpp"
 
 using namespace std;
 using namespace sdsl;
+
+
+// Global vars ... 
+vector <uint64_t>* ones_to_write;
+uint64_t* last_pos;
+uint64_t n_tries, max_level;
+
 
 void intersection(vector <binTrie> &Bs, uint16_t max_level, uint16_t curr_level, 
                   vector<uint64_t> roots, vector<uint64_t> &last_pos,
@@ -59,62 +67,75 @@ void intersection(vector <binTrie> &Bs, uint16_t max_level, uint16_t curr_level,
 
 
 template <class trieType>
-void runsEncodedIntersection(vector <trieType> &Bs, uint16_t &max_level, uint16_t &curr_level, 
-                uint64_t roots[], vector<uint64_t> &last_pos,
-                vector<uint64_t> ones_to_write[], bool activeTries[]) {
+void runsEncodedIntersection(vector <trieType> &Bs, uint64_t &n_tries, 
+                uint64_t &max_level, uint64_t curr_level, 
+                uint64_t roots[], 
+                // vector<uint64_t> &last_pos,
+                uint64_t* last_pos,
+                vector<uint64_t> ones_to_write[], bool activeTries[]
+                ,uint64_t &n_ranks) {
 	
-	uint16_t n_tries = Bs.size();
 	uint64_t result = 0b11; // 0....11
     uint64_t node00 = 0b00; // 0....00
-    bool tempActiveTries[16] = {false, false, false, false,
-                                false, false, false, false,
-                                false, false, false, false,
-                                false, false, false, false};
-
-	for (uint16_t i = 0; i < n_tries; ++i) {
+    // bool tempActiveTries[16] = {false, false, false, false,
+    //                             false, false, false, false,
+    //                             false, false, false, false,
+    //                             false, false, false, false};
+    bool tempActiveTries[16];
+	for (uint64_t i = 0; i < n_tries; ++i) {
         if (activeTries[i]){
-            uint64_t node_i = Bs[i].getNode(roots[i]);
-            if (node_i != 0b00){
+            // auto start   = std::chrono::high_resolution_clock::now();
+            uint64_t node_i = (curr_level == max_level - 1) ? 
+                                Bs[i].getNode2(roots[i]) :
+                                Bs[i].getNode1(roots[i]);
+            // auto end     = std::chrono::high_resolution_clock::now();
+            // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+            // auto time    = elapsed.count();
+            // cout << "Tiempo por rank: "<< time <<" [ns]" << endl;
+            // n_ranks+=time;
+            // if (node_i != 0b00) {
+            if (node_i){
                 tempActiveTries[i] = true;
                 result &= node_i;
                 node00 |= node_i;
             }
+            else
+                tempActiveTries[i] = false;
         }
         else {
            tempActiveTries[i] = false;
         }
 	}
 
-    bool left_one = false;
-    bool right_one = false;
+    // bool left_one;
+    // bool right_one;
 
-    switch (result) {
-        case 0b00:  
-            left_one = false;
-            right_one = false;
-            break;
-        case 0b01:
-            left_one = false;  
-            right_one = true;
-            break;
-        case 0b10:  
-            left_one = true;
-            right_one = false;
-            break;
-        case 0b11:
-            left_one = true;
-            right_one = true;
-            break;
-    }
+    // switch (result) {
+    //     case 0b00:  left_one = false;
+    //                 right_one = false;
+    //                 break;
+    //     case 0b01:  left_one = false;
+    //                 right_one = true;
+    //                 break;
+    //     case 0b10:  left_one = true;
+    //                 right_one = false;
+    //                 break;
+    //     case 0b11:  left_one = true;
+    //                 right_one = true;
+    //                 break;
+    // }
 
     // End condition
 	if (curr_level == max_level - 1) {
         // Only write when result = 11, 10 or 01
-        if (left_one || right_one) {
-            if (left_one)
+        if (result ==  0b11 || result == 0b01 || result == 0b10) {
+            // if (left_one)
+            if (result == 0b10 || result == 0b11)
                 ones_to_write[curr_level].push_back(last_pos[curr_level]);
-            if (right_one)
+            // if (right_one)
+            if (result == 0b01 || result == 0b11)
                 ones_to_write[curr_level].push_back(last_pos[curr_level] + 1); 
+            // last_pos[curr_level] += 2*(left_one || right_one);
             last_pos[curr_level] += 2;
         }
 		return;
@@ -131,16 +152,26 @@ void runsEncodedIntersection(vector <trieType> &Bs, uint16_t &max_level, uint16_
     uint64_t left_nodes[16];
     uint64_t right_nodes[16];
 
-    bool exist_lchild;
-    bool exist_rchild;
+    bool exist_lchild, exist_rchild;
 	
     // Left child
-    if (left_one) {
+    if (result == 0b10 || result == 0b11) {
+    // if (left_one) {
         for (uint64_t i = 0; i < n_tries; ++i) {
-            if (activeTries[i])
+            // if (activeTries[i])
+            if (tempActiveTries[i]){
+                // auto start   = std::chrono::high_resolution_clock::now();
+
 			    left_nodes[i] = Bs[i].getLeftChild(roots[i]);
+                
+                // auto end     = std::chrono::high_resolution_clock::now();
+                // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+                // auto time    = elapsed.count();
+                // cout << "Tiempo por rank: "<< time <<" [ns]" << endl;
+                // n_ranks+=time;
+            }
 		}
-        runsEncodedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, tempActiveTries);
+        runsEncodedIntersection(Bs, n_tries, max_level, next_level, left_nodes, last_pos, ones_to_write, tempActiveTries, n_ranks);
     }
     // if (left_one)
     //     runsEncodedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
@@ -148,6 +179,11 @@ void runsEncodedIntersection(vector <trieType> &Bs, uint16_t &max_level, uint16_
     if (last_pos[next_level] == pos_next_level_before) {
         exist_lchild = false;
     }
+    // exist_lchild = (last_pos[next_level] == pos_next_level_before);
+    // if (exist_lchild) {
+    //     ones_to_write[curr_level].push_back(last_pos[curr_level]);
+    //     pos_next_level_before = last_pos[next_level];
+    // }
     else  {
         ones_to_write[curr_level].push_back(last_pos[curr_level]);
         pos_next_level_before = last_pos[next_level];
@@ -155,17 +191,29 @@ void runsEncodedIntersection(vector <trieType> &Bs, uint16_t &max_level, uint16_
     }
     
     // Right child
-    if (right_one) {
+    if (result == 0b01 || result == 0b11) {
+    // if (right_one) {
         for (uint64_t i = 0; i < n_tries; ++i) {
-            if (left_one && activeTries[i]) {
-                right_nodes[i] = left_nodes[i] + 1;
+            // if (left_one && activeTries[i]) {
+            if (tempActiveTries[i]){
+                // auto start = std::chrono::high_resolution_clock::now();
+
+                right_nodes[i] = (result == 0b11) ? left_nodes[i] + 1 : Bs[i].getRightChild(roots[i]);
+
+                // auto end = std::chrono::high_resolution_clock::now();
+                // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+                // auto time = elapsed.count();
+                // n_ranks += time;
+                // if (left_one){
+                //     right_nodes[i] = left_nodes[i] + 1;
+                // }
+                // else {
+                //     right_nodes[i] = Bs[i].getRightChild(roots[i]);
+                //     // n_ranks++;
+                // } 
             }
-            else {
-                if (activeTries[i])
-                    right_nodes[i] = Bs[i].getRightChild(roots[i]);
-            } 
         }
-        runsEncodedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, tempActiveTries);
+        runsEncodedIntersection(Bs, n_tries, max_level, next_level, right_nodes, last_pos, ones_to_write, tempActiveTries, n_ranks);
     }
     // if (right_one)
     //     runsEncodedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level, tempActiveTries);
@@ -173,20 +221,148 @@ void runsEncodedIntersection(vector <trieType> &Bs, uint16_t &max_level, uint16_
     if (last_pos[next_level] == pos_next_level_before) {
         exist_rchild = false;
     }
+    // exist_rchild = (last_pos[next_level] == pos_next_level_before);
     else {
         ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
         exist_rchild = true;
     }
+    // if (exist_rchild){
+    //     ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+    // }
     // mark if node is write
     if (exist_lchild || exist_rchild) {
         last_pos[curr_level] += 2;
-    }    
+    }  
+    // last_pos[curr_level] += 2 * (exist_lchild || exist_rchild);
+}
+
+
+template <class trieType>
+void runsEncodedIntersection(vector <trieType> &Bs,  uint64_t curr_level, 
+                                uint64_t roots[], bool activeTries[]) {
+	
+	uint64_t result = 0b11; // 0....11
+    uint64_t node00 = 0b00; // 0....00
+    bool tempActiveTries[16];
+
+	for (uint64_t i = 0; i < n_tries; ++i) {
+        if (activeTries[i]) {
+            uint64_t node_i = (curr_level == max_level - 1) ? 
+                                Bs[i].getNode2(roots[i]) :
+                                Bs[i].getNode1(roots[i]);
+            if (node_i) {
+                tempActiveTries[i] = true;
+                result &= node_i;
+                node00 |= node_i;
+            }
+            else
+                tempActiveTries[i] = false;
+        }
+        else {
+           tempActiveTries[i] = false;
+        }
+	}
+    
+
+    // End condition
+	if (curr_level == max_level - 1) {
+        // Only write when result = 11, 10 or 01
+        if (result == 0b01 || result == 0b10 || result ==  0b11) {
+            if (result == 0b10 || result == 0b11)
+                ones_to_write[curr_level].push_back(last_pos[curr_level]);
+            if (result == 0b01 || result == 0b11)
+                ones_to_write[curr_level].push_back(last_pos[curr_level] + 1); 
+            last_pos[curr_level] += 2;
+        }
+		return;
+	}
+    // all nodes are 00...0
+    if ( node00 == 0b00 ) {
+        last_pos[curr_level] += 2;
+        return;
+    }
+
+    uint64_t next_level = curr_level + 1;
+    uint64_t pos_next_level_before = last_pos[next_level];
+
+    if ( result == 0b10 ) {
+        uint64_t left_nodes[16];
+
+        for (uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i]) {
+                left_nodes[i] = Bs[i].getLeftChild(roots[i]);
+            }
+        }
+
+        runsEncodedIntersection(Bs, next_level, left_nodes, tempActiveTries);
+        
+        if (last_pos[next_level] != pos_next_level_before) {
+            ones_to_write[curr_level].push_back(last_pos[curr_level]);
+            pos_next_level_before = last_pos[next_level];
+            last_pos[curr_level] += 2;
+        }
+    }
+
+    else if ( result == 0b01) {
+        uint64_t right_nodes[16];
+
+        for(uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i]) {
+                right_nodes[i] = Bs[i].getRightChild(roots[i]);
+            }
+        }
+
+        runsEncodedIntersection(Bs, next_level, right_nodes, tempActiveTries);
+        
+        if (last_pos[next_level] != pos_next_level_before) {
+            ones_to_write[curr_level].push_back(last_pos[curr_level]+1);
+            last_pos[curr_level] += 2;
+        }
+    }
+
+    // result its 11
+    else if (result == 0b11) {
+        bool exist_lchild, exist_rchild;
+        uint64_t left_nodes[16];
+        uint64_t right_nodes[16];
+        for (uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i]){
+                uint64_t left_node = Bs[i].getLeftChild(roots[i]); 
+                left_nodes[i]  = left_node;
+                right_nodes[i] = left_node + 1;
+            }
+        }
+        runsEncodedIntersection(Bs, next_level, left_nodes, tempActiveTries);
+        if (last_pos[next_level] == pos_next_level_before) {
+            exist_lchild = false;
+        }
+        else  {
+            ones_to_write[curr_level].push_back(last_pos[curr_level]);
+            pos_next_level_before = last_pos[next_level];
+            exist_lchild = true;
+        }
+        runsEncodedIntersection(Bs, next_level, right_nodes, tempActiveTries);
+        if (last_pos[next_level] == pos_next_level_before) {
+            exist_rchild = false;
+        }
+        // exist_rchild = (last_pos[next_level] == pos_next_level_before);
+        else {
+            ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+            exist_rchild = true;
+        }
+        // mark if node is write
+        if (exist_lchild || exist_rchild) {
+            last_pos[curr_level] += 2;
+        } 
+    }  
 }
 
 
 template <class trieType>
 void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint16_t curr_level, 
-                               uint64_t *roots, vector<uint64_t> &last_pos,
+                               uint64_t *roots, 
+                            //    vector<uint64_t> &last_pos,
+                               uint64_t* last_pos,
                                vector<uint64_t> *ones_to_write, vector<uint64_t> &nodes_per_level) {
 	
 	uint16_t n_tries = Bs.size();
@@ -200,16 +376,18 @@ void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint1
 
     // cout  << endl;
 
-    bool left_one = false;
-    bool right_one = false;
+    bool left_one;
+    bool right_one;
 
     switch (result) {
         case 0b00:  left_one = false;
                     right_one = false;
                     break;
-        case 0b01:  right_one = true;
+        case 0b01:  left_one = false;
+                    right_one = true;
                     break;
         case 0b10:  left_one = true;
+                    right_one = false;
                     break;
         case 0b11:  left_one = true;
                     right_one = true;
@@ -219,13 +397,13 @@ void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint1
      // End condition
 	if (curr_level == max_level - 1) {
         // Only write when result = 11, 10 or 01
-        if (left_one || right_one){
-            if (left_one)
-                ones_to_write[curr_level].push_back(last_pos[curr_level]);
-            if (right_one)
-                ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
-            last_pos[curr_level] += 2;
-        }
+        // if (left_one || right_one){
+        if (left_one)
+            ones_to_write[curr_level].push_back(last_pos[curr_level]);
+        if (right_one)
+            ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+        last_pos[curr_level] += 2*(left_one || right_one);
+        // }
 		return;
 	}
 
@@ -235,8 +413,7 @@ void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint1
     uint64_t left_nodes[16];
     uint64_t right_nodes[16];
 
-    bool exist_lchild;
-    bool exist_rchild;
+    bool exist_lchild, exist_rchild;
 
 	// Left child
 	if (left_one) {
@@ -245,14 +422,19 @@ void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint1
 		}
 		notRunsEncodedIntersection(Bs, max_level, next_level, left_nodes, last_pos, ones_to_write, nodes_per_level);
 	}
-
-    if (last_pos[next_level] == pos_next_level_before) {
-        exist_lchild = false;
-    }
-    else  {
+    
+    // if (last_pos[next_level] == pos_next_level_before) {
+    //     exist_lchild = false;
+    exist_lchild = (last_pos[next_level] == pos_next_level_before);
+    // }
+    // else  {
+    //     ones_to_write[curr_level].push_back(last_pos[curr_level]);
+    //     pos_next_level_before = last_pos[next_level];
+    //     exist_lchild = true;
+    // }
+    if (exist_lchild) {
         ones_to_write[curr_level].push_back(last_pos[curr_level]);
         pos_next_level_before = last_pos[next_level];
-        exist_lchild = true;
     }
 
 	// Right child
@@ -269,76 +451,79 @@ void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint1
 		notRunsEncodedIntersection(Bs, max_level, next_level, right_nodes, last_pos, ones_to_write, nodes_per_level);
 	}
     
-    if (last_pos[next_level] == pos_next_level_before) {
-        exist_rchild = false;
-    }
-    else {
-        ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
-        exist_rchild = true;
-    }
+    // if (last_pos[next_level] == pos_next_level_before) {
+        // exist_rchild = false;
+        exist_rchild = (last_pos[next_level] == pos_next_level_before);
+        if (exist_rchild) ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+    // }
+    // else {
+    //     ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+    //     exist_rchild = true;
+    // }
     // mark if node is write
-    if (exist_lchild || exist_rchild) {
-        last_pos[curr_level] += 2;
-    } 
+    // if (exist_lchild || exist_rchild) {
+    last_pos[curr_level] += 2*(exist_lchild || exist_rchild);
+    // } 
 }
 
+// template<class trieType>
+// void* iterativeJoin(vector<trieType> &Bs, bool runs_encoded){
+//     uint64_t n_tries = Bs.size();
+//     bool activeTries[16] = { true, true, true, true,
+//                              true, true, true, true,
+//                              true, true, true, true,
+//                              true, true, true, true };
+//     uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+//                            0, 0, 0, 0, 0, 0, 0, 0 };
+//     stack<uint64_t> stack;
+//     stack.push(0);
+//     while (!stack.empty) {
+
+//         uint64_t result = 0b11;
+//         for (uint16_t = 0; i < n_tries; ++i) {
+//             uint64_t node_i = Bs[i].getNode(roots[i]);}
+//             result &= node_i;
+//         }
+
+//         if (result == 0b11) {
+//             uint64_t leftNodes[16];
+//             uint64_t rightNodes[16];
+//             for (uint16_t i = 0; i < n_tries; ++i){
+//                 uint64_t leftNode = B[i].getLeftChild(roots[i]);
+//                 leftNodes[i] = leftNode;
+//                 rightNodes[i] = leftNode + 1;
+//             }
+//         }
+//         else if (result == 0b10) {
+//             uint64_t leftNodes[16];
+//             for (uint16_t i = 0; i < n_tries; ++i){
+//                 uint64_t leftNode = B[i].getLeftChild(roots[i]);
+//                 leftNodes[i] = leftNode;
+//             }
+//         }
+//         else if (result == 0b01) {
+//             uint64_t rightNodes[16];
+//             for (uint16_t i = 0; i < n_tries; ++i){
+//                 uint64_t rightNode = B[i].getRightChild(roots[i]);
+//                 rightNodes[i] = rightNode;
+//             }
+
+//         }
+//         else {
+
+//         }
+
+//     }
+
+
+
+// }
+
 template<class trieType>
-void* iterativeJoin(vector<trieType> &Bs, bool runs_encoded){
-    uint64_t n_tries = Bs.size();
-    bool activeTries[16] = { true, true, true, true,
-                             true, true, true, true,
-                             true, true, true, true,
-                             true, true, true, true };
-    uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
-                           0, 0, 0, 0, 0, 0, 0, 0 };
-    stack<uint64_t> stack;
-    stack.push(0);
-    while (!stack.empty) {
-
-        uint64_t result = 0b11;
-        for (uint16_t = 0; i < n_tries; ++i) {
-            uint64_t node_i = Bs[i].getNode(roots[i]);}
-            result &= node_i;
-        }
-
-        if (result == 0b11) {
-            uint64_t leftNodes[16];
-            uint64_t rightNodes[16];
-            for (uint16_t i = 0; i < n_tries; ++i){
-                uint64_t leftNode = B[i].getLeftChild(roots[i]);
-                leftNodes[i] = leftNode;
-                rightNodes[i] = leftNode + 1;
-            }
-        }
-        else if (result == 0b10) {
-            uint64_t leftNodes[16];
-            for (uint16_t i = 0; i < n_tries; ++i){
-                uint64_t leftNode = B[i].getLeftChild(roots[i]);
-                leftNodes[i] = leftNode;
-            }
-        }
-        else if (result == 0b01) {
-            uint64_t rightNodes[16];
-            for (uint16_t i = 0; i < n_tries; ++i){
-                uint64_t rightNode = B[i].getRightChild(roots[i]);
-                rightNodes[i] = rightNode;
-            }
-
-        }
-        else {
-
-        }
-
-    }
-
-
-
-}
-
-template<class trieType>
-trieType* joinTries(vector<trieType> &Bs, bool runs_encoded) {
+trieType* joinTries(vector<trieType> &Bs, bool runs_encoded, uint64_t &n_ranks) {
     
-    uint16_t max_level = Bs[0].getHeight();
+    // uint64_t max_level = Bs[0].getHeight();
+    max_level = Bs[0].getHeight();
     // for (uint16_t i = 0; i < Bs.size(); ++i) {
     //     if (Bs[i].getHeight() > max_level) 
     //         max_level = Bs[i].getHeight();
@@ -353,23 +538,31 @@ trieType* joinTries(vector<trieType> &Bs, bool runs_encoded) {
     uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
     
-    vector<uint64_t> last_pos(max_level, 0);
-    vector<uint64_t> ones_to_write[max_level];
-    vector<uint64_t> nodes_per_level(max_level, 0);
+    // uint64_t *last_pos = new uint64_t[max_level];
+    last_pos = new uint64_t[max_level];
+    for (uint64_t i = 0; i < max_level; ++i) 
+        last_pos[i] = 0;
+    // vector<uint64_t> last_pos(max_level, 0);
+    // vector<uint64_t> ones_to_write[max_level];
+    ones_to_write = new vector<uint64_t>[max_level];
+    // vector<uint64_t> nodes_per_level(max_level, 0);
 
-    for (uint16_t i = 0; i < max_level; ++i) {
-        ones_to_write[i].reserve(pow(2, i));
-    }
+    // for (uint16_t i = 0; i < max_level; ++i) {
+    //     ones_to_write[i].reserve(pow(2, i));
+    // }
     
 
     // auto start = std::chrono::high_resolution_clock::now();
-    uint16_t curr_level = 0;
+    uint64_t curr_level = 0;
+    // uint64_t n_tries = Bs.size();
+    n_tries = Bs.size();
     if (runs_encoded) {
-        runsEncodedIntersection(Bs, max_level, curr_level, roots, last_pos, ones_to_write, activeTries);
+        // runsEncodedIntersection(Bs, n_tries, max_level, curr_level, roots, last_pos, ones_to_write, activeTries, n_ranks);
+        runsEncodedIntersection(Bs, curr_level, roots, activeTries);
     }
-    else {
-        notRunsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level);
-    }
+    // else {
+    //     notRunsEncodedIntersection(Bs, max_level, 0, roots, last_pos, ones_to_write, nodes_per_level);
+    // }
     
     // auto end = std::chrono::high_resolution_clock::now();
     // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -378,20 +571,20 @@ trieType* joinTries(vector<trieType> &Bs, bool runs_encoded) {
 
     // flatBinTrie<rankType>* result;
     // result = new flatBinTrie<rankType>(ones_to_write, max_level, last_pos, runs_encoded);
-    trieType* result = new trieType();
-    // result = new trieType(ones_to_write, max_level, last_pos, runs_encoded);
-
+    // trieType* result = new trieType();
+    trieType* result = new trieType(ones_to_write, max_level, last_pos, runs_encoded);
+    delete[] last_pos;
     return result;
 }
 template flatBinTrie<rank_support_v5<1>>* 
-joinTries<flatBinTrie<rank_support_v5<1>>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool runs_encoded);
+joinTries<flatBinTrie<rank_support_v5<1>>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, bool runs_encodedm, uint64_t &n_ranks);
 template flatBinTrie<rank_support_v<1>>* 
-joinTries<flatBinTrie<rank_support_v<1>>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool runs_encoded);
+joinTries<flatBinTrie<rank_support_v<1>>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, bool runs_encoded, uint64_t &n_ranks);
 template binTrie_il<512>* 
-joinTries<binTrie_il<512>>(vector<binTrie_il<512>> &Bs, bool runs_encoded);
+joinTries<binTrie_il<512>>(vector<binTrie_il<512>> &Bs, bool runs_encoded, uint64_t &n_ranks);
 template binTrie_il<256>* 
-joinTries<binTrie_il<256>>(vector<binTrie_il<256>> &Bs, bool runs_encoded);
+joinTries<binTrie_il<256>>(vector<binTrie_il<256>> &Bs, bool runs_encoded, uint64_t &n_ranks);
 template binTrie_il<128>* 
-joinTries<binTrie_il<128>>(vector<binTrie_il<128>> &Bs, bool runs_encoded);
+joinTries<binTrie_il<128>>(vector<binTrie_il<128>> &Bs, bool runs_encoded, uint64_t &n_ranks);
 template binTrie_il<64>* 
-joinTries<binTrie_il<64>>(vector<binTrie_il<64>> &Bs, bool runs_encoded);
+joinTries<binTrie_il<64>>(vector<binTrie_il<64>> &Bs, bool runs_encoded, uint64_t &n_ranks);

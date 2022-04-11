@@ -23,19 +23,11 @@ class binTrie_il{
         sdsl::bit_vector_il<block_size> *bTrie;
         sdsl::bit_vector *lastLevel;     
         rank_support_il<1, block_size> b_rank;
-        vector<uint64_t> level_pos;
+        // vector<uint64_t> level_pos;
+        uint64_t* level_pos;
 
     public:
         binTrie_il() = default;
-
-        // ~flatBinTrie() {
-        //     // cout << "comienza el free" <<endl;
-        //     // cout << "destructor is called" <<endl;
-        //     delete binTrie_il::lastLevel;
-        //     delete binTrie_il::bTrie;
-        //     // cout << "termina el free" <<endl;
-            
-        // }
 
 
         binTrie_il(vector<uint64_t> &set, uint64_t u) {
@@ -44,7 +36,8 @@ class binTrie_il{
 
             uint16_t height = floor(log2(u - 1)) +  1;
             binTrie_il::height = height;
-            binTrie_il::level_pos = vector<uint64_t>(height, 0);
+            // binTrie_il::level_pos = vector<uint64_t>(height, 0);
+            binTrie_il::level_pos = new uint64_t[height];
             
             // uint64_t max_nodes = 2*(pow(2, height+1) - 1);
             uint64_t max_nodes            = 2 * (pow(2, height) - 1);
@@ -164,7 +157,10 @@ class binTrie_il{
         }
 
 
-        binTrie_il(vector<uint64_t> ones_to_write[], uint16_t height, vector<uint64_t> &level_pos, bool runs_encoded) {
+        binTrie_il(vector<uint64_t> ones_to_write[], uint16_t height, 
+                    // vector<uint64_t> &level_pos,
+                    uint64_t* level_pos, 
+                    bool runs_encoded) {
             binTrie_il::runs_encoded = runs_encoded;
             binTrie_il::height = height;
             
@@ -194,7 +190,8 @@ class binTrie_il{
 
             bit_vector* _bTrie    = new bit_vector(bits_n - level_pos[max_level_not_empty], 0);
             binTrie_il::lastLevel = new bit_vector(level_pos[max_level_not_empty], 0); 
-            binTrie_il::level_pos = vector<uint64_t>(height, 0);
+            // binTrie_il::level_pos = vector<uint64_t>(height, 0);
+            binTrie_il::level_pos = new uint64_t[height]; 
 
             uint64_t global_level_pos = 0;
             for (uint16_t level = 0; level < height; ++level) {
@@ -280,27 +277,46 @@ class binTrie_il{
             return node;
         };
 
+        inline uint64_t getNode1(uint64_t &node_id) {
+            uint64_t pos  = 2 * node_id;
+            // if (cur_level < flatBinTrie::height - 1)
+            // if (pos < bTrie -> size() )
+                return (((*bTrie)[pos]) << 1) | (*bTrie)[pos+1];
+            
+            // else{
+                // pos -= flatBinTrie::bTrie -> size();
+                // return (((*lastLevel)[pos]) << 1) | (*lastLevel)[pos+1];
+            // }
+            // return node;
+        }
 
-        inline uint64_t getLeftChild(uint64_t node_id) {
-            if (2*node_id + 1 <= binTrie_il::bTrie -> size() -1){
+        uint64_t getNode2(uint64_t &node_id) {
+            uint64_t pos = 2*node_id - (bTrie -> size());
+            return ((*lastLevel)[pos] << 1) | (*lastLevel)[pos+1];
+        }
+
+
+        inline uint64_t getLeftChild(uint64_t &node_id) {
+            // if (2*node_id + 1 <= binTrie_il::bTrie -> size()){
                 // auto start = std::chrono::high_resolution_clock::now();
                 uint64_t rank = binTrie_il::b_rank((2*node_id) + 1);
                 // auto end = std::chrono::high_resolution_clock::now();
                 // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
                 // auto time = elapsed.count();
                 // cout << "Tiempo por rank: "<< time <<" [ns]" << endl;
-                return rank;}
+                return rank;
+            // }
                 // return binTrie_il::b_rank((2*node_id) + 1);
-            else 
-                return 0;
+            // else 
+            //     return 0;
         };
 
 
-        inline uint64_t getRightChild(uint64_t node_id) {
-            if (2*node_id + 2 <= binTrie_il::bTrie -> size() -1)
+        inline uint64_t getRightChild(uint64_t &node_id) {
+            // if (2*node_id + 2 <= binTrie_il::bTrie -> size())
                 return binTrie_il::b_rank((2*node_id) + 2);
-            else 
-                return 0;
+            // else 
+                // return 0;
         };
 
 
@@ -373,12 +389,15 @@ class binTrie_il{
         };
 
 
-        inline void writeCompressTrie(vector<uint64_t> ones_to_write[], vector<uint64_t> &level_pos, 
+        inline void writeCompressTrie(vector<uint64_t> ones_to_write[], 
+                                // vector<uint64_t> &level_pos,
+                                uint64_t* level_pos, 
                                 uint16_t curr_level, uint64_t node_id, bool &its11){
             // cout << "node_id: " << node_id << " current level: " << curr_level << endl;
-            uint64_t node = getNode(node_id);
+            
             // End condition
             if (curr_level == (binTrie_il::height-1)) {
+                uint64_t node = getNode2(node_id);
                 // if node == 11
                 if (node == 0b11) {
                     its11 = true;
@@ -394,7 +413,7 @@ class binTrie_il{
                 
                 return;
             }
-
+            uint64_t node = getNode1(node_id);
             uint16_t next_level = curr_level + 1;
             uint64_t next_level_pos = level_pos[next_level];
 
@@ -444,7 +463,10 @@ class binTrie_il{
         };
 
         // Method write ones in bit vector
-        inline void writeOnes(vector<uint64_t> ones_to_write[], vector<uint64_t> level_pos){
+        inline void writeOnes(vector<uint64_t> ones_to_write[], 
+                                // vector<uint64_t> level_pos
+                                uint64_t* level_pos){
+            // cout << "Escribiendo unos" << endl;
             binTrie_il::runs_encoded = true;
             uint64_t bits_n = 0;
             uint16_t last_level = 0;
@@ -465,11 +487,14 @@ class binTrie_il{
             delete binTrie_il::bTrie;
             delete binTrie_il::lastLevel;
             // cout << "termina el delete" << endl;
-            
+            // cout << "New de los bit_vectors" << endl;
             // binTrie_il::bTrie     = new bit_vector(bits_n, 0);
             bit_vector* _bTrie     = new bit_vector(bits_n - level_pos[last_level], 0);
-            binTrie_il::lastLevel = new bit_vector(level_pos[last_level], 0);
-            binTrie_il::level_pos = vector<uint64_t>(height, 0);
+            binTrie_il::lastLevel  = new bit_vector(level_pos[last_level], 0);
+            // binTrie_il::level_pos = vector<uint64_t>(height, 0);
+            // delete[] binTrie_il::level_pos;
+            // cout << "Antes del new" << endl;
+            binTrie_il::level_pos = new uint64_t[height];
             // cout << "Ok operador new " << endl;
             uint64_t global_level_pos = 0;
             for (uint16_t level = 0; level < height_with_runs; ++level) {
@@ -502,17 +527,20 @@ class binTrie_il{
             binTrie_il::bTrie = new bit_vector_il<block_size>(*_bTrie);
             delete _bTrie;
             binTrie_il::b_rank = rank_support_il<1, block_size>(binTrie_il::bTrie);
+            delete[] level_pos;
         };
 
 
         inline void encodeRuns() {
             // bit_vector new_bv = new bit_vector(binTrie_il::bTrie -> size(), 0);
             vector<uint64_t> ones_to_write[binTrie_il::height];
-            vector<uint64_t> level_pos(binTrie_il::height, 0);
+            // vector<uint64_t> level_pos(binTrie_il::height, 0);
+            uint64_t* level_pos = new uint64_t[height];
+            for (uint64_t i = 0; i < height; ++i) level_pos[i] = 0;
             bool itsOneOne = false;
-
+            // cout << "init recursive func" << endl;
             binTrie_il::writeCompressTrie(ones_to_write, level_pos, 0, 0, itsOneOne);
-            
+            // cout << "end recursive func" << endl;
             writeOnes(ones_to_write, level_pos);
         };
 

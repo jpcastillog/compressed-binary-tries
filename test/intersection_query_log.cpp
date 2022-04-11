@@ -135,9 +135,12 @@ void performIntersections( std::string sequences_path, std::string query_path,
     queries   = loadQueryLog(query_path);
     cout << "Queries loaded succefully" << endl;
 
+    uint64_t n_ranks = 0;
+
     uint64_t nq = 0;
     long unsigned int total_time = 0;
     uint64_t total_height = 0;
+    uint64_t time_of_ranks = 0;
     auto start = std::chrono::high_resolution_clock::now();
     // for (int i = 0; i < queries -> size(); ++i) {
     for (int i = 0; i < 2000; ++i) {
@@ -151,7 +154,7 @@ void performIntersections( std::string sequences_path, std::string query_path,
         if (Bs.size() <= 16){
             trieType* intersection;
             
-            intersection = joinTries<trieType>(Bs, runs_encoded);
+            intersection = joinTries<trieType>(Bs, runs_encoded, time_of_ranks);
             total_height += intersection -> getHeight();
             // vector<uint64_t> decode_r;
             // // intersection -> decode(decode_r);
@@ -176,8 +179,10 @@ void performIntersections( std::string sequences_path, std::string query_path,
     delete sequences;
     delete queries;
 
-    cout <<"|Avg time execution: " << (float)(time*10e-6)/nq << "[ms]" << endl;
+    cout <<"|Avg time execution: " << (double)(time*10e-6)/nq << "[ms]" << endl;
     cout << total_height << endl;   
+    cout << "Avg number of ranks: " << (float)n_ranks/nq << endl;
+    cout << "Avg time of ranks: " << (double)(time_of_ranks*10e-6)/nq <<endl;
 }
 template
 void performIntersections<flatBinTrie<sdsl::rank_support_v<1>>>(std::string sequences_path, std::string query_path, std::string out_path,bool runs_encoded, uint64_t n_sequences);
@@ -208,15 +213,16 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    int rank = 1;
+    int rank = 0;
     uint64_t min_size;
     bool runs = true;
-    uint32_t block_size = 512;
+    uint32_t block_size = 128;
     // uint64_t n_sequences = 0xffffffffffffffff;
     uint64_t n_sequences = 1107205;
     // std::string sequences_filename = std::string(argv[1]);
     // std::string querylog_filename   = std::string(argv[2]);
-    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_128_runs_t.bin";
+    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_128_runs_t.bin";
+    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
     std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt";
     std::string output_filename = "";
     for (int i = 1; i < argc; ++i){

@@ -80,8 +80,11 @@ void buildCollection(std::string input_path, std::string out_path,
 
             if (rank_type == 1) {
                 binTrie_il<block_size> trie_il(*il, u);
+                // cout << "Ok create tries" << endl;
                 if (runs)
+                    // cout << "Init to create tries" << endl;
                     trie_il.encodeRuns();
+                    // cout << "OK encode runs" << endl;
                 if (out_path != "") {
                     trie_il.serialize(out);
                 }
@@ -179,9 +182,9 @@ int main(int argc, char** argv) {
         }
     }
     
-    // std::cout << "Min size: " << min_size << std::endl;
-    // std::cout << "Rank: " << rank << std::endl;
-    // std::cout << "Runs: " << runs << std::endl;
+    std::cout << "Min size: " << min_size << std::endl;
+    std::cout << "Rank: " << rank << std::endl;
+    std::cout << "Runs: " << runs << std::endl;
     std::cout << output_filename << endl;
     
     // Call function here
