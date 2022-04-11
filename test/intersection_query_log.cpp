@@ -142,8 +142,8 @@ void performIntersections( std::string sequences_path, std::string query_path,
     uint64_t total_height = 0;
     uint64_t time_of_ranks = 0;
     auto start = std::chrono::high_resolution_clock::now();
-    // for (int i = 0; i < queries -> size(); ++i) {
-    for (int i = 0; i < 2000; ++i) {
+    for (int i = 0; i < queries -> size(); ++i) {
+    // for (int i = 0; i < 2000; ++i) {
         vector<trieType> Bs;
         Bs.reserve(16);
         for(int j = 0; j < (*queries)[i].size(); ++j) {
@@ -224,6 +224,7 @@ int main(int argc, char const *argv[]) {
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_128_runs_t.bin";
     std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
     std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt";
+    // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";
     std::string output_filename = "";
     for (int i = 1; i < argc; ++i){
         if (std::string(argv[i]) == "--rank") {
