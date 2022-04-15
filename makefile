@@ -15,7 +15,7 @@ build: test/build_tries.cpp
 # 	$(CC) $(CFLAGS) test/intersection_query_log.cpp -o queries $(SDSLFLAGS)
 
 queries: $(OBJDIR)/intersection_query_log.o $(OBJDIR)/intersection.o
-	$(CC) -o queries.out $(OBJDIR)/intersection_query_log.o $(OBJDIR)/intersection.o $(CFLAGS) $(SDSLFLAGS) 
+	$(CC) -o queries.out $(OBJDIR)/intersection_query_log.o $(OBJDIR)/intersection.o $(CFLAGS) $(SDSLFLAGS) -pthread
 
 $(OBJDIR)/intersection.o: src/intersection.cpp src/intersection.hpp
 	mkdir -p obj

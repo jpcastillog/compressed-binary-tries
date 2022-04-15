@@ -152,14 +152,18 @@ void performIntersections( std::string sequences_path, std::string query_path,
         }
         // cout << "Query size: " << Bs.size() << endl;
         if (Bs.size() <= 16){
+            cout << "i: " << nq << endl;
             trieType* intersection;
             
-            intersection = joinTries<trieType>(Bs, runs_encoded, time_of_ranks);
+            // intersection = joinTries<trieType>(Bs, runs_encoded, time_of_ranks);
+            intersection = parJoin<trieType>(Bs);
+
             total_height += intersection -> getHeight();
+            cout << "Size of intersection: " << intersection -> elements_coded() << endl;
             // vector<uint64_t> decode_r;
-            // // intersection -> decode(decode_r);
+            // intersection -> decode(decode_r);
             // cout << nq << " |Query size: "<< Bs.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" 
-            //      << "| intersection size: " << decode_r.size() << endl;
+                //  cout << "| intersection size: " << decode_r.size() << endl;
             
             // Write results in a out file
             // if (out.is_open()) {
@@ -178,8 +182,8 @@ void performIntersections( std::string sequences_path, std::string query_path,
 
     delete sequences;
     delete queries;
-
-    cout <<"|Avg time execution: " << (double)(time*10e-6)/nq << "[ms]" << endl;
+    cout << "Number of queries: " << nq << endl;
+    cout <<"|Avg time execution: " << (double)(time)*10e-6/nq << "[ms]" << endl;
     cout << total_height << endl;   
     cout << "Avg number of ranks: " << (float)n_ranks/nq << endl;
     cout << "Avg time of ranks: " << (double)(time_of_ranks*10e-6)/nq <<endl;
@@ -223,7 +227,8 @@ int main(int argc, char const *argv[]) {
     // std::string querylog_filename   = std::string(argv[2]);
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_128_runs_t.bin";
     std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
-    std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt";
+    // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt";
+    std::string querylog_filename   = "./../../s_indexes/1000_pairwise_first_3000.txt";
     // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";
     std::string output_filename = "";
     for (int i = 1; i < argc; ++i){

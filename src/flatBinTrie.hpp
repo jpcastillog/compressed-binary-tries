@@ -512,9 +512,10 @@ class flatBinTrie{
                                 uint64_t* level_pos, 
                                 uint16_t curr_level, uint64_t node_id, bool &its11){
             // cout << "node_id: " << node_id << " current level: " << curr_level << endl;
-            uint64_t node = getNode(node_id);
+            
             // End condition
             if (curr_level == (flatBinTrie::height-1)) {
+                uint64_t node = getNode2(node_id);
                 // if node == 11
                 if (node == 0b11) {
                     its11 = true;
@@ -530,7 +531,7 @@ class flatBinTrie{
                 
                 return;
             }
-
+            uint64_t node = getNode1(node_id);
             uint16_t next_level = curr_level + 1;
             uint64_t next_level_pos = level_pos[next_level];
 
@@ -607,7 +608,7 @@ class flatBinTrie{
             // flatBinTrie::bTrie     = new bit_vector(bits_n, 0);
             flatBinTrie::bTrie     = new bit_vector(bits_n - level_pos[last_level], 0);
             flatBinTrie::lastLevel = new bit_vector(level_pos[last_level], 0);
-            delete[] flatBinTrie::level_pos;
+            // delete[] flatBinTrie::level_pos;
             flatBinTrie::level_pos = new uint64_t[height];
             // flatBinTrie::level_pos = vector<uint64_t>(height, 0);
             // cout << "Ok operador new " << endl;
@@ -639,19 +640,18 @@ class flatBinTrie{
                 // flatBinTrie::level_pos[level] = global_level_pos;
             }
             // cout << "antes del rank" << endl;
+            delete[] level_pos;
             flatBinTrie::b_rank = rankType(flatBinTrie::bTrie);
         };
 
 
         inline void encodeRuns() {
-            // bit_vector new_bv = new bit_vector(flatBinTrie::bTrie -> size(), 0);
             vector<uint64_t> ones_to_write[flatBinTrie::height];
-            // vector<uint64_t> level_pos(flatBinTrie::height, 0);
             flatBinTrie::level_pos = new uint64_t[height];
+            for(uint64_t i = 0; i < flatBinTrie::height; ++i) level_pos[i] = 0;
             bool itsOneOne = false;
 
             flatBinTrie::writeCompressTrie(ones_to_write, level_pos, 0, 0, itsOneOne);
-            
             writeOnes(ones_to_write, level_pos);
         };
 

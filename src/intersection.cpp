@@ -5,9 +5,12 @@
 #include "binTrie.hpp"
 #include "flatBinTrie.hpp"
 #include "binTrie_il.hpp"
+#include "parallel_for.hpp"
 
 using namespace std;
 using namespace sdsl;
+
+
 
 
 // Global vars ... 
@@ -253,17 +256,17 @@ void runsEncodedIntersection(vector <trieType> &Bs,  uint64_t curr_level,
             if (node_i) {
                 tempActiveTries[i] = true;
                 result &= node_i;
-                node00 |= node_i;
             }
             else
                 tempActiveTries[i] = false;
+
+            node00 |= node_i;
         }
         else {
            tempActiveTries[i] = false;
         }
 	}
     
-
     // End condition
 	if (curr_level == max_level - 1) {
         // Only write when result = 11, 10 or 01
@@ -276,6 +279,7 @@ void runsEncodedIntersection(vector <trieType> &Bs,  uint64_t curr_level,
         }
 		return;
 	}
+
     // all nodes are 00...0
     if ( node00 == 0b00 ) {
         last_pos[curr_level] += 2;
@@ -356,6 +360,204 @@ void runsEncodedIntersection(vector <trieType> &Bs,  uint64_t curr_level,
         } 
     }  
 }
+
+template <class trieType>
+void parRunsEncodedIntersection(uint16_t nb_threads, uint16_t threadId, std::mutex &sharedMutex, vector <trieType> &Bs,  uint64_t curr_level, 
+                                uint64_t roots[], bool activeTries[]) {
+	
+	uint64_t result = 0b11; // 0....11
+    uint64_t node00 = 0b00; // 0....00
+    bool tempActiveTries[16];
+    // cout << "Thread Id: " << threadId << endl;
+    // sharedMutex.lock();
+    // cout << "roots: "; 
+    // for (uint16_t i = 0; i < 16; ++i) cout << roots[i] << " ";
+    // cout << "|"<< endl;
+    // sharedMutex.unlock();
+	for (uint64_t i = 0; i < n_tries; ++i) {
+        if (activeTries[i]) {
+            uint64_t node_i = (curr_level == max_level - 1) ? 
+                                Bs[i].getNode2(roots[i]) :
+                                Bs[i].getNode1(roots[i]);
+            // if (node_i%nb_threads != threadId) continue;
+            if (node_i) {
+                tempActiveTries[i] = true;
+                result &= node_i;
+            }
+            else
+                tempActiveTries[i] = false;
+
+            node00 |= node_i;
+        }
+        else {
+           tempActiveTries[i] = false;
+        }
+	}
+    
+    // End condition
+	if (curr_level == max_level - 1) {
+        // Only write when result = 11, 10 or 01
+        if (result == 0b01 || result == 0b10 || result ==  0b11) {
+            if (result == 0b10 || result == 0b11)
+                // sharedMutex.lock();
+                ones_to_write[curr_level].push_back(last_pos[curr_level]);
+                // sharedMutex.unlock();
+            if (result == 0b01 || result == 0b11)
+                // sharedMutex.lock();
+                ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+                // sharedMutex.unlock(); 
+            last_pos[curr_level] += 2;
+        }
+		return;
+	}
+
+    // all nodes are 00...0
+    if ( node00 == 0b00 ) {
+        last_pos[curr_level] += 2;
+        return;
+    }
+
+    uint64_t next_level = curr_level + 1;
+    uint64_t pos_next_level_before = last_pos[next_level];
+
+    if ( result == 0b10 ) {
+        uint64_t left_nodes[16];
+
+        for (uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i]) {
+                left_nodes[i] = Bs[i].getLeftChild(roots[i]);
+            }
+        }
+        // sharedMutex.lock();
+        parRunsEncodedIntersection(nb_threads, threadId, sharedMutex, Bs, next_level, left_nodes, tempActiveTries);
+        // sharedMutex.unlock();
+        if (last_pos[next_level] != pos_next_level_before) {
+            // sharedMutex.lock();
+            ones_to_write[curr_level].push_back(last_pos[curr_level]);
+            // sharedMutex.unlock();
+            pos_next_level_before = last_pos[next_level];
+            last_pos[curr_level] += 2;
+        }
+    }
+
+    else if ( result == 0b01) {
+        uint64_t right_nodes[16];
+
+        for(uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i]) {
+                right_nodes[i] = Bs[i].getRightChild(roots[i]);
+            }
+        }
+        // sharedMutex.lock();
+        parRunsEncodedIntersection(nb_threads, threadId, sharedMutex, Bs, next_level, right_nodes, tempActiveTries);
+        // sharedMutex.unlock();
+        if (last_pos[next_level] != pos_next_level_before) {
+            // sharedMutex.lock();
+            ones_to_write[curr_level].push_back(last_pos[curr_level]+1);
+            // sharedMutex.unlock();
+            last_pos[curr_level] += 2;
+        }
+    }
+
+    // result its 11
+    else if (result == 0b11) {
+        bool exist_lchild, exist_rchild;
+        uint64_t left_nodes[16];
+        uint64_t right_nodes[16];
+        for (uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i]){
+                uint64_t left_node = Bs[i].getLeftChild(roots[i]); 
+                left_nodes[i]  = left_node;
+                right_nodes[i] = left_node + 1;
+            }
+        }
+        // sharedMutex.lock();
+        parRunsEncodedIntersection(nb_threads, threadId, sharedMutex, Bs, next_level, left_nodes, tempActiveTries);
+        // sharedMutex.unlock();
+        if (last_pos[next_level] == pos_next_level_before) {
+            exist_lchild = false;
+        }
+        else  {
+            // sharedMutex.lock();
+            ones_to_write[curr_level].push_back(last_pos[curr_level]);
+            // sharedMutex.unlock();
+            pos_next_level_before = last_pos[next_level];
+            exist_lchild = true;
+        }
+        // sharedMutex.lock();
+        parRunsEncodedIntersection(nb_threads, threadId, sharedMutex, Bs, next_level, right_nodes, tempActiveTries);
+        // sharedMutex.unlock();
+        if (last_pos[next_level] == pos_next_level_before) {
+            exist_rchild = false;
+        }
+        // exist_rchild = (last_pos[next_level] == pos_next_level_before);
+        else {
+            // sharedMutex.lock();
+            ones_to_write[curr_level].push_back(last_pos[curr_level] + 1);
+            // sharedMutex.unlock();
+            exist_rchild = true;
+        }
+        // mark if node is write
+        if (exist_lchild || exist_rchild) {
+            last_pos[curr_level] += 2;
+        } 
+    }  
+}
+
+
+template <class trieType>
+trieType* parJoin(vector<trieType> &Bs){
+    
+    max_level = Bs[0].getHeight();
+    // max 16 relations
+    
+    
+    last_pos = new uint64_t[max_level];
+    for (uint64_t i = 0; i < max_level; ++i) 
+        last_pos[i] = 0;
+    ones_to_write = new vector<uint64_t>[max_level];
+    uint64_t curr_level = 0;
+    n_tries = Bs.size();
+    
+
+    unsigned nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
+    unsigned nb_threads = nb_threads_hint == 0 ? 8 : (nb_threads_hint);
+    std::mutex tuplesMutex;
+    parallel_for(nb_threads, [&](int start, int end) {
+        for (int threadId = start; threadId < end; ++threadId)
+        {
+            bool activeTries[16] = { true, true, true, true,
+                             true, true, true, true,
+                             true, true, true, true,
+                             true, true, true, true }; 
+                            // active tries in runs encode implementation
+            uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 0 };
+            for (uint64_t i = 0; i < max_level; ++i) 
+                last_pos[i] = 0;
+            parRunsEncodedIntersection(nb_threads, threadId, tuplesMutex, Bs, curr_level, roots, activeTries);
+            // parAND(nb_threads, threadId, levelOfCut, tuplesMutex, Q_star, Q_roots, Q.size(), 0, height - 1, bv, last_pos, ancestor, A.size(), bounded_result, UPPER_BOUND);
+        }
+    });
+    
+    trieType* result = new trieType(ones_to_write, max_level, last_pos, true);
+    delete[] last_pos;
+    return result;
+    // return;
+}
+template 
+flatBinTrie<rank_support_v5<1>>* 
+parJoin<flatBinTrie<rank_support_v5<1>>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs);
+template flatBinTrie<rank_support_v<1>>* 
+parJoin<flatBinTrie<rank_support_v<1>>>(vector<flatBinTrie<rank_support_v<1>>> &Bs);
+template binTrie_il<512>* 
+parJoin<binTrie_il<512>>(vector<binTrie_il<512>> &Bs);
+template binTrie_il<256>* 
+parJoin<binTrie_il<256>>(vector<binTrie_il<256>> &Bs);
+template binTrie_il<128>* 
+parJoin<binTrie_il<128>>(vector<binTrie_il<128>> &Bs);
+template binTrie_il<64>* 
+parJoin<binTrie_il<64>>(vector<binTrie_il<64>> &Bs);
 
 
 template <class trieType>

@@ -13,6 +13,8 @@
 // flatBinTrie<rankType>* joinTries(vector<flatBinTrie<rankType>> &Bs, bool runs_encoded);
 template<class trieType>
 trieType* joinTries(vector<trieType> &Bs, bool runs_encoded, uint64_t &n_ranks);
+template <class trieType>
+trieType* parJoin(vector<trieType> &Bs);
 
 
 #endif
