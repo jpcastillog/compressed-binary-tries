@@ -11,7 +11,7 @@
 
 # ./queries.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_64_runs_t.bin" "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt" --rank il 64 --runs t
 # ./queries.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_256_runs_t.bin" "/media/jpcastillog/Nuevo vol/data/Gov2Flat/aol.txt" --#sequences 1100000 --rank il 256 --runs t
-./queries.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v5_runs_t.bin" "/media/jpcastillog/Nuevo vol/data/Gov2Flat/aol.txt" --rank v5--runs t
+./queries.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v5_runs_t.bin" "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt" --rank v5--runs t
 
 
 

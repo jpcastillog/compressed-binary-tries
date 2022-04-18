@@ -23,12 +23,14 @@
 ///
 static
 void parallel_for(unsigned nb_elements,
+                  unsigned nb_threads,
                   std::function<void (int start, int end)> functor,
                   bool use_threads = true)
 {
     // -------
-    unsigned nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
-    unsigned nb_threads = nb_threads_hint == 0 ? 8 : (nb_threads_hint);
+    // unsigned nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
+    // // unsigned nb_threads = nb_threads_hint == 0 ? 8 : (nb_threads_hint);
+    // unsigned nb_threads = 2;
 
     unsigned batch_size = nb_elements / nb_threads;
     unsigned batch_remainder = nb_elements % nb_threads;

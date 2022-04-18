@@ -16,7 +16,7 @@ template <class trieType>
 vector<trieType>* loadSequences(std::string input_path, uint64_t n){
 
     vector<trieType>* sequences = new vector<trieType>();
-    sequences -> reserve (1200000);
+    // sequences -> reserve (1200000);
     std::ifstream in;
     in.open(input_path, std::ios::binary | std::ios::in);
     if (!in.is_open()) {
@@ -36,9 +36,9 @@ vector<trieType>* loadSequences(std::string input_path, uint64_t n){
             break;
         }
         trieType b = trieType();
-        // cout << "Init load" << endl;
+        cout << "Init load" << endl;
         b.load(in);
-        // cout << "Finish load " << count << endl;
+        cout << "Finish load " << count << endl;
         sequences -> push_back(b);
         count++;
     }
@@ -152,14 +152,14 @@ void performIntersections( std::string sequences_path, std::string query_path,
         }
         // cout << "Query size: " << Bs.size() << endl;
         if (Bs.size() <= 16){
-            cout << "i: " << nq << endl;
+            // cout << "i: " << nq << endl;
             trieType* intersection;
             
             // intersection = joinTries<trieType>(Bs, runs_encoded, time_of_ranks);
             intersection = parJoin<trieType>(Bs);
 
-            total_height += intersection -> getHeight();
-            cout << "Size of intersection: " << intersection -> elements_coded() << endl;
+            // total_height += intersection -> getHeight();
+            // cout << "Size of intersection: " << intersection -> elements_coded() << endl;
             // vector<uint64_t> decode_r;
             // intersection -> decode(decode_r);
             // cout << nq << " |Query size: "<< Bs.size() << " |Time execution: " << (float)time*10e-6 << "[ms]" 
@@ -217,19 +217,23 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    int rank = 0;
+    int rank = 2;
     uint64_t min_size;
     bool runs = true;
-    uint32_t block_size = 128;
+    uint32_t block_size = 512;
     // uint64_t n_sequences = 0xffffffffffffffff;
-    uint64_t n_sequences = 1107205;
+    uint64_t n_sequences = 50131015;
     // std::string sequences_filename = std::string(argv[1]);
     // std::string querylog_filename   = std::string(argv[2]);
-    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_128_runs_t.bin";
-    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
+    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_512_runs_t.bin";
+    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
+    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_v5_runs_t.bin";
+    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v5_runs_t.bin";
     // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt";
-    std::string querylog_filename   = "./../../s_indexes/1000_pairwise_first_3000.txt";
-    // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";
+    std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/1mq.txt";
+    // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/aol.txt";
+    // std::string querylog_filename   = "./../../s_indexes/1000_pairwise_first_3000.txt";
+    // std::string     querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";
     std::string output_filename = "";
     for (int i = 1; i < argc; ++i){
         if (std::string(argv[i]) == "--rank") {
