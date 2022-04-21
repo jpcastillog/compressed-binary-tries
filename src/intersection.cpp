@@ -70,6 +70,81 @@ void intersection(vector <binTrie> &Bs, uint16_t max_level, uint16_t curr_level,
 
 
 template <class trieType>
+void AND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level,
+                  uint64_t roots[], bool activeTries[], uint64_t partial_int,
+                  vector<uint64_t> &r) {
+    // End condition
+    if (curr_level == max_level) {
+        r.push_back(partial_int);
+    }
+    
+    bool tempActiveTries [16]; 
+    uint64_t result = 0b11;
+    uint64_t node00 = 0b00;
+    for (uint16_t i = 0;  i < n_tries; ++i) {
+        if (activeTries[i]) {
+            uint64_t node_i = (curr_level == max_level - 1) ?
+                                Ts[i].getNode2(roots[i]):
+                                Ts[i].getNode1(roots[i]);
+            if (node_i) {
+                tempActiveTries[i] = true;
+                result &= node_i;
+            }
+            else tempActiveTries[i] = false;
+            node00 |= node_i;
+        }
+    }
+
+    if (node00 == 0b00) {
+        uint64_t below = partial_int;
+        uint64_t range = ((uint64_t)1 << (max_level - curr_level))- 1;
+        uint64_t above = partial_int | range;
+        for (uint64_t i = below; i <= above; ++i)
+            r.push_back(i);
+
+        return;
+    }
+
+    if (result == 0b10) {
+        uint64_t left_nodes[16];
+        for (uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i])
+                left_nodes[i] = Ts[i].getLeftChild(roots[i]);
+        }
+        intersection();
+
+    }
+    else if (result == 0b01){
+        uint64_t right_nodes[16];
+        for (uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i])
+                right_nodes[i] = Ts[i].getRightChild(roots[i]);
+        }
+        intersection();
+
+    }
+    else if (result == 0b11) {
+        uint64_t left_nodes[16];
+        uint64_t right_nodes[16];
+
+        for(uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i]){
+                uint64_t left_node = Ts[i].getLeftChild(roots[i]);
+                left_nodes[i]  = left_node;
+                right_nodes[i] = left_node + 1; 
+            }
+        }
+        // Left Childs
+        intersection();
+        // Right Childs
+        intersection();
+
+    }
+
+}
+
+
+template <class trieType>
 void runsEncodedIntersection(vector <trieType> &Bs, uint64_t &n_tries, 
                 uint64_t &max_level, uint64_t curr_level, 
                 uint64_t roots[], 
