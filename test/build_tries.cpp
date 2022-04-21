@@ -78,13 +78,13 @@ void buildCollection(std::string input_path, std::string out_path,
                 trie_v.free();
             }
 
-            if (rank_type == 1) {
+            else if (rank_type == 1) {
                 binTrie_il<block_size> trie_il(*il, u);
-                // cout << "Ok create tries" << endl;
+                cout << "Ok create tries" << endl;
                 if (runs)
-                    // cout << "Init to create tries" << endl;
+                    cout << "Init encodeRuns" << endl;
                     trie_il.encodeRuns();
-                    // cout << "OK encode runs" << endl;
+                    cout << "OK encode runs" << endl;
                 if (out_path != "") {
                     trie_il.serialize(out);
                 }
@@ -106,7 +106,7 @@ void buildCollection(std::string input_path, std::string out_path,
             total_elements += n;
             n_il++;
 
-            cout << "#Elements: " << n << " | Bpi: " << (float)(trie_bytes_size*8)/n << endl;
+            // cout << "#Elements: " << n << " | Bpi: " << (float)(trie_bytes_size*8)/n << endl;
             if ((n_il % 1000) == 0) {
                 cout << n_il  <<" lists processed " << endl;
             }
@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
     std::string output_filename = "";
     std::string input_filename = std::string(argv[1]);
     
-    for (int i = 1; i < argc; ++i){
+    for (int i = 2; i < argc; ++i){
         if (std::string(argv[i]) == "--min_size") {
             ++i;
             min_size = std::stoull(argv[i]);
@@ -195,6 +195,6 @@ int main(int argc, char** argv) {
     else if (block_size == 128)
         buildCollection<128>(input_filename, output_filename, min_size, rank, runs);
     else
-        buildCollection<64>(input_filename, output_filename, min_size, rank, runs);
+        buildCollection<64> (input_filename, output_filename, min_size, rank, runs);
 
 }

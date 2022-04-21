@@ -1,4 +1,4 @@
-CFLAGS = -std=c++11 -msse4.2 -O3 -march=native
+CFLAGS = -std=c++17 -msse4.2 -O3 -march=native
 CC = g++
 OBJDIR = obj
 SDSLFLAGS = -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
