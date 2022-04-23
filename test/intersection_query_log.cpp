@@ -147,10 +147,13 @@ void performIntersections( std::string sequences_path, std::string query_path,
     // for (int i = 0; i < 2000; ++i) {
         vector<trieType> Bs;
         Bs.reserve(16);
+        // cout << "ids: " ;
         for(int j = 0; j < (*queries)[i].size(); ++j) {
             Bs.push_back((*sequences)[(*queries)[i][j]]);
             // cout << (*sequences)[(*queries)[i][j]].getHeight() << endl;
+            // cout << (*queries)[i][j] << " ";
         }
+        // cout << endl;
         // cout << "Query size: " << Bs.size() << endl;
         if (Bs.size() <= 16){
             // cout << "i: " << nq << endl;
@@ -218,22 +221,22 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    int rank = 2;
+    int rank = 0;
     uint64_t min_size;
     bool runs = true;
     uint32_t block_size = 512;
     // uint64_t n_sequences = 0xffffffffffffffff;
-    // uint64_t n_sequences = 1000000;
-    uint64_t n_sequences = 1107204;
+    uint64_t n_sequences = 1000000;
+    // uint64_t n_sequences = 1107204;
     // std::string sequences_filename = std::string(argv[1]);
     // std::string querylog_filename   = std::string(argv[2]);
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_512_runs_t.bin";
-    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v5_runs_t.bin";
-    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_v_runs_t.bin";
+    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
+    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_v_runs_t.bin";
     // std::string sequences_filename =  "/home/jpcastillog/Escritorio/data/clueweb09_rank_v_runs_t.bin";
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v5_runs_t.bin";
-    std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt";
-    // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/1mq.txt";
+    // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt";
+    std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/1mq.txt";
     // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/aol.txt";
     // std::string querylog_filename   = "./../../s_indexes/1000_pairwise_first_3000.txt";
     // std::string     querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";

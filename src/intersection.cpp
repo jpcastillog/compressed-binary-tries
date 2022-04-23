@@ -70,12 +70,117 @@ void intersection(vector <binTrie> &Bs, uint16_t max_level, uint16_t curr_level,
 
 
 template <class trieType>
-void AND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level,
+void AND(vector<trieType> &Ts, uint64_t &n_tries, uint64_t &max_level, uint64_t curr_level,
                   uint64_t roots[], bool activeTries[], uint64_t partial_int,
-                  vector<uint64_t> &r) {
+                  vector<uint64_t> &r, std::mutex &sharedMutex) {
     // End condition
     if (curr_level == max_level) {
+        // sharedMutex.lock();
         r.push_back(partial_int);
+        // sharedMutex.unlock();
+        return;
+    }
+    
+    bool tempActiveTries[16]; 
+    uint64_t result = 0b11;
+    uint64_t node00 = 0b00;
+    for (uint16_t i = 0;  i < n_tries; ++i) {
+        if (activeTries[i]) {
+            uint64_t node_i = (curr_level == max_level - 1) ?
+                                Ts[i].getNode2(roots[i]):
+                                Ts[i].getNode1(roots[i]);
+            if (node_i) {
+                tempActiveTries[i] = true;
+                result &= node_i;
+            }
+            else {
+                tempActiveTries[i] = false;
+            }
+            node00 |= node_i;
+        }
+        else {
+            tempActiveTries[i] = false;
+        }
+    }
+
+    if (node00 == 0b00) {
+        uint64_t dummy;
+        uint64_t below = partial_int;
+        uint64_t range = ((uint64_t)1 << (max_level - curr_level))- 1;
+        uint64_t above = partial_int | range;
+        for (uint64_t i = below; i <= above; ++i) {
+            // sharedMutex.lock();
+            r.push_back(i);
+            // sharedMutex.unlock();
+            // dummy = i;
+        }
+        return;
+    }
+
+    uint64_t next_level = curr_level + 1;
+    if (result == 0b10) {
+        uint64_t left_nodes[16];
+        uint64_t leftResult = partial_int;
+        for (uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i] && curr_level != max_level - 1)
+                left_nodes[i] = Ts[i].getLeftChild(roots[i]);
+        }
+        AND(Ts, n_tries, max_level, next_level,
+            left_nodes, tempActiveTries, leftResult, r, sharedMutex);
+
+    }
+    else if (result == 0b01){
+        uint64_t right_nodes[16];
+        uint64_t rightResult = partial_int;
+        rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
+        for (uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i] && curr_level != max_level - 1)
+                right_nodes[i] = Ts[i].getRightChild(roots[i]);
+        }
+        AND(Ts, n_tries, max_level, next_level, 
+            right_nodes, tempActiveTries, rightResult, r, sharedMutex);
+
+    }
+    else if (result == 0b11) {
+        uint64_t left_nodes[16];
+        uint64_t right_nodes[16];
+        uint64_t leftResult = partial_int;
+        uint64_t rightResult = partial_int;
+        rightResult = (rightResult | (1ULL << (max_level - curr_level - 1)));
+        for(uint64_t i = 0; i < n_tries; ++i) {
+            if (tempActiveTries[i] && curr_level != max_level - 1) {
+                uint64_t left_node = Ts[i].getLeftChild(roots[i]);
+                left_nodes[i]  = left_node;
+                right_nodes[i] = left_node + 1; 
+            }
+        }
+        // Left Childs
+        AND(Ts, n_tries, max_level, next_level, 
+            left_nodes, tempActiveTries, leftResult, r, sharedMutex);
+        // Right Childs
+        AND(Ts, n_tries, max_level, next_level, 
+            right_nodes, tempActiveTries, rightResult, r, sharedMutex);
+    }
+}
+
+
+template <class trieType>
+void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level, 
+                uint64_t cut_level, uint64_t roots[], bool activeTries[], uint64_t partial_int,
+                vector <uint64_t> &r, vector<uint64_t> &partial_ints, vector<uint64_t*> &threads_roots,
+                vector<bool*> &threads_activeTries) {
+    // End condition
+    if (curr_level == cut_level) {
+        partial_ints.push_back(partial_int);
+        uint64_t* rts = new uint64_t[16];
+        bool* atrs = new bool[16];
+        for (uint64_t i = 0; i < n_tries; ++i){
+            rts[i] = roots[i];
+            atrs[i] = activeTries[i];
+        }
+        threads_roots.push_back(rts);
+        threads_activeTries.push_back(atrs);
+        return;
     }
     
     bool tempActiveTries [16]; 
@@ -93,40 +198,53 @@ void AND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t cu
             else tempActiveTries[i] = false;
             node00 |= node_i;
         }
+        else {
+            tempActiveTries[i] = false;
+        }
     }
 
     if (node00 == 0b00) {
         uint64_t below = partial_int;
         uint64_t range = ((uint64_t)1 << (max_level - curr_level))- 1;
         uint64_t above = partial_int | range;
-        for (uint64_t i = below; i <= above; ++i)
+        for (uint64_t i = below; i <= above; ++i) {
             r.push_back(i);
+        }
 
         return;
     }
 
     if (result == 0b10) {
         uint64_t left_nodes[16];
+        uint64_t leftResult = partial_int;
         for (uint64_t i = 0; i < n_tries; ++i) {
             if (tempActiveTries[i])
                 left_nodes[i] = Ts[i].getLeftChild(roots[i]);
         }
-        intersection();
+        partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level, 
+            left_nodes, tempActiveTries, leftResult, r, partial_ints,
+            threads_roots, threads_activeTries);
 
     }
     else if (result == 0b01){
         uint64_t right_nodes[16];
+        uint64_t rightResult = partial_int;
+        rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
         for (uint64_t i = 0; i < n_tries; ++i) {
             if (tempActiveTries[i])
                 right_nodes[i] = Ts[i].getRightChild(roots[i]);
         }
-        intersection();
+        partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level,
+            right_nodes, tempActiveTries, rightResult, r, partial_ints,
+            threads_roots, threads_activeTries);
 
     }
     else if (result == 0b11) {
         uint64_t left_nodes[16];
         uint64_t right_nodes[16];
-
+        uint64_t leftResult = partial_int;
+        uint64_t rightResult = partial_int;
+        rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
         for(uint64_t i = 0; i < n_tries; ++i) {
             if (tempActiveTries[i]){
                 uint64_t left_node = Ts[i].getLeftChild(roots[i]);
@@ -135,12 +253,14 @@ void AND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t cu
             }
         }
         // Left Childs
-        intersection();
+        partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level, 
+            left_nodes, tempActiveTries, leftResult, r, partial_ints,
+            threads_roots, threads_activeTries);
         // Right Childs
-        intersection();
-
+        partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level,
+            right_nodes, tempActiveTries, rightResult, r, partial_ints,
+            threads_roots, threads_activeTries);
     }
-
 }
 
 
@@ -736,54 +856,97 @@ trieType* parJoin(vector<trieType> &Bs){
     int64_t init_of_level     = pow(2, level_of_cut) - 1;
     vector<bool*>               activeTries2;
     vector<uint64_t*>           roots2;
-    vector<uint64_t*>           last_pos2(16);
-    vector<vector<uint64_t>*>   ones_to_write2(16);
+    // vector<uint64_t*>           last_pos2(16);
+    // vector<vector<uint64_t>*>   ones_to_write2(16);
+    vector<uint64_t> partial_solutions;
+    vector<uint64_t> results;
+    results.reserve(100000);
+    uint64_t partial_int = 0;
     // Resolve problem until level of cut
-    partialIntersection(Bs, curr_level, level_of_cut, roots, activeTries, roots2, activeTries2);
-
+    // partialIntersection(Bs, curr_level, level_of_cut, roots, activeTries, roots2, activeTries2);
+    partialAND(Bs, n_tries, max_level2, curr_level, level_of_cut, roots, activeTries, partial_int, results,
+                partial_solutions, roots2, activeTries2);
+    // cout << "ok partial solution" << endl;
+    // cout << "init real threads: " << roots2.size() << endl;
     uint16_t real_threads = roots2.size();
-    for (uint64_t i = 0; i < real_threads; ++i) {
-        // uint64_t root = init_of_level + i;
-        ones_to_write2[i] = new vector<uint64_t>[max_level2];
-        last_pos2[i] = new uint64_t[max_level2];
+    uint16_t init_threads = real_threads;
+    vector<uint64_t> init_level(real_threads, level_of_cut);
+    uint64_t i = 0;
+    while (nb_threads - real_threads > 1 && i < init_threads) {
+        // cout << "dentro del while" << endl;
+        partialAND(Bs, n_tries, max_level2, level_of_cut, level_of_cut + 1,
+                roots2[i], activeTries2[i], partial_solutions[i], results,
+                partial_solutions, roots2, activeTries2);
+        // init_level.erase(init_level.begin());
+        // activeTries2.erase(activeTries2.begin());
+        // roots2.erase(roots2.begin());
+        // partial_solutions.erase(partial_solutions.begin());
+        uint64_t dif = roots2.size() - real_threads ;
+        for (uint64_t j = 0; j < dif; ++j){
+            init_level.push_back(level_of_cut + 1);
+        }
+         ++i;
+        real_threads = roots2.size() - i ;
     }
-    // cout << "real threads: " << real_threads << endl;
-    
+    vector<vector<uint64_t>> threads_results(real_threads);
+
+    // for (uint64_t i = 0; i < real_threads; ++i) {
+    //     // uint64_t root = init_of_level + i;
+    //     ones_to_write2[i] = new vector<uint64_t>[max_level2];
+    //     last_pos2[i] = new uint64_t[max_level2];
+    // // }
+    // cout << "real threads: " << roots2.size() << endl;
+    // cout << "iminus: " << i << endl;
     std::mutex tuplesMutex;
     parallel_for(real_threads, real_threads, [&](int start, int end) {
         for (uint16_t threadId = start; threadId < end; ++threadId) {
-            for(uint64_t i = 0; i < max_level2; ++i)
-                last_pos2[threadId][i] = 0;
+            // for(uint64_t i = 0; i < max_level2; ++i)
+            //     last_pos2[threadId][i] = 0;
             // cout << "Thread id: " << threadId << endl;
-            parRunsEncodedIntersection(nb_threads, threadId, tuplesMutex,
-                                       Bs, n_tries, max_level2,
-                                       level_of_cut, roots2[threadId], activeTries2[threadId],
-                                       last_pos2[threadId], ones_to_write2[threadId]);
+            // parRunsEncodedIntersection(nb_threads, threadId, tuplesMutex,
+            //                            Bs, n_tries, max_level2,
+            //                            level_of_cut, roots2[threadId], activeTries2[threadId],
+            //                            last_pos2[threadId], ones_to_write2[threadId]);
+            // AND(Bs, n_tries, max_level, level_of_cut, 
+            //     roots2[threadId], activeTries2[threadId],
+            //     partial_solutions[threadId], threads_results[threadId], tuplesMutex);
+            AND(Bs, n_tries, max_level, init_level[threadId+i], 
+                roots2[threadId+i], activeTries2[threadId+i],
+                partial_solutions[threadId+i], threads_results[threadId], tuplesMutex);
         }
     });
+    // cout << "Size of intersection: " << results.size() << endl;
 
 
-    for (uint64_t level = level_of_cut; level < max_level2; ++level){
-        uint64_t shift = 0;
-        for (uint64_t i = 0; i < real_threads; ++i) {
-            for(uint64_t j = 0; j < ones_to_write2[i][level].size(); ++j) {
-                ones_to_write[level].push_back(ones_to_write2[i][level][j]+shift);
-            }
-            shift += last_pos2[i][level];
-        }
-        last_pos[level] =  shift;
+    // for (uint64_t level = level_of_cut; level < max_level2; ++level){
+    //     uint64_t shift = 0;
+    //     for (uint64_t i = 0; i < real_threads; ++i) {
+    //         for(uint64_t j = 0; j < ones_to_write2[i][level].size(); ++j) {
+    //             ones_to_write[level].push_back(ones_to_write2[i][level][j]+shift);
+    //         }
+    //         shift += last_pos2[i][level];
+    //     }
+    //     last_pos[level] =  shift;
+    // }
+
+    // Concatenate solutions
+    for(uint64_t t=0; t < real_threads; ++t){
+        results.insert(results.end(), 
+                        threads_results[t].begin(),
+                        threads_results[t].end());
     }
+    // cout << "Intersection size: " << results.size() << endl;
 
     // Free memory
     for (uint64_t i = 0; i < real_threads; ++i) {
-        delete[] ones_to_write2[i];
+        // delete[] ones_to_write2[i];
         delete[] activeTries2[i];
-        delete[] last_pos2[i];
+        // delete[] last_pos2[i];
         delete[] roots2[i];
     }
 
-    trieType* result = new trieType(ones_to_write, max_level, last_pos, true);
-    // trieType* result;
+    // trieType* result = new trieType(ones_to_write, max_level, last_pos, true);
+    trieType* result;
     // delete[] last_pos;
     return result;
     // return;
