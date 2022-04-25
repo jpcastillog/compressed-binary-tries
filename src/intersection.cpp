@@ -102,7 +102,7 @@ void AND(vector<trieType> &Ts, uint64_t &n_tries, uint64_t &max_level, uint64_t 
             tempActiveTries[i] = false;
         }
     }
-
+    
     if (node00 == 0b00) {
         uint64_t dummy;
         uint64_t below = partial_int;
@@ -929,7 +929,7 @@ trieType* parJoin(vector<trieType> &Bs){
     //     last_pos[level] =  shift;
     // }
 
-    // Concatenate solutions
+    // Concatenate solutions of treads
     for(uint64_t t=0; t < real_threads; ++t){
         results.insert(results.end(), 
                         threads_results[t].begin(),

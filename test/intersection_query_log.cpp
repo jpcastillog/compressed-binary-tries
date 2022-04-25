@@ -226,20 +226,20 @@ int main(int argc, char const *argv[]) {
     bool runs = true;
     uint32_t block_size = 512;
     // uint64_t n_sequences = 0xffffffffffffffff;
-    uint64_t n_sequences = 1000000;
-    // uint64_t n_sequences = 1107204;
+    // uint64_t n_sequences = 1000000;
+    uint64_t n_sequences = 1107204;
     // std::string sequences_filename = std::string(argv[1]);
     // std::string querylog_filename   = std::string(argv[2]);
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_512_runs_t.bin";
-    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
-    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_v_runs_t.bin";
-    // std::string sequences_filename =  "/home/jpcastillog/Escritorio/data/clueweb09_rank_v_runs_t.bin";
+    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
+    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_v_runs_t.bin";
+    // std::string sequences_filename =  "/home/jpcastillog/Escritorio/data/clueweb09_rank_v_runs_t_2.bin";
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v5_runs_t.bin";
     // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/1mq.txt";
-    std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/1mq.txt";
+    // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/1mq.txt";
     // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/aol.txt";
     // std::string querylog_filename   = "./../../s_indexes/1000_pairwise_first_3000.txt";
-    // std::string     querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";
+    std::string     querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";
     std::string output_filename = "";
     for (int i = 1; i < argc; ++i){
         if (std::string(argv[i]) == "--rank") {
