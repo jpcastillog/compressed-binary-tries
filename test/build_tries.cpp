@@ -32,7 +32,12 @@ void buildCollection(std::string input_path, std::string out_path,
         cout << "Can't open file:  " << input_path << endl;
         return;
     }
-    std::ofstream out(out_path, ios::out | ios::binary);
+    std::ofstream out;
+    out.open(out_path, ios::out | ios::binary);
+    if(!out.is_open()) {
+        cout << "Can't open file:  " << out_path << endl;
+        return;
+    }
 
     uint32_t _1, u;
     // Read universe of collection
@@ -80,11 +85,12 @@ void buildCollection(std::string input_path, std::string out_path,
 
             else if (rank_type == 1) {
                 binTrie_il<block_size> trie_il(*il, u);
-                cout << "Ok create tries" << endl;
-                if (runs)
-                    cout << "Init encodeRuns" << endl;
+                // cout << "Ok create tries" << endl;
+                if (runs) {
+                    // cout << "Init encodeRuns" << endl;
                     trie_il.encodeRuns();
-                    cout << "OK encode runs" << endl;
+                    // cout << "OK encode runs" << endl;
+                }
                 if (out_path != "") {
                     trie_il.serialize(out);
                 }

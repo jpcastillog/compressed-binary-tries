@@ -60,42 +60,42 @@ echo -e "Building ..."
 
 # echo -e "Running GOV2 rank v ..."
 # ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank v --runs f
-echo -e "-------------------size 4096-------------------"
-echo -e "-------------------Gov2-------------------"
-echo -e "Running GOV2 rank il 64 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 4096 --rank il 64 --runs t
-echo -e "Running GOV2 rank il 128 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 4096 --rank il 128 --runs t
-echo -e "Running GOV2 rank il 256 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 4096 --rank il 256 --runs t
-echo -e "Running GOV2 rank il 512 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 4096 --rank il 512 --runs t
-echo -e "-------------------ClueWeb09-------------------"
-echo -e "Running ClueWeb09 rank il 64 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 4096 --rank il 64 --runs t
-echo -e "Running ClueWeb09 rank il 128..."
-./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 4096 --rank il 128 --runs t
-echo -e "Running ClueWeb09 rank il 256..."
-./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 4096 --rank il 256 --runs t
-echo -e "Running ClueWeb09 rank il 512..."
-./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 4096 --rank il 512 --runs t
+# echo -e "-------------------size 4096-------------------"
+# echo -e "-------------------Gov2-------------------"
+# echo -e "Running GOV2 rank il 64 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 4096 --rank il 64 --runs t
+# echo -e "Running GOV2 rank il 128 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 4096 --rank il 128 --runs t
+# echo -e "Running GOV2 rank il 256 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 4096 --rank il 256 --runs t
+# echo -e "Running GOV2 rank il 512 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 4096 --rank il 512 --runs t
+# echo -e "-------------------ClueWeb09-------------------"
+# echo -e "Running ClueWeb09 rank il 64 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 4096 --rank il 64 --runs t
+# echo -e "Running ClueWeb09 rank il 128..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 4096 --rank il 128 --runs t
+# echo -e "Running ClueWeb09 rank il 256..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 4096 --rank il 256 --runs t
+# echo -e "Running ClueWeb09 rank il 512..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 4096 --rank il 512 --runs t
 
--e "-------------------size 100000-------------------"
-echo -e "-------------------Gov2-------------------"
-echo -e "Running GOV2 rank il 64 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank il 64 --runs t
-echo -e "Running GOV2 rank il 128 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank il 128 --runs t
-echo -e "Running GOV2 rank il 256 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank il 256 --runs t
-echo -e "Running GOV2 rank il 512 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank il 512 --runs t
+# -e "-------------------size 100000-------------------"
+# echo -e "-------------------Gov2-------------------"
+# echo -e "Running GOV2 rank il 64 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank il 64 --runs t
+# echo -e "Running GOV2 rank il 128 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank il 128 --runs t
+# echo -e "Running GOV2 rank il 256 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank il 256 --runs t
+# echo -e "Running GOV2 rank il 512 ..."
+# ./build.out "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2.sorted" --min_size 100000 --rank il 512 --runs t
 echo -e "-------------------ClueWeb09-------------------"
 echo -e "Running ClueWeb09 rank il 64 ..."
-./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 100000 --rank il 64 --runs t
+./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 1 --rank il 64 --runs t --out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_il_64_runs_t.bin"
 echo -e "Running ClueWeb09 rank il 128..."
-./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 100000 --rank il 128 --runs t
+./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 1 --rank il 128 --runs t --out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_il_128_runs_t.bin"
 echo -e "Running ClueWeb09 rank il 256..."
-./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 100000 --rank il 256 --runs t
+./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 1 --rank il 256 --runs t --out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_il_256_runs_t.bin"
 echo -e "Running ClueWeb09 rank il 512..."
-./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 100000 --rank il 512 --runs t
+./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 1 --rank il 512 --runs t --out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_il_512_runs_t.bin"
