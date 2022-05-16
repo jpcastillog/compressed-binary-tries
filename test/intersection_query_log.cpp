@@ -155,12 +155,32 @@ void performIntersections( std::string sequences_path, std::string query_path,
         }
         // cout << endl;
         // cout << "Query size: " << Bs.size() << endl;
+        vector<uint64_t> intersection;
         if (Bs.size() <= 16){
             // cout << "i: " << nq << endl;
-            trieType* intersection;
+            // trieType* intersection;
             
             // intersection = joinTries<trieType>(Bs, runs_encoded, time_of_ranks);
-            intersection = parJoin<trieType>(Bs);
+            // intersection =
+            uint64_t time_10 = 0;
+            for(int rep = 0; rep < 10; ++rep) {
+                auto start = std::chrono::high_resolution_clock::now();
+                parJoin<trieType>(Bs, intersection);
+                auto end = std::chrono::high_resolution_clock::now();
+                // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+                auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+                auto time = elapsed.count();
+                total_time += time;
+                time_10 += time;
+                if (rep != 9)
+                    intersection.clear();        
+            }
+            if (out.is_open()) {
+                // out << Bs.size() << "," << (float)time_10*10e-6/10.0 << "," << intersection.size() << std::endl;
+                out << Bs.size() << "," << (float)time_10/10.0 << "," << intersection.size() << std::endl;
+            }
+            // cout << nq <<"|Time execution: " << (double)(time_10)*10e-6/10.0 << "[ms]" << endl;
+            cout << nq <<"|Time execution: " << (double)(time_10*1e-3)/(10.0) << "[ms]" << endl;
 
             // total_height += intersection -> getHeight();
             // cout << "Size of intersection: " << intersection -> elements_coded() << endl;
@@ -173,21 +193,23 @@ void performIntersections( std::string sequences_path, std::string query_path,
             // if (out.is_open()) {
             //     out << Bs.size() << "," << (float)time*10e-6 << "," << decode_r.size() << std::endl;
             // }
-            //  total_time += time;
+            // total_time += time;
             // intersection -> free();
             // delete intersection;
             ++nq;
         }
     }
-    auto end = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    auto time = elapsed.count();
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    // auto time = elapsed.count();
     out.close();
 
     delete sequences;
     delete queries;
     cout << "Number of queries: " << nq << endl;
-    cout <<"|Avg time execution: " << (double)(time)*10e-6/nq << "[ms]" << endl;
+    // cout <<"|Avg time execution: " << (double)(time)*10e-6/nq << "[ms]" << endl;
+    // cout <<"|Avg time execution: " << (double)(total_time)*10e-6/(nq*10) << "[ms]" << endl;
+    cout <<"|Avg time execution: " << (double)(total_time*1e-3)/(nq*10) << "[ms]" << endl;
     cout << total_height << endl;   
     cout << "Avg number of ranks: " << (float)n_ranks/nq << endl;
     cout << "Avg time of ranks: " << (double)(time_of_ranks*10e-6)/nq <<endl;
@@ -228,10 +250,10 @@ int main(int argc, char const *argv[]) {
     // uint64_t n_sequences = 0xffffffffffffffff;
     // uint64_t n_sequences = 1000000;
     uint64_t n_sequences = 1107204;
-    // std::string sequences_filename = std::string(argv[1]);
-    // std::string querylog_filename   = std::string(argv[2]);
+    std::string sequences_filename = std::string(argv[1]);
+    std::string querylog_filename   = std::string(argv[2]);
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_il_512_runs_t.bin";
-    std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
+    // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v_runs_t.bin";
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_v_runs_t.bin";
     // std::string sequences_filename =  "/home/jpcastillog/Escritorio/data/clueweb09_rank_v_runs_t_2.bin";
     // std::string sequences_filename =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/gov2_rank_v5_runs_t.bin";
@@ -239,7 +261,7 @@ int main(int argc, char const *argv[]) {
     // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/1mq.txt";
     // std::string querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/aol.txt";
     // std::string querylog_filename   = "./../../s_indexes/1000_pairwise_first_3000.txt";
-    std::string     querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";
+    // std::string     querylog_filename   =  "/media/jpcastillog/Nuevo vol/data/Gov2Flat/random_pairwise_queries_1000.txt";
     std::string output_filename = "";
     for (int i = 1; i < argc; ++i){
         if (std::string(argv[i]) == "--rank") {
@@ -275,6 +297,8 @@ int main(int argc, char const *argv[]) {
 
     cout << "Rank: " << rank << endl;
     cout << "Runs:" << runs << endl;
+    cout << "#sequences: " << n_sequences << endl;
+    cout << "outfilename: " << output_filename << endl;
 
 
     if (rank == 0) {

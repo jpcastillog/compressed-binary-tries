@@ -828,7 +828,7 @@ void parRunsEncodedIntersection(uint16_t nb_threads, uint16_t threadId, std::mut
 
 
 template <class trieType>
-trieType* parJoin(vector<trieType> &Bs){
+void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
     
     max_level = Bs[0].getHeight();
     const uint64_t max_level2 = Bs[0].getHeight();
@@ -847,7 +847,6 @@ trieType* parJoin(vector<trieType> &Bs){
     uint64_t curr_level = 0;
     n_tries = Bs.size();
     
-
     // unsigned nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
     // cout << "Threads hint: " << nb_threads_hint << endl;
     // unsigned nb_threads = nb_threads_hint == 0 ? 8 : (nb_threads_hint);
@@ -856,18 +855,14 @@ trieType* parJoin(vector<trieType> &Bs){
     int64_t init_of_level     = pow(2, level_of_cut) - 1;
     vector<bool*>               activeTries2;
     vector<uint64_t*>           roots2;
-    // vector<uint64_t*>           last_pos2(16);
-    // vector<vector<uint64_t>*>   ones_to_write2(16);
     vector<uint64_t> partial_solutions;
-    vector<uint64_t> results;
-    results.reserve(100000);
+    
+    result.reserve(100000);
     uint64_t partial_int = 0;
     // Resolve problem until level of cut
-    // partialIntersection(Bs, curr_level, level_of_cut, roots, activeTries, roots2, activeTries2);
-    partialAND(Bs, n_tries, max_level2, curr_level, level_of_cut, roots, activeTries, partial_int, results,
+    partialAND(Bs, n_tries, max_level2, curr_level, level_of_cut, roots, activeTries, partial_int, result,
                 partial_solutions, roots2, activeTries2);
-    // cout << "ok partial solution" << endl;
-    // cout << "init real threads: " << roots2.size() << endl;
+    
     uint16_t real_threads = roots2.size();
     uint16_t init_threads = real_threads;
     vector<uint64_t> init_level(real_threads, level_of_cut);
@@ -875,14 +870,10 @@ trieType* parJoin(vector<trieType> &Bs){
     while (nb_threads - real_threads > 1 && i < init_threads) {
         // cout << "dentro del while" << endl;
         partialAND(Bs, n_tries, max_level2, level_of_cut, level_of_cut + 1,
-                roots2[i], activeTries2[i], partial_solutions[i], results,
+                roots2[i], activeTries2[i], partial_solutions[i], result,
                 partial_solutions, roots2, activeTries2);
-        // init_level.erase(init_level.begin());
-        // activeTries2.erase(activeTries2.begin());
-        // roots2.erase(roots2.begin());
-        // partial_solutions.erase(partial_solutions.begin());
-        uint64_t dif = roots2.size() - real_threads ;
-        for (uint64_t j = 0; j < dif; ++j){
+        uint64_t dif = roots2.size() - real_threads;
+        for (uint64_t j = 0; j < dif; ++j) {
             init_level.push_back(level_of_cut + 1);
         }
          ++i;
@@ -890,86 +881,47 @@ trieType* parJoin(vector<trieType> &Bs){
     }
     vector<vector<uint64_t>> threads_results(real_threads);
 
-    // for (uint64_t i = 0; i < real_threads; ++i) {
-    //     // uint64_t root = init_of_level + i;
-    //     ones_to_write2[i] = new vector<uint64_t>[max_level2];
-    //     last_pos2[i] = new uint64_t[max_level2];
-    // // }
-    // cout << "real threads: " << roots2.size() << endl;
-    // cout << "iminus: " << i << endl;
     std::mutex tuplesMutex;
     parallel_for(real_threads, real_threads, [&](int start, int end) {
         for (uint16_t threadId = start; threadId < end; ++threadId) {
-            // for(uint64_t i = 0; i < max_level2; ++i)
-            //     last_pos2[threadId][i] = 0;
-            // cout << "Thread id: " << threadId << endl;
-            // parRunsEncodedIntersection(nb_threads, threadId, tuplesMutex,
-            //                            Bs, n_tries, max_level2,
-            //                            level_of_cut, roots2[threadId], activeTries2[threadId],
-            //                            last_pos2[threadId], ones_to_write2[threadId]);
-            // AND(Bs, n_tries, max_level, level_of_cut, 
-            //     roots2[threadId], activeTries2[threadId],
-            //     partial_solutions[threadId], threads_results[threadId], tuplesMutex);
             AND(Bs, n_tries, max_level, init_level[threadId+i], 
                 roots2[threadId+i], activeTries2[threadId+i],
                 partial_solutions[threadId+i], threads_results[threadId], tuplesMutex);
         }
     });
-    // cout << "Size of intersection: " << results.size() << endl;
-
-
-    // for (uint64_t level = level_of_cut; level < max_level2; ++level){
-    //     uint64_t shift = 0;
-    //     for (uint64_t i = 0; i < real_threads; ++i) {
-    //         for(uint64_t j = 0; j < ones_to_write2[i][level].size(); ++j) {
-    //             ones_to_write[level].push_back(ones_to_write2[i][level][j]+shift);
-    //         }
-    //         shift += last_pos2[i][level];
-    //     }
-    //     last_pos[level] =  shift;
-    // }
 
     // Concatenate solutions of treads
     for(uint64_t t=0; t < real_threads; ++t){
-        results.insert(results.end(), 
+        result.insert(result.end(), 
                         threads_results[t].begin(),
                         threads_results[t].end());
     }
-    // cout << "Intersection size: " << results.size() << endl;
-
     // Free memory
     for (uint64_t i = 0; i < real_threads; ++i) {
-        // delete[] ones_to_write2[i];
         delete[] activeTries2[i];
-        // delete[] last_pos2[i];
         delete[] roots2[i];
     }
-
-    // trieType* result = new trieType(ones_to_write, max_level, last_pos, true);
-    trieType* result;
-    // delete[] last_pos;
-    return result;
-    // return;
+    
+    return;
 }
-template 
-flatBinTrie<rank_support_v5<1>>* 
-parJoin<flatBinTrie<rank_support_v5<1>>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs);
-template flatBinTrie<rank_support_v<1>>* 
-parJoin<flatBinTrie<rank_support_v<1>>>(vector<flatBinTrie<rank_support_v<1>>> &Bs);
-template binTrie_il<512>* 
-parJoin<binTrie_il<512>>(vector<binTrie_il<512>> &Bs);
-template binTrie_il<256>* 
-parJoin<binTrie_il<256>>(vector<binTrie_il<256>> &Bs);
-template binTrie_il<128>* 
-parJoin<binTrie_il<128>>(vector<binTrie_il<128>> &Bs);
-template binTrie_il<64>* 
-parJoin<binTrie_il<64>>(vector<binTrie_il<64>> &Bs);
+template void 
+parJoin<flatBinTrie<rank_support_v5<1>>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result);
+template void 
+parJoin<flatBinTrie<rank_support_v<1>>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result);
+template void 
+parJoin<binTrie_il<512>>(vector<binTrie_il<512>> &Bs, vector<uint64_t> &result);
+template void
+parJoin<binTrie_il<256>>(vector<binTrie_il<256>> &Bs, vector<uint64_t> &result);
+template void
+parJoin<binTrie_il<128>>(vector<binTrie_il<128>> &Bs, vector<uint64_t> &result);
+template void 
+parJoin<binTrie_il<64>>(vector<binTrie_il<64>> &Bs, vector<uint64_t> &result);
 
 
 template <class trieType>
 void notRunsEncodedIntersection(vector <trieType> &Bs, uint16_t max_level, uint16_t curr_level, 
                                uint64_t *roots, 
-                            //    vector<uint64_t> &last_pos,
+                               // vector<uint64_t> &last_pos,
                                uint64_t* last_pos,
                                vector<uint64_t> *ones_to_write, vector<uint64_t> &nodes_per_level) {
 	

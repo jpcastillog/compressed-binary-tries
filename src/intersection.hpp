@@ -14,7 +14,7 @@
 template<class trieType>
 trieType* joinTries(vector<trieType> &Bs, bool runs_encoded, uint64_t &n_ranks);
 template <class trieType>
-trieType* parJoin(vector<trieType> &Bs);
+void parJoin(vector<trieType> &Bs, vector<uint64_t> &result);
 
 
 #endif
