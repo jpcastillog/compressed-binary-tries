@@ -41,7 +41,7 @@ class TrieRun{
 }
 
 Gap::Gap(std::string collection, uint32_t min_lenght = 4096){
-    Gap::GAP = 0; //Init gap measure in 0;
+    Gap::GAP = 0.0; //Init gap measure in 0;
     Gap::total_elements = 0;
     Gap::total_sets = 0;
 
@@ -73,7 +73,7 @@ Gap::Gap(std::string collection, uint32_t min_lenght = 4096){
                 in.read(reinterpret_cast<char*>(&x_i), 4);
                 g_i = x_i - x_i1 - 1;
                 if (g_i == 0) g_i = 1; 
-                GAP += floor(g_i) + 1;
+                Gap::GAP += floor(g_i) + 1;
 
             }
         }
@@ -85,5 +85,45 @@ Gap::Gap(std::string collection, uint32_t min_lenght = 4096){
 }
 
 RLE::RLE(std::string collection, uint32_t min_length) {
-    
+    RLE::RLE = 0.0; //Init gap measure in 0;
+    RLE::total_elements = 0;
+    RLE::total_sets = 0;
+
+    std::ifstream in;
+    in.open(collection, std::ios::binary || std::ios::in);
+    assert(in.is_open());
+
+    uint32_t _1, u;
+    in.read(reinterpret_cast<char *>(&_1), 4);
+    in.read(reinterpret_cast<char *>(&u), 4);
+
+    while(true){
+        uint32_t;
+        in.read(reinterpret_cast<char*>(&n), 4);
+        if (input_stream.eof()) {
+            break;
+        }
+        
+        if (n > min_length) {
+            uint32_t z_i;
+            uint32_t l_i;
+            uint32_t g_i;
+
+            RLE::total_elements += n;
+            RLE::total_sets++;
+
+            in.read(reinterpret_cast<char*>(&x_i1), 4);
+            for(uint32_t i = 1; i < n; ++i) {\
+                in.read(reinterpret_cast<char*>(&x_i), 4);
+                g_i = x_i - x_i1 - 1;
+                if (g_i == 0) g_i = 1; 
+                RLE::RLE += floor(g_i) + 1;
+
+            }
+        }
+        else {
+            in.seekg(4*n, ios::cur);
+        }
+
+    }    
 }
