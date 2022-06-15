@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "flatBinTrie.hpp"
+#include <sdsl/bit_vectors.hpp>
 
 using namespace std;
 
@@ -98,32 +99,48 @@ RLE::RLE(std::string collection, uint32_t min_length) {
     in.read(reinterpret_cast<char *>(&u), 4);
 
     while(true){
-        uint32_t;
+        uint32_t n;
         in.read(reinterpret_cast<char*>(&n), 4);
         if (input_stream.eof()) {
             break;
         }
         
         if (n > min_length) {
-            uint32_t z_i;
-            uint32_t l_i;
-            uint32_t g_i;
+            // Characteristic bit vector (cbv)
+            sdsl::bit_vector cbv(0, u+1);
+            uint32_t x;
+            uint32_t x_i;
+            // uint32_t g_i;
 
             RLE::total_elements += n;
             RLE::total_sets++;
 
             in.read(reinterpret_cast<char*>(&x_i1), 4);
-            for(uint32_t i = 1; i < n; ++i) {\
+            for(uint32_t i = 1; i < n; ++i) {
+                in.read(reinterpret_cast<char*>(&x), 4);
+                cbv[x] = 1;
+            } // End create cbv  
+            
+            uint32_t runLength = 1;
+            in.read(reinterpret_cast<char*>(&x), 4);
+            for(uint32_t i = 1; i < n; ++i) {
                 in.read(reinterpret_cast<char*>(&x_i), 4);
-                g_i = x_i - x_i1 - 1;
-                if (g_i == 0) g_i = 1; 
-                RLE::RLE += floor(g_i) + 1;
-
+                if (x_i != x) {
+                    uint32_t sub = runLength -1;
+                    if (sub == 0) 
+                        sub = 1;
+                    RLE::RLE  += floor(sub) + 1;
+                    runLength = 1;
+                }
+                else {
+                    ++runLength;
+                }
+                x = x_i;
             }
+
         }
         else {
             in.seekg(4*n, ios::cur);
         }
-
-    }    
+    }
 }

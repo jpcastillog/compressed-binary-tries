@@ -821,6 +821,12 @@ class flatBinTrie{
                 recursiveDecode(decoded, partial_int, 0, 0);
             }
         }
+
+        inline uint32_t trieMeasure() {
+            // If runs are encoded, this measure is trie-run
+            return flatBinTrie::bTrie -> size() +
+                   flatBinTrie::lastLevel -> size(); 
+        }
     
 };
 
