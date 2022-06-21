@@ -824,8 +824,13 @@ class flatBinTrie{
 
         inline uint32_t trieMeasure() {
             // If runs are encoded, this measure is trie-run
-            return flatBinTrie::bTrie -> size() +
-                   flatBinTrie::lastLevel -> size(); 
+            // return flatBinTrie::bTrie -> size() +
+            //        flatBinTrie::lastLevel -> size();
+            uint64_t nEdgesLastLevel = 0;
+            for (uint64_t i = 0; i < flatBinTrie::lastLevel -> size(); ++i){
+                if ((*lastLevel)[i] == 1) nEdgesLastLevel++;
+            }
+            return flatBinTrie::b_rank(flatBinTrie::bTrie -> size()) + nEdgesLastLevel;
         }
     
 };
