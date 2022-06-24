@@ -20,21 +20,17 @@ uint64_t Gap(std::vector<uint64_t> &v) {
     x_i1 = v[0];
     // g1
     uint64_t g_1 = x_i1;
-    if (g_1 == 0)
+    if (g_1 <= 0)
         g_1 = 1;
-    gap += floor(log2(g_1)) + 1;
-    // it = v.begin();
-    // it++;
-    // for (; it != v.end(); it++) {
-    for (uint32_t i = 1; i < v.size(); i++){
-        // x_i = *it;
+    gap += (floor(log2(g_1)) + 1);
+    for (uint32_t i = 1; i < v.size(); i++) {
         x_i = v[i];
         g_i = x_i - x_i1 - 1;
         if (x_i - x_i1 <=  0)
             cout << "Conjunto no ordenado" << endl;
         if (g_i == 0)
             g_i = 1;
-        gap += floor(log2(g_i)) + 1;
+        gap += (floor(log2(g_i)) + 1);
         x_i1 = x_i;
     }
     return gap;
@@ -55,7 +51,10 @@ uint64_t Rle(std::vector<uint64_t> &v) {
     it = v.begin();
     // x = *it;
     x = v[0];
-    it++;
+    if (x != 0)
+        x = 0;
+    else
+        it++;
     for (; it != v.end(); it++){
         x_i = *it;
         uint64_t delta = x_i - x;
@@ -93,9 +92,9 @@ uint64_t Rle(std::vector<uint64_t> &v) {
 }
 
 // if encodeRuns is true the measure is trie-run
-uint64_t Trie(std::vector<uint64_t> &v, bool encodeRuns) {
+uint64_t Trie(std::vector<uint64_t> &v, uint32_t u, bool encodeRuns) {
     // uint64_t u = *v.end();
-    uint64_t u = v[v.size() - 1];
+    // uint64_t u = v[v.size() - 1];
     flatBinTrie<rank_support_v<1>> t = flatBinTrie<rank_support_v<1>>(v, u);
     if (encodeRuns)
         t.encodeRuns();
@@ -138,8 +137,10 @@ int main(int argc, const char** argv) {
     uint64_t n_il = 0;
     // uint32_t n, x;
     uint32_t u, _1;
-    in.read(reinterpret_cast<char*>(&u), 4);
     in.read(reinterpret_cast<char*>(&_1), 4);
+    in.read(reinterpret_cast<char*>(&u), 4);
+    std::cout << "Universe: " <<u << std::endl;
+    uint64_t first = 0, last = 0;
     while (true) {
         uint32_t n;
         in.read(reinterpret_cast<char*>(&n), 4);
@@ -158,10 +159,23 @@ int main(int argc, const char** argv) {
             }
             // std::cout << "Size of vector: " << s.size() << std::endl;
             // Calculate Measures
-            gap += Gap(s);
-            // rle += Rle(s);
-            // trie += Trie(s, false);
-            // trie_run += Trie(s, true);
+            first = s[0];
+            uint32_t delta = -1;
+            if (last != 0){
+                delta = (u-last) + (first) - 1;
+                if (delta <= 0)
+                    delta = 1;
+            }
+            gap      += Gap(s);
+            if (delta >= 0){
+                cout << "delta: " << floor(log2(delta)) + 1 << endl;
+                gap  += floor(log2(delta)) + 1;
+            }
+            // rle      += Rle(s);
+            // trie     += Trie(s, u, false);
+            // trie_run += Trie(s, u, true);
+
+            last = s[s.size()-1];
             // delete s;
             n_il++;
             if (n_il %1000 == 0)
