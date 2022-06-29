@@ -33,7 +33,6 @@
 
 # compile program
 program
-build
 queries
 
 # visual studio code files
@@ -41,3 +40,6 @@ queries
 
 # gproof
 analysis.txt
+
+# build folder
+build

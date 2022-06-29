@@ -6,11 +6,11 @@
 #include "flatBinTrie.hpp"
 #include "binTrie_il.hpp"
 #include "parallel_for.hpp"
+#include <math.h>
+
 
 using namespace std;
 using namespace sdsl;
-
-
 
 
 // Global vars ... 
@@ -847,11 +847,14 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
     uint64_t curr_level = 0;
     n_tries = Bs.size();
     
-    // unsigned nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
+    unsigned nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
     // cout << "Threads hint: " << nb_threads_hint << endl;
     // unsigned nb_threads = nb_threads_hint == 0 ? 8 : (nb_threads_hint);
-    unsigned int nb_threads   = 16;
-    uint64_t level_of_cut     = 4;
+    unsigned int nb_threads   = 8;
+
+    // uint64_t level_of_cut     = floor(log2(nb_threads_hint));
+    // unsigned int nb_threads   = pow(2, level_of_cut);
+    uint64_t level_of_cut     = 3;
     int64_t init_of_level     = pow(2, level_of_cut) - 1;
     vector<bool*>               activeTries2;
     vector<uint64_t*>           roots2;

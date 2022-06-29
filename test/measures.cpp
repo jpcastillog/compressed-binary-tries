@@ -171,9 +171,9 @@ int main(int argc, const char** argv) {
                 cout << "delta: " << floor(log2(delta)) + 1 << endl;
                 gap  += floor(log2(delta)) + 1;
             }
-            // rle      += Rle(s);
-            // trie     += Trie(s, u, false);
-            // trie_run += Trie(s, u, true);
+            rle      += Rle(s);
+            trie     += Trie(s, u, false);
+            trie_run += Trie(s, u, true);
 
             last = s[s.size()-1];
             // delete s;
