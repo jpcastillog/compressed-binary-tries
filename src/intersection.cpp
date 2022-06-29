@@ -883,7 +883,7 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
          ++i;
         real_threads = roots2.size() - i ;
     }
-    
+
     vector<vector<uint64_t>> threads_results(real_threads);
     std::mutex tuplesMutex;
     parallel_for(real_threads, real_threads, [&](int start, int end) {
@@ -896,9 +896,10 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
 
     // Concatenate solutions of threads
     for(uint64_t t=0; t < real_threads; ++t){
-        result.insert(result.end(), 
+        result.insert(  result.end(), 
                         threads_results[t].begin(),
-                        threads_results[t].end());
+                        threads_results[t].end()
+                    );
     }
     // Free memory
     for (uint64_t i = 0; i < real_threads; ++i) {
