@@ -11,7 +11,7 @@ To build the code in linux sistems, run the following comands:
 Now the all executables are in **build** folder.
 
 ## Input data format
-Our implementation only need the collection of docID's (posting lists) following format of [**dsi2**](https://github.com/ot/ds2i) and [**pisa**](https://github.com/pisa-engine/pisa) projects, the posting lists are written as 32-bit little-endian unsingned integers. The files containing the collection must start with a singleton binary sequence where its only integer is the number of documents of collection. It is then followed by one binary sequence for each posting list. 
+Our implementation only need the collection of docID's (posting lists) following format of [**dsi2**](https://github.com/ot/ds2i) and [**pisa**](https://github.com/pisa-engine/pisa) projects, the posting lists are written as 32-bit little-endian unsingned integers. The files containing the collections must start with a singleton binary sequence where its only integer is the number of documents of collection. It is then followed by one binary sequence for each posting list. 
 
 ## How to compress collection
 For compress a collection need to use build.out exec as following.
@@ -25,5 +25,5 @@ Where:
 * --min_size m (optional): filter lists of length less than a m.
 
 ## Intersection
-
+For test the intersection between the tries, only need the file containing the collection compressed and a file with lists of terms involver in a query
  
