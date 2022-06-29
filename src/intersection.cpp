@@ -847,15 +847,16 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
     uint64_t curr_level = 0;
     n_tries = Bs.size();
     
+    // Hint of threads avaible in our CPU
     unsigned nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
     // cout << "Threads hint: " << nb_threads_hint << endl;
     // unsigned nb_threads = nb_threads_hint == 0 ? 8 : (nb_threads_hint);
-    unsigned int nb_threads   = 8;
-
-    // uint64_t level_of_cut     = floor(log2(nb_threads_hint));
-    // unsigned int nb_threads   = pow(2, level_of_cut);
-    uint64_t level_of_cut     = 3;
+    // unsigned int nb_threads   = 8;
+    // uint64_t level_of_cut     = 3;
+    uint64_t level_of_cut     = floor(log2(nb_threads_hint));
+    unsigned int nb_threads   = pow(2, level_of_cut);
     int64_t init_of_level     = pow(2, level_of_cut) - 1;
+    
     vector<bool*>               activeTries2;
     vector<uint64_t*>           roots2;
     vector<uint64_t> partial_solutions;
@@ -871,10 +872,10 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
     vector<uint64_t> init_level(real_threads, level_of_cut);
     uint64_t i = 0;
     while (nb_threads - real_threads > 1 && i < init_threads) {
-        // cout << "dentro del while" << endl;
-        partialAND(Bs, n_tries, max_level2, level_of_cut, level_of_cut + 1,
-                roots2[i], activeTries2[i], partial_solutions[i], result,
-                partial_solutions, roots2, activeTries2);
+        partialAND( Bs, n_tries, max_level2, level_of_cut, level_of_cut + 1,
+                    roots2[i], activeTries2[i], partial_solutions[i], result,
+                    partial_solutions, roots2, activeTries2
+                    );
         uint64_t dif = roots2.size() - real_threads;
         for (uint64_t j = 0; j < dif; ++j) {
             init_level.push_back(level_of_cut + 1);
@@ -882,8 +883,8 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
          ++i;
         real_threads = roots2.size() - i ;
     }
+    
     vector<vector<uint64_t>> threads_results(real_threads);
-
     std::mutex tuplesMutex;
     parallel_for(real_threads, real_threads, [&](int start, int end) {
         for (uint16_t threadId = start; threadId < end; ++threadId) {
@@ -893,7 +894,7 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
         }
     });
 
-    // Concatenate solutions of treads
+    // Concatenate solutions of threads
     for(uint64_t t=0; t < real_threads; ++t){
         result.insert(result.end(), 
                         threads_results[t].begin(),
