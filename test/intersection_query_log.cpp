@@ -180,7 +180,7 @@ void performIntersections( std::string sequences_path, std::string query_path,
                 out << Bs.size() << "," << (float)time_10/10.0 << "," << intersection.size() << std::endl;
             }
             // cout << nq <<"|Time execution: " << (double)(time_10)*10e-6/10.0 << "[ms]" << endl;
-            cout << nq <<"|Time execution: " << (double)(time_10*1e-3)/(10.0) << "[ms]" << endl;
+            cout << nq <<"|Time execution: " << (double)(time_10*1e-3)/(10.0) << "[ms]| " << intersection.size() << endl;
 
             // total_height += intersection -> getHeight();
             // cout << "Size of intersection: " << intersection -> elements_coded() << endl;

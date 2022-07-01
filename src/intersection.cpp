@@ -861,7 +861,7 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
     vector<uint64_t*>           roots2;
     vector<uint64_t> partial_solutions;
     
-    result.reserve(100000);
+    // result.reserve(100000);
     uint64_t partial_int = 0;
     // Resolve problem until level of cut
     partialAND(Bs, n_tries, max_level2, curr_level, level_of_cut, roots, activeTries, partial_int, result,
@@ -893,14 +893,42 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
                 partial_solutions[threadId+i], threads_results[threadId], tuplesMutex);
         }
     });
-
-    // Concatenate solutions of threads
-    for(uint64_t t=0; t < real_threads; ++t){
-        result.insert(  result.end(), 
-                        threads_results[t].begin(),
-                        threads_results[t].end()
-                    );
+    
+    uint64_t output_size = result.size(); 
+    vector<uint64_t> shifts(real_threads);
+    uint64_t shift = result.size();
+    for(uint64_t t = 0; t < real_threads; ++t){
+        output_size += threads_results[t].size();
+        shifts[t] = shift;
+        // cout << "Shift: " << shifts[t] << endl;
+        shift += threads_results[t].size();
     }
+    result.resize(output_size);
+    // cout << "Output size: " << output_size - threads_results[real_threads - 1].size()<< endl;
+    
+    // Write in parallel threads result
+    // vector<uint64_t> new_result(output_size);
+    if (output_size > 450000){
+        parallel_for(real_threads, real_threads, [&](int start, int end) {
+            for (uint16_t threadId = start; threadId < end; ++threadId) {
+                for (uint64_t i = 0; i < threads_results[threadId].size(); ++i) {
+                    result[i+shifts[threadId]] = threads_results[threadId][i];
+                } 
+                
+            }        
+        });
+    } else {
+        // Concatenate solutions of threads
+        for(uint64_t t=0; t < real_threads; ++t){
+            result.insert(  result.end(), 
+                            threads_results[t].begin(),
+                            threads_results[t].end()
+                        );
+        }
+
+    }
+
+        
     // Free memory
     for (uint64_t i = 0; i < real_threads; ++i) {
         delete[] activeTries2[i];
