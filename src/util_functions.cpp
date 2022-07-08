@@ -545,3 +545,105 @@ void performQueryLog(string query_log_path, string ii_path) {
     ii_stream.close();
 
 }
+
+void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64_t>> &q,  
+                   sdsl::bit_vector *bTrie, sdsl::bit_vector *lastLevel, 
+                   uint64_t *level_pos, uint16_t height, uint16_t level_of_cut) {
+    
+            uint16_t level            = 0;
+            uint64_t nodes_curr_level = 1; 
+            uint64_t count_nodes      = 0;
+            uint64_t nodes_next_level = 0;
+            uint64_t index            = 0;
+            uint64_t total_nodes      = 0;
+            uint64_t nodes_last_level = 0;
+
+            while (!q.empty()) {
+                count_nodes++; // count node visited
+                // Get node to write
+                tuple<uint64_t, uint64_t, uint64_t> s = q.front();
+                q.pop(); 
+                
+                uint64_t l, r, n;
+                std::tie(l, r, n) = s;
+                uint64_t left_elements  = 0;
+                uint64_t right_elements = 0;
+
+                // j-th most significative bit
+                uint8_t j = height - level;
+                uint64_t ll, lr, rl, rr;
+                for (uint64_t i = l; i < r+1; ++i) {
+                    if ((set[i] >> j-1) & 1) {                        
+                        right_elements = r-i+1;
+                        rl = i;
+                        rr = r;
+                        break;
+                    }
+                    else {
+                        if (i == l){
+                            ll = l;
+                        }
+                        lr = i;    
+                        left_elements++;
+                    }
+                }
+                // Add to queue split sets and write nodes
+                tuple<uint64_t,uint64_t,uint64_t> left_split;
+                tuple<uint64_t,uint64_t,uint64_t> right_split;
+                // left child
+                if (left_elements > 0) {
+                    // write 1
+                    if (level == height-1)
+                        (*lastLevel)[index] = 1;
+                    else
+                        (*bTrie)[index] = 1;
+                    tuple<uint64_t,uint64_t,uint64_t> left_split(ll, lr, left_elements);
+                    q.push(left_split);
+                    nodes_next_level++;
+                    index++;
+                    total_nodes++;
+                }
+                else {
+                    // write 0
+                    index++;
+                    total_nodes++;
+                }
+                // right child
+                if (right_elements > 0) {
+                    // write 1
+                    if (level == height-1)
+                        (*lastLevel)[index] = 1;
+                    else
+                        (*bTrie)[index] = 1;
+                    tuple<uint64_t,uint64_t,uint64_t> right_split(rl, rr, right_elements);
+                    q.push(right_split);
+                    nodes_next_level++;
+                    index++;
+                    total_nodes++;
+                }
+                else {
+                    // write 0
+                    index++;
+                    total_nodes++;
+                }
+
+                if (count_nodes == nodes_curr_level) {
+                    level_pos[level] = index;
+                    if (level == height-2){
+                        nodes_last_level = nodes_next_level;
+                        index = 0;
+                    }
+                    
+                    nodes_curr_level = nodes_next_level;
+                    nodes_next_level = 0;
+                    count_nodes = 0;
+                    level++;
+                    
+                }
+
+                if (level == flatBinTrie::height || level == level_of_cut) {
+                    break;
+                }
+            }
+
+}

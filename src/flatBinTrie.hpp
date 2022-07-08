@@ -6,8 +6,9 @@
 #include <sdsl/int_vector.hpp>
 #include <vector>
 #include <queue>
-#include <math.h> 
-// #include "utils_functions.hpp"
+#include <math.h>
+#include "util_functions.hpp"
+#include "parallel_for.hpp"
 
 using namespace sdsl;
 using namespace std;
@@ -39,6 +40,67 @@ class flatBinTrie{
         //     // cout << "termina el free" <<endl;
             
         // }
+
+        flatBinTrie(vector<uint64_t> &set, uint64_t u, bool parallel) {
+            flatBinTrie::runsEncoded = false;
+            uint32_t n  = set.size();
+            flatBinTrie::height = floor(log2(u - 1)) +  1;
+            flatBinTrie::level_pos = new uint64_t[height];
+            uint64_t max_nodes = 2 * (pow(2, height) - 1);
+            uint64_t max_nodes_last_level = pow(2, height);  
+            
+            flatBinTrie::bTrie     = new bit_vector(max_nodes, 0);
+            flatBinTrie::lastLevel = new bit_vector(max_nodes_last_level, 0);
+            
+            queue<tuple<uint64_t, uint64_t, uint64_t>> q;         
+            tuple<uint64_t, uint64_t, uint64_t> split(0, n-1, n); // add all set to split
+            q.push(split);
+
+            unsigned nb_threads_hint;
+            uint64_t level_of_cut;  
+            unsigned int nb_threads;
+            
+            if (parallel) {
+                nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
+                level_of_cut  = floor(log2(nb_threads_hint));
+                nb_threads = pow(2, level_of_cut);
+                vector<sdsl::bit_vector> bvs;
+                vector<sdsl::bit_vector> bvs_last;
+                vector<uint64_t *> level_positions;
+                
+                splitUniverse(set, q, bTrie, lastLevel, level_pos, height, level_of_cut);
+                uint16_t real_threads = q.size();
+                
+                for (uint16_t i = 0; i < q.size(); ++i) {
+                    tuple<uint64_t, uint64_t, uint64_t> s = q.front();
+                    q.pop();
+                    queue<tuple<uint64_t, uint64_t, uint64_t>> q_p;
+                    qp.push(s);
+                    
+                    sdsl::bit_vector bv(max_nodes, 0);
+                    sdsl::bit_vector bv_last(max_nodes_last_level, 0);
+                    uint64_t* level_pos_p = new uint64_t[height];
+
+                    level_positions.push_back(level_pos_p);
+                    bvs.push_back(bv);
+                    bvs_last.push_back(bv_last);
+                    
+                    parallel_for(real_threads, real_threads, [&](int start, int end){
+                        for (uint16_t threadId = start; threadId < end; ++threadId) {
+                            splitUniverse(s, q_p, bv, bv_last, level_pos_p, 
+                                height-level_of_cut, height-level_of_cut);
+                        }
+                    });
+                }
+            } else {
+                splitUniverse(set, q, bTrie, lastLevel, level_pos, height, height);
+            }
+
+            flatBinTrie::bTrie -> resize(total_nodes - 2*nodes_last_level);
+            flatBinTrie::lastLevel -> resize(2*nodes_last_level);
+            flatBinTrie::b_rank = rankType(bTrie);
+
+        }
 
 
         flatBinTrie(vector<uint64_t> &set, uint64_t u) {
@@ -822,8 +884,8 @@ class flatBinTrie{
             }
         }
 
+        // If runs are encoded, this measure is trie-run
         inline uint32_t trieMeasure() {
-            // If runs are encoded, this measure is trie-run
             // return flatBinTrie::bTrie -> size() +
             //        flatBinTrie::lastLevel -> size();
             uint64_t nEdgesLastLevel = 0;
