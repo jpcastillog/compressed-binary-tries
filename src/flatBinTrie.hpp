@@ -8,7 +8,8 @@
 #include <queue>
 #include <math.h>
 #include "util_functions.hpp"
-#include "parallel_for.hpp"
+#include <thread>
+// #include "parallel_for.hpp"
 
 using namespace sdsl;
 using namespace std;
@@ -57,11 +58,11 @@ class flatBinTrie{
             q.push(split);
 
             unsigned nb_threads_hint;
-            uint64_t level_of_cut;  
+            uint16_t level_of_cut;  
             unsigned int nb_threads;
             
             if (parallel) {
-                nb_threads_hint = THREADS_BY_CORE * std::thread::hardware_concurrency();
+                nb_threads_hint = std::thread::hardware_concurrency();
                 level_of_cut  = floor(log2(nb_threads_hint));
                 nb_threads = pow(2, level_of_cut);
                 vector<sdsl::bit_vector> bvs;
@@ -75,7 +76,7 @@ class flatBinTrie{
                     tuple<uint64_t, uint64_t, uint64_t> s = q.front();
                     q.pop();
                     queue<tuple<uint64_t, uint64_t, uint64_t>> q_p;
-                    qp.push(s);
+                    q_p.push(s);
                     
                     sdsl::bit_vector bv(max_nodes, 0);
                     sdsl::bit_vector bv_last(max_nodes_last_level, 0);
@@ -87,8 +88,7 @@ class flatBinTrie{
                     
                     parallel_for(real_threads, real_threads, [&](int start, int end){
                         for (uint16_t threadId = start; threadId < end; ++threadId) {
-                            splitUniverse(s, q_p, bv, bv_last, level_pos_p, 
-                                height-level_of_cut, height-level_of_cut);
+                            splitUniverse(set, q_p, &bv, &bv_last, level_pos_p, height-level_of_cut, height-level_of_cut);
                         }
                     });
                 }
@@ -96,9 +96,9 @@ class flatBinTrie{
                 splitUniverse(set, q, bTrie, lastLevel, level_pos, height, height);
             }
 
-            flatBinTrie::bTrie -> resize(total_nodes - 2*nodes_last_level);
-            flatBinTrie::lastLevel -> resize(2*nodes_last_level);
-            flatBinTrie::b_rank = rankType(bTrie);
+            // flatBinTrie::bTrie -> resize(total_nodes - 2*nodes_last_level);
+            // flatBinTrie::lastLevel -> resize(2*nodes_last_level);
+            // flatBinTrie::b_rank = rankType(bTrie);
 
         }
 
