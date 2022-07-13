@@ -645,5 +645,36 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
                     break;
                 }
             }
+}
 
+void joinSolutions(sdsl::bit_vector* bTrie, sdsl::bit_vector* lastLevel, 
+                   uint64_t* level_pos, uint16_t level_of_cut, uint16_t height,
+                   std::vector<sdsl::bit_vector> &bvs, std::vector<sdsl::bit_vector> &bvs_last,
+                   std::vector<uint64_t*> &level_positions) {
+
+        uint16_t nThreads = bvs.size();
+        std::vector<uint64_t> positions(nThreads, 0);
+        uint64_t curr = level_pos[level_of_cut -1];
+        uint64_y curr_last_level = 0;
+        for (uint16_t level = level_of_cut; i < height; ++level) {
+            for (uint16_t t = 0; t < nThreads; ++t) {
+                if (level < height - 1) {
+                    uint64_t nbits = level == level_of_cut ?
+                                 level_positions[t][level] :
+                                 level_positions[t][level] - level_positions[t][level - 1];
+                    for(uint64_t j = 0; j < nbits; ++j) {
+                        (*bTrie)[curr] = bvs[t][j];
+                        curr++;
+                    }
+                } else {
+                    for(uint64_t j = 0; j < nbits; ++j) {
+                        (*lastLevel)[curr_last_level] = bvs_last[t][j];
+                        curr_last_level++;
+                    }
+                }
+                level_pos[level] = curr;
+            }
+        }
+
+    return;
 }
