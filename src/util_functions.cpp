@@ -546,8 +546,111 @@ void performQueryLog(string query_log_path, string ii_path) {
 
 }
 
+// void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64_t>> &q,  
+//                    sdsl::bit_vector *bTrie, sdsl::bit_vector *lastLevel, 
+//                    uint64_t *level_pos, uint16_t height, uint16_t level_of_cut) {
+    
+//             uint16_t level            = 0;
+//             uint64_t nodes_curr_level = 1; 
+//             uint64_t count_nodes      = 0;
+//             uint64_t nodes_next_level = 0;
+//             uint64_t index            = 0;
+//             uint64_t total_nodes      = 0;
+//             uint64_t nodes_last_level = 0;
+
+//             while (!q.empty()) {
+//                 count_nodes++; // count node visited
+//                 // Get node to write
+//                 tuple<uint64_t, uint64_t, uint64_t> s = q.front();
+//                 q.pop(); 
+                
+//                 uint64_t l, r, n;
+//                 std::tie(l, r, n) = s;
+//                 uint64_t left_elements  = 0;
+//                 uint64_t right_elements = 0;
+
+//                 // j-th most significative bit
+//                 uint8_t j = height - level;
+//                 uint64_t ll, lr, rl, rr;
+//                 for (uint64_t i = l; i < r+1; ++i) {
+//                     if ((set[i] >> j-1) & 1) {                        
+//                         right_elements = r-i+1;
+//                         rl = i;
+//                         rr = r;
+//                         break;
+//                     }
+//                     else {
+//                         if (i == l){
+//                             ll = l;
+//                         }
+//                         lr = i;    
+//                         left_elements++;
+//                     }
+//                 }
+//                 // Add to queue split sets and write nodes
+//                 tuple<uint64_t,uint64_t,uint64_t> left_split;
+//                 tuple<uint64_t,uint64_t,uint64_t> right_split;
+//                 // left child
+//                 if (left_elements > 0) {
+//                     // write 1
+//                     if (level == height-1)
+//                         (*lastLevel)[index] = 1;
+//                     else
+//                         (*bTrie)[index] = 1;
+//                     tuple<uint64_t,uint64_t,uint64_t> left_split(ll, lr, left_elements);
+//                     q.push(left_split);
+//                     nodes_next_level++;
+//                     index++;
+//                     total_nodes++;
+//                 }
+//                 else {
+//                     // write 0
+//                     index++;
+//                     total_nodes++;
+//                 }
+//                 // right child
+//                 if (right_elements > 0) {
+//                     // write 1
+//                     if (level == height-1)
+//                         (*lastLevel)[index] = 1;
+//                     else
+//                         (*bTrie)[index] = 1;
+//                     tuple<uint64_t,uint64_t,uint64_t> right_split(rl, rr, right_elements);
+//                     q.push(right_split);
+//                     nodes_next_level++;
+//                     index++;
+//                     total_nodes++;
+//                 }
+//                 else {
+//                     // write 0
+//                     index++;
+//                     total_nodes++;
+//                 }
+
+//                 if (count_nodes == nodes_curr_level) {
+//                     level_pos[level] = index;
+//                     if (level == height-2){
+//                         nodes_last_level = nodes_next_level;
+//                         index = 0;
+//                     }
+                    
+//                     nodes_curr_level = nodes_next_level;
+//                     nodes_next_level = 0;
+//                     count_nodes = 0;
+//                     level++;
+                    
+//                 }
+
+//                 if (level == flatBinTrie::height || level == level_of_cut) {
+//                     break;
+//                 }
+//             }
+// }
+
+
 void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64_t>> &q,  
-                   sdsl::bit_vector *bTrie, sdsl::bit_vector *lastLevel, 
+                //    sdsl::bit_vector *bTrie, sdsl::bit_vector *lastLevel,
+                   std::vector<uint64_t> &ones, std::vector<uint64_t> &ones_last_lvl, 
                    uint64_t *level_pos, uint16_t height, uint16_t level_of_cut) {
     
             uint16_t level            = 0;
@@ -612,9 +715,11 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
                 if (right_elements > 0) {
                     // write 1
                     if (level == height-1)
-                        (*lastLevel)[index] = 1;
+                        ones_last_lvl.push_back(index);
+                        // (*lastLevel)[index] = 1; 
                     else
-                        (*bTrie)[index] = 1;
+                        ones.push_back(index);
+                        // (*bTrie)[index] = 1;
                     tuple<uint64_t,uint64_t,uint64_t> right_split(rl, rr, right_elements);
                     q.push(right_split);
                     nodes_next_level++;
@@ -647,34 +752,83 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
             }
 }
 
+// void joinSolutions(sdsl::bit_vector* bTrie, sdsl::bit_vector* lastLevel, 
+//                    uint64_t* level_pos, uint16_t level_of_cut, uint16_t height,
+//                    std::vector<sdsl::bit_vector> &bvs, std::vector<sdsl::bit_vector> &bvs_last,
+//                    std::vector<uint64_t*> &level_positions) {
+
+//         uint16_t nThreads = bvs.size();
+//         std::vector<uint64_t> positions(nThreads, 0);
+//         uint64_t curr = level_pos[level_of_cut -1];
+//         uint64_y curr_last_level = 0;
+//         for (uint16_t level = level_of_cut; i < height; ++level) {
+//             for (uint16_t t = 0; t < nThreads; ++t) {
+//                 if (level < height - 1) {
+//                     uint64_t nbits = level == level_of_cut ?
+//                                  level_positions[t][level] :
+//                                  level_positions[t][level] - level_positions[t][level - 1];
+//                     for(uint64_t j = 0; j < nbits; ++j) {
+//                         (*bTrie)[curr] = bvs[t][j];
+//                         curr++;
+//                     }
+//                 } else {
+//                     for(uint64_t j = 0; j < nbits; ++j) {
+//                         (*lastLevel)[curr_last_level] = bvs_last[t][j];
+//                         curr_last_level++;
+//                     }
+//                 }
+//                 level_pos[level] = curr;
+//             }
+//         }
+
+//     return;
+// }
+
+
 void joinSolutions(sdsl::bit_vector* bTrie, sdsl::bit_vector* lastLevel, 
                    uint64_t* level_pos, uint16_t level_of_cut, uint16_t height,
-                   std::vector<sdsl::bit_vector> &bvs, std::vector<sdsl::bit_vector> &bvs_last,
+                //    std::vector<sdsl::bit_vector> &bvs, std::vector<sdsl::bit_vector> &bvs_last,
+                   std::vector<std::vector<uint64_t>> &ones, std::vector<std::vector<uint64_t>> &ones_last_lvl, 
                    std::vector<uint64_t*> &level_positions) {
 
-        uint16_t nThreads = bvs.size();
+        uint16_t nThreads = ones.size();
+        uint64_t pos, nBits, shift = 0;
         std::vector<uint64_t> positions(nThreads, 0);
-        uint64_t curr = level_pos[level_of_cut -1];
-        uint64_y curr_last_level = 0;
-        for (uint16_t level = level_of_cut; i < height; ++level) {
-            for (uint16_t t = 0; t < nThreads; ++t) {
-                if (level < height - 1) {
-                    uint64_t nbits = level == level_of_cut ?
-                                 level_positions[t][level] :
-                                 level_positions[t][level] - level_positions[t][level - 1];
-                    for(uint64_t j = 0; j < nbits; ++j) {
-                        (*bTrie)[curr] = bvs[t][j];
-                        curr++;
-                    }
-                } else {
-                    for(uint64_t j = 0; j < nbits; ++j) {
-                        (*lastLevel)[curr_last_level] = bvs_last[t][j];
-                        curr_last_level++;
-                    }
-                }
-                level_pos[level] = curr;
+        // Write first levels of Trie
+        for(uint16_t level = 0; level < level_of_cut; ++level) {
+            for(uint64_t i = 0; i < ones[0].size(); ++i) {
+                pos = ones[0][i];
+                (*bTrie)[pos] = 1;
             }
+            shift = level_positions[0][level];
         }
 
+        for (uint16_t level = level_of_cut; level < height; ++level) {
+            for (uint16_t thread = 1; thread < nThreads; ++thread) {
+                // Number of bits
+                nBits = (level == level_of_cut ?
+                        level_positions[thread][level] :
+                        level_positions[thread][level] - level_positions[thread][level-1]);
+                if (level != height - 1){
+                    uint64_t i = 0;
+                    while(ones[thread][i] < level_positions[level]) {
+                        pos = ones[thread][i] + shift;
+                        (*bTrie)[pos] = 1;
+                        ++i;
+                    }
+                } 
+                else{
+                    shift = 0;
+                    uint64_t i = 0;
+                    while(ones_last_lvl[thread][i] < level_positions[level]) {
+                        pos = ones_last_lvl[thread][i] + shift;
+                        (*lastLevel)[pos] = 1;
+                        ++i;
+                    }
+                }
+                shift += nBits;       
+            }
+            level_pos[level] = shift;
+        }
     return;
 }

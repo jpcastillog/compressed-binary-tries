@@ -25,7 +25,14 @@ void performQueryLog(string query_log_path, string ii_path);
 void randomQueries(string file_path);
 
 void splitUniverse(std::vector<uint64_t> &set, std::queue<tuple<uint64_t, uint64_t, uint64_t>> &q,  
-                   sdsl::bit_vector *bTrie, sdsl::bit_vector *lastLevel, 
+                //    sdsl::bit_vector *bTrie, sdsl::bit_vector *lastLevel,
+                   vector<uint64_t> &ones, vector<uint64_t> &ones_last_lvl, 
                    uint64_t *level_pos, uint16_t height, uint16_t level_of_cut);
+
+void joinSolutions(sdsl::bit_vector* bTrie, sdsl::bit_vector* lastLevel, 
+                   uint64_t* level_pos, uint16_t level_of_cut, uint16_t height,
+                //    std::vector<sdsl::bit_vector> &bvs, std::vector<sdsl::bit_vector> &bvs_last,
+                   std::vector<std::vector<uint64_t>> &ones, std::vector<std::vector<uint64_t>> &ones_last_lvl, 
+                   std::vector<uint64_t*> &level_positions);
 
 #endif
