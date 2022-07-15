@@ -29,16 +29,14 @@ void buildCollection(std::string input_path, std::string out_path,
     std::ifstream input_stream;
     input_stream.open(input_path, std::ios::binary | std::ios::in);
     if (!input_stream.is_open()) {
-        cout << "Can't open input file:  " << input_path << endl;
+        cout << "Can't open file:  " << input_path << endl;
         return;
     }
     std::ofstream out;
-    if (out_path != ""){
-        out.open(out_path, ios::out | ios::binary);
-        if(!out.is_open()) {
-            cout << "Can't open  output file:  " << out_path << endl;
-            return;
-        }
+    out.open(out_path, ios::out | ios::binary);
+    if(!out.is_open()) {
+        cout << "Can't open file:  " << out_path << endl;
+        return;
     }
 
     uint32_t _1, u;
@@ -75,7 +73,7 @@ void buildCollection(std::string input_path, std::string out_path,
             
             if (rank_type == 0) {
                 // flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
-                flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, u);
+                flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, u, true);
                 if (runs)
                     trie_v.encodeRuns();
                 if (out_path != "") {
@@ -101,7 +99,7 @@ void buildCollection(std::string input_path, std::string out_path,
             }
 
             else {
-                flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, u);
+                flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, u, true);
                 if (runs)
                     trie_v5.encodeRuns();
                 if (out_path != "") {
@@ -157,7 +155,6 @@ int main(int argc, char** argv) {
     bool runs;
     std::string output_filename = "";
     std::string input_filename = std::string(argv[1]);
-    std::cout << input_filename << endl;
     
     for (int i = 2; i < argc; ++i){
         if (std::string(argv[i]) == "--min_size") {
@@ -169,7 +166,7 @@ int main(int argc, char** argv) {
             if (std::string(argv[i]) == "v") {
                 rank = 0;
             }
-            else if (std::string(argv[i]) == "il") {
+            if (std::string(argv[i]) == "il") {
                 rank = 1;
                 i++;
                 block_size = std::atoi(argv[i]);
@@ -192,18 +189,9 @@ int main(int argc, char** argv) {
     }
     
     std::cout << "Min size: " << min_size << std::endl;
-    std::cout << "Rank: ";
-    if (rank  == 0){
-        std::cout << "rank v" << std::endl;
-    }
-    else if (rank == 1) {
-        std::cout << "rank il" << std::endl;
-    }
-    else {
-        std::cout << "rank v5" << std::endl;
-    }
-    std::cout << "Runs: " << (runs == 1 ? "true" : "false") << std::endl;
-    std::cout << "Output file name: "<< output_filename << endl;
+    std::cout << "Rank: " << rank << std::endl;
+    std::cout << "Runs: " << runs << std::endl;
+    std::cout << output_filename << endl;
     
     // Call function here
     if (block_size == 512)

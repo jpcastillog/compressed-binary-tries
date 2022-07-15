@@ -5,7 +5,8 @@
 #include "binTrie.hpp"
 #include "flatBinTrie.hpp"
 #include "binTrie_il.hpp"
-#include "parallel_for.hpp"
+#include "util_functions.hpp"
+// #include "parallel_for.hpp"
 #include <math.h>
 
 

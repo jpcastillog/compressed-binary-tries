@@ -6,8 +6,8 @@ SDSLFLAGS = -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
 vpath %.cpp src
 vpath %.hpp src
 
-program: $(OBJDIR)/intersection.o $(OBJDIR)/intersection_query_log.o $(OBJDIR)/barbay_and_kenyon.o
-	$(CC) $(CFLAGS) test/build_tries.cpp -o $(BUILDIR)/build.out $(SDSLFLAGS)
+program: $(OBJDIR)/intersection.o $(OBJDIR)/intersection_query_log.o $(OBJDIR)/barbay_and_kenyon.o $(OBJDIR)/util_functions.o
+	$(CC) $(CFLAGS) test/build_tries.cpp -o $(BUILDIR)/build.out $(OBJDIR)/util_functions.o $(SDSLFLAGS)
 	$(CC) -o $(BUILDIR)/queries.out $(OBJDIR)/intersection_query_log.o $(OBJDIR)/intersection.o $(CFLAGS) $(SDSLFLAGS) -pthread
 	$(CC) $(CFLAGS) test/measures.cpp -o $(BUILDIR)/measures.out $(SDSLFLAGS) 
 	$(CC) $(CFLAGS) test/classic_coders.cpp -o $(BUILDIR)/classic_coders.out $(SDSLFLAGS)
