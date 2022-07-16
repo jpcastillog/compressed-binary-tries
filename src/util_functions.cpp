@@ -790,10 +790,9 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
 
 
     void joinSolutions(sdsl::bit_vector* bTrie, sdsl::bit_vector* lastLevel, 
-                uint64_t* level_pos, uint16_t level_of_cut, uint16_t height,
-            //    std::vector<sdsl::bit_vector> &bvs, std::vector<sdsl::bit_vector> &bvs_last,
-                std::vector<std::vector<uint64_t>> &ones, std::vector<std::vector<uint64_t>> &ones_last_lvl, 
-                std::vector<uint64_t*> &level_positions) {
+                       uint64_t* level_pos, uint16_t level_of_cut, uint16_t height,
+                       std::vector<std::vector<uint64_t>> &ones, std::vector<std::vector<uint64_t>> &ones_last_lvl, 
+                       std::vector<uint64_t*> &level_positions) {
 
     uint16_t nThreads = ones.size();
     uint64_t pos, nBits, shift = 0;
@@ -815,18 +814,19 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
                     level_positions[thread][level] - level_positions[thread][level-1] - 1);
             // cout << "Join Solutions: nBits -> " << nBits << "|level " << level << endl;
             // cout << level_positions[thread][level] << endl;
-            if (level != height - 1){
+            if (level < height - 1){
                 // uint64_t i = 0;
-                uint64_t i =(level == level_of_cut ?
-                            0 :
-                            level_positions[thread][level-1]);
+                uint64_t i = (level == level_of_cut ?
+                              0 :
+                              level_positions[thread][level-1]
+                             );
                 while(ones[thread][i] < level_positions[thread][level] && i < ones[thread].size()) {
                     pos = ones[thread][i] + shift;
                     (*bTrie)[pos] = 1;
                     ++i;
                 }
             } 
-            else{
+            else {
                 shift = 0;
                 uint64_t i = 0;
                 while(ones_last_lvl[thread][i] < level_positions[thread][level] && i < ones_last_lvl[thread].size()) {
