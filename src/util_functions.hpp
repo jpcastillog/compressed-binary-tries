@@ -12,13 +12,15 @@ using namespace std;
 using namespace sdsl;
 
 void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64_t>> &q,
-                   vector<uint64_t> &ones, vector<uint64_t> &ones_last_lvl, uint64_t* level_pos, 
+                   vector<uint64_t> &ones, vector<uint64_t> &ones_last_lvl, uint64_t* level_pos,
+                   uint64_t* nNodes, 
                    uint16_t init_level, uint16_t height, uint16_t level_of_cut);
 
 void joinSolutions(bit_vector* bTrie, bit_vector* lastLevel,
                   uint64_t* level_pos, uint16_t level_of_cut, uint16_t height,
                   vector<vector<uint64_t>> &ones, vector<vector<uint64_t>> &ones_last_lvl, 
-                  vector<uint64_t*> &level_positions);
+                  vector<uint64_t*> &level_positions,
+                  vector<uint64_t*> &nNodes);
 
 // void decodeBinTrie(binTrie &b, vector<uint64_t> &decoded, bit_vector partial_result, uint64_t node_id, uint16_t curr_level, uint16_t max_level);
 

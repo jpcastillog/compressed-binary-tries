@@ -54,6 +54,7 @@ class flatBinTrie{
             
             flatBinTrie::bTrie     = new bit_vector(max_nodes, 0);
             flatBinTrie::lastLevel = new bit_vector(max_nodes_last_level, 0);
+            uint64_t* nNodes = new uint64_t[height + 1];
             
             queue<tuple<uint64_t, uint64_t, uint64_t>> q;         
             tuple<uint64_t, uint64_t, uint64_t> split(0, n-1, n); // add all set to split
@@ -67,55 +68,30 @@ class flatBinTrie{
             vector<vector<uint64_t>> ones_t;
             vector<vector<uint64_t>> ones_last_lvl_t;
             vector<uint64_t *> level_positions;
+            vector<uint64_t *> nNodes_t;
             if (parallel) {
                 nb_threads_hint = std::thread::hardware_concurrency();
                 level_of_cut  = floor(log2(nb_threads_hint));
                 nb_threads = pow(2, level_of_cut);
-                // vector<sdsl::bit_vector> bvs;
-                // vector<sdsl::bit_vector> bvs_last;
-                // Contain ones of thread subproblems
-                // Contain ones until level of cut
+
                 vector<uint64_t> ones;
                 vector<uint64_t> ones_last_lvl;
 
-                // splitUniverse(set, q, bTrie, lastLevel, level_pos, height, level_of_cut);
-                splitUniverse(set, q, ones, ones_last_lvl, level_pos, 0, height, level_of_cut);
+                splitUniverse(set, q, ones, ones_last_lvl, level_pos, nNodes, 0, height, level_of_cut);
                 
                 ones_t.resize(q.size() + 1);
                 ones_last_lvl_t.resize(q.size() + 1);
-                level_positions.resize(q.size() + 1);                
+                level_positions.resize(q.size() + 1);
+                nNodes_t.resize(q.size() + 1);                
 
-                ones_t[0] = ones; //.push_back(ones);
-                ones_last_lvl_t[0] = ones_last_lvl; //.push_back(ones_last_lvl);
-                level_positions[0] = level_pos; //.push_back(level_pos);
+                ones_t[0]           = ones; //.push_back(ones);
+                ones_last_lvl_t[0]  = ones_last_lvl; //.push_back(ones_last_lvl);
+                level_positions[0]  = level_pos; //.push_back(level_pos);
+                nNodes_t[0]         = nNodes;
                 unsigned real_threads = q.size();
 
                 vector<queue<tuple<uint64_t, uint64_t, uint64_t>>> qs(q.size());
-                // for (uint16_t i = 0; i < q.size(); ++i) {
-                   
-                    // queue<tuple<uint64_t, uint64_t, uint64_t>> q_p;
-                    // q_p.push(s);
                     
-
-                    // sdsl::bit_vector bv(max_nodes, 0);
-                    // sdsl::bit_vector bv_last(max_nodes_last_level, 0);
-                    // vector<uint64_t> o; 
-                    // vector<uint64_t> last_lvl;
-                    // uint64_t* level_pos_p = new uint64_t[height];
-                    
-                    
-                    // ones_t[i+1] = o; //.push_back(o);
-                    // ones_last_lvl_t[i+1] = last_lvl; //.push_back(last_lvl);
-                    // level_positions.push_back(level_pos_p);
-
-                    // bvs.push_back(bv);
-                    // bvs_last.push_back(bv_last);
-                    
-                cout << "Call parallel for, threads: " << real_threads << endl;
-                cout << level_pos[level_of_cut-1] << endl;
-                cout << "Size ones_t: " << ones_t.size() << endl;
-                cout << "Size ones_last_lvl_t: " << ones_last_lvl_t.size() << endl;
-                cout << "-> " << ones_t[1].size() << endl;
                 uint16_t e = 0;
                 while (!q.empty()){
                     tuple<uint64_t, uint64_t, uint64_t> s = q.front();
@@ -125,39 +101,30 @@ class flatBinTrie{
                 }
                 parallel_for(real_threads, real_threads, [&](int start, int end){
                     for (uint16_t threadId = start; threadId < end; ++threadId) {
-                        // cout << "Thread: " << threadId << endl;
-                        // tuple<uint64_t, uint64_t, uint64_t> s = q.front();
-                        // q.pop();
-                        // qs[threadId].push(s);
                         level_positions[threadId+1] = new uint64_t[height];
-                        // splitUniverse(set, q_p, &bv, &bv_last, level_pos_p, height-level_of_cut, height-level_of_cut);
-                        // splitUniverse(set, q_p, o, last_lvl, level_pos_p, level_of_cut, height, level_of_cut);
+                        nNodes_t[threadId+1] = new uint64_t[height + 1];
                         splitUniverse(set, qs[threadId], ones_t[threadId+1], ones_last_lvl_t[threadId+1], 
-                                        level_positions[threadId+1], level_of_cut, height, height);
-                        // delete [] level_positions[threadId+1];
+                                        level_positions[threadId+1], nNodes_t[threadId+1], level_of_cut, height, height);
                     }
                 });
-                // }
             } 
             else {
                 vector<uint64_t> o;
                 vector<uint64_t> last_lvl;
                 // splitUniverse(set, q, bTrie, lastLevel, level_pos, height, height);
-                splitUniverse(set, q, o, last_lvl, level_pos, 0, height, height);
+                splitUniverse(set, q, o, last_lvl, level_pos, nNodes, 0, height, height);
                 ones_t.push_back(o);
                 ones_last_lvl_t.push_back(last_lvl);
                 level_positions.push_back(level_pos);
             }
-            cout << "OK Split Universe" << endl;
             joinSolutions(bTrie, lastLevel, level_pos, level_of_cut, height,
-                            ones_t, ones_last_lvl_t, level_positions);
-            cout <<  "Ok Join Solutions" << endl;
-            flatBinTrie::bTrie -> resize(level_pos[height - 2] + 1);
-            flatBinTrie::lastLevel -> resize(level_pos[height - 1] + 1);
+                            ones_t, ones_last_lvl_t, level_positions, nNodes_t);
+            
+            flatBinTrie::bTrie -> resize(level_pos[height - 2]);
+            flatBinTrie::lastLevel -> resize(level_pos[height - 1]);
             flatBinTrie::b_rank = rankType(bTrie);
             // flatBinTrie::bTrie -> resize(total_nodes - 2*nodes_last_level);
             // flatBinTrie::lastLevel -> resize(2*nodes_last_level);
-            cout << "Ok constructor" << endl;
             // 
 
         }

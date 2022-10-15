@@ -75,7 +75,11 @@ void buildCollection(std::string input_path, std::string out_path,
             
             if (rank_type == 0) {
                 // flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
-                flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, u);
+                flatBinTrie<rank_support_v<1>> trie_v;
+                // if (n >= 1000000)
+                //     trie_v = flatBinTrie<rank_support_v<1>>(*il, u, true);
+                // else trie_v = flatBinTrie<rank_support_v<1>>(*il, u, true);
+                trie_v = flatBinTrie<rank_support_v<1>>(*il, u);
                 if (runs)
                     trie_v.encodeRuns();
                 if (out_path != "") {

@@ -653,7 +653,8 @@
 void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64_t>> &q,  
                 //    sdsl::bit_vector *bTrie, sdsl::bit_vector *lastLevel,
                    std::vector<uint64_t> &ones, std::vector<uint64_t> &ones_last_lvl, 
-                   uint64_t *level_pos, uint16_t init_level, uint16_t height, uint16_t level_of_cut) {
+                   uint64_t *level_pos, uint64_t *nNodes, 
+                   uint16_t init_level, uint16_t height, uint16_t level_of_cut) {
     
     uint16_t level            = init_level;
     uint64_t nodes_curr_level = 1; 
@@ -698,12 +699,14 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
         // left child
         if (left_elements > 0) {
             // write 1
-            if (level == height-1)
+            if (level == height-1){
                 ones_last_lvl.push_back(index);
                 // (*lastLevel)[index] = 1;
-            else
+            }
+            else{
                 ones.push_back(index);
                 // (*bTrie)[index] = 1;
+            }
             tuple<uint64_t,uint64_t,uint64_t> left_split(ll, lr, left_elements);
             q.push(left_split);
             nodes_next_level++;
@@ -718,12 +721,14 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
         // right child
         if (right_elements > 0) {
             // write 1
-            if (level == height-1)
+            if (level == height-1){
                 ones_last_lvl.push_back(index);
-                // (*lastLevel)[index] = 1; 
-            else
+                // (*lastLevel)[index] = 1;
+            } 
+            else{
                 ones.push_back(index);
                 // (*bTrie)[index] = 1;
+            }
             tuple<uint64_t,uint64_t,uint64_t> right_split(rl, rr, right_elements);
             q.push(right_split);
             nodes_next_level++;
@@ -740,9 +745,10 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
             level_pos[level] = index;
             if (level == height-2){
                 nodes_last_level = nodes_next_level;
-                index = 0;
+                // index = 0;
             }
-            
+            nNodes[level] = nodes_curr_level;
+            index = 0;
             nodes_curr_level = nodes_next_level;
             nodes_next_level = 0;
             count_nodes = 0;
@@ -751,6 +757,7 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
         }
 
         if (level == height || level == level_of_cut) {
+            nNodes[height] = total_nodes;
             break;
         }
     }
@@ -792,44 +799,59 @@ void splitUniverse(vector<uint64_t> &set, queue<tuple<uint64_t, uint64_t, uint64
     void joinSolutions(sdsl::bit_vector* bTrie, sdsl::bit_vector* lastLevel, 
                        uint64_t* level_pos, uint16_t level_of_cut, uint16_t height,
                        std::vector<std::vector<uint64_t>> &ones, std::vector<std::vector<uint64_t>> &ones_last_lvl, 
-                       std::vector<uint64_t*> &level_positions) {
+                       std::vector<uint64_t*> &level_positions,
+                       std::vector<uint64_t*> &nNodes) {
 
     uint16_t nThreads = ones.size();
-    uint64_t pos, nBits, shift = 0;
+    uint64_t pos, prev, nBits; 
+    uint64_t count_nodes = 0;
+    uint64_t shift = 0;
     std::vector<uint64_t> positions(nThreads, 0);
+    std::vector<std::vector<uint64_t>::iterator> its(nThreads);
+    
+    for (uint16_t t = 0; t < nThreads; ++t) 
+        its[t] = ones[t].begin();
+    
     // Write first levels of Trie
     for(uint16_t level = 0; level < level_of_cut; ++level) {
-        for(uint64_t i = 0; i < ones[0].size(); ++i) {
-            pos = ones[0][i];
+        uint64_t nOnes;
+        if (level == level_of_cut - 1)
+            nOnes = nThreads - 1;
+        else
+            nOnes = nNodes[0][level + 1];
+        for(uint64_t i = 0; i < nOnes; ++i) {
+             
+            pos = *(its[0]) + shift;
             (*bTrie)[pos] = 1;
+             //level_positions[0][level];
+            count_nodes += nNodes[0][level];
+            its[0]++;
         }
-        shift = level_positions[0][level];
+        shift += 2 * nNodes[0][level];
+        level_pos[level] = shift;
+        // shift = level_positions[0][level];
     }
     // cout << "Join Solutions: Ok before level of cut" << endl;
     for (uint16_t level = level_of_cut; level < height; ++level) {
+        if (level == height - 1) shift = 0;
         for (uint16_t thread = 1; thread < nThreads; ++thread) {
             // Number of bits
-            nBits = ((level == level_of_cut || level == height - 1) ?
-                    level_positions[thread][level] :
-                    level_positions[thread][level] - level_positions[thread][level-1] - 1);
-            // cout << "Join Solutions: nBits -> " << nBits << "|level " << level << endl;
-            // cout << level_positions[thread][level] << endl;
+            nBits = 2 * nNodes[thread][level];
+            count_nodes += nNodes[thread][level];
+            
             if (level < height - 1){
-                // uint64_t i = 0;
-                uint64_t i = (level == level_of_cut ?
-                              0 :
-                              level_positions[thread][level-1]
-                             );
-                while(ones[thread][i] < level_positions[thread][level] && i < ones[thread].size()) {
-                    pos = ones[thread][i] + shift;
-                    (*bTrie)[pos] = 1;
-                    ++i;
+                uint64_t nOnes = nNodes[thread][level+1];
+                for(uint64_t i = 0; i < nOnes; ++i) {
+                    pos = *(its[thread]);
+                    (*bTrie)[pos + shift] = 1;
+                    its[thread]++;
                 }
             } 
             else {
-                shift = 0;
+                // shift = 0;
+                // uint64_t nOnes = nNodes[thread][level]
                 uint64_t i = 0;
-                while(ones_last_lvl[thread][i] < level_positions[thread][level] && i < ones_last_lvl[thread].size()) {
+                while(i < ones_last_lvl[thread].size()) {
                     pos = ones_last_lvl[thread][i] + shift;
                     (*lastLevel)[pos] = 1;
                     ++i;

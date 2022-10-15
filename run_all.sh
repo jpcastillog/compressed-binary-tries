@@ -100,4 +100,7 @@ echo -e "Running ClueWeb09 rank il 256..."
 echo -e "Running ClueWeb09 rank il 512..."
 ./build.out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09.sorted" --min_size 1 --rank il 512 --runs t --out "/media/jpcastillog/Nuevo vol/data/ClueWeb09Flat/clueweb09_rank_il_512_runs_t.bin"
 
+
 ./build/build.out "/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2.docs" --min_size 1 --rank v --runs t
+
+./build.out "/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news.docs" --min_size 1 --rank v --runs t --out "/media/jpcastillog/Respaldo 2/data/CC-News/cc-news_rank_v_runs_t.bin"
