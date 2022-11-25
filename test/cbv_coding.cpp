@@ -116,7 +116,7 @@ int main(int argc, const char** argv) {
             // hybb    = cbvCoding<sdsl::hyb_vector<>>(s, u);
             // sdsl::rrr_vector<255> rrrb(bv);
             // sdsl::sd_vector<> sdb(bv);
-            sdsl::hyb_vector<128> hybb(bv);
+            sdsl::hyb_vector<512> hybb(bv);
 
             // cout << "OK encoding" << endl;
 

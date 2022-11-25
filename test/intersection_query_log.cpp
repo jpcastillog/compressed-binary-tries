@@ -5,9 +5,10 @@
 #include <sdsl/rank_support.hpp>
 #include <sdsl/rank_support_v.hpp>
 #include <sdsl/rank_support_v5.hpp>
-#include "../src/intersection.hpp"
+// #include "../src/intersection.hpp"
 #include "../src/flatBinTrie.hpp"
 #include "../src/binTrie_il.hpp"
+#include "../src/intersectionV2.hpp"
 
 using namespace std;
 using namespace sdsl;
@@ -122,6 +123,8 @@ vector<vector<uint32_t>>* loadQueryLog(std::string path) {
 template <class trieType>
 void performIntersections( std::string sequences_path, std::string query_path,
                            std::string out_path, bool runs_encoded, uint64_t n_sequences) {
+
+    uint64_t trep = 10;
     std::ofstream out;
     if (out_path != "") {
         out.open(out_path, std::ios::out);
@@ -162,25 +165,28 @@ void performIntersections( std::string sequences_path, std::string query_path,
             
             // intersection = joinTries<trieType>(Bs, runs_encoded, time_of_ranks);
             // intersection =
+            
             uint64_t time_10 = 0;
-            for(int rep = 0; rep < 10; ++rep) {
+            for(int rep = 0; rep < trep; ++rep) {
                 auto start = std::chrono::high_resolution_clock::now();
-                parJoin<trieType>(Bs, intersection);
+                // parJoin<trieType>(Bs, intersection);
+                Intersect(Bs, intersection, runs_encoded);
+                // join<trieType> (Bs, true, intersection, false);
                 auto end = std::chrono::high_resolution_clock::now();
                 // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
                 auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
                 auto time = elapsed.count();
                 total_time += time;
                 time_10 += time;
-                if (rep != 9)
+                if (rep != trep-1)
                     intersection.clear();        
             }
             if (out.is_open()) {
                 // out << Bs.size() << "," << (float)time_10*10e-6/10.0 << "," << intersection.size() << std::endl;
-                out << Bs.size() << "," << (float)time_10/10.0 << "," << intersection.size() << std::endl;
+                out << Bs.size() << "," << (float)time_10/trep<< "," << intersection.size() << std::endl;
             }
             // cout << nq <<"|Time execution: " << (double)(time_10)*10e-6/10.0 << "[ms]" << endl;
-            cout << nq <<"|Time execution: " << (double)(time_10*1e-3)/(10.0) << "[ms]| " << intersection.size() << endl;
+            cout << nq <<"|Time execution: " << (double)(time_10*1e-3)/(trep) << "[ms]| " << intersection.size() << endl;
 
             // total_height += intersection -> getHeight();
             // cout << "Size of intersection: " << intersection -> elements_coded() << endl;
@@ -209,7 +215,7 @@ void performIntersections( std::string sequences_path, std::string query_path,
     cout << "Number of queries: " << nq << endl;
     // cout <<"|Avg time execution: " << (double)(time)*10e-6/nq << "[ms]" << endl;
     // cout <<"|Avg time execution: " << (double)(total_time)*10e-6/(nq*10) << "[ms]" << endl;
-    cout <<"|Avg time execution: " << (double)(total_time*1e-3)/(nq*10) << "[ms]" << endl;
+    cout <<"|Avg time execution: " << (double)(total_time*1e-3)/(nq*trep) << "[ms]" << endl;
     cout << total_height << endl;   
     cout << "Avg number of ranks: " << (float)n_ranks/nq << endl;
     cout << "Avg time of ranks: " << (double)(time_of_ranks*10e-6)/nq <<endl;

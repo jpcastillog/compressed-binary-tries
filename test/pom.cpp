@@ -4,15 +4,36 @@
 #include <sdsl/vectors.hpp>
 
 using namespace std;
-// Compile
-// g++ -std=c++11 -O3 -DNDEBUG -I ~/include -L ~/lib classic_coders.cpp -o classic_coders.out -lsdsl -ldivsufsort -ldivsufsort64
+// using namespace sdsl;
 
+template<class uint_type>
+void prefixOf(uint_type x, uint_type y, uint_type &xp, uint_type &yp, uint16_t nBits) {
+    uint_type bx, by;
+    uint16_t shift = 0;
+    uint64_t mask = 0xFFFFFFFFFFFFFFFF;
+    xp = x;
+    yp = y;
+    for (uint16_t i = nBits; i > 0; --i) {
+        bx = (x>>(i-1)) & 1;
+        by = (y>>(i-1)) & 1;
+        if (bx == by) { 
+            shift++;
+        }
+        else {
+            mask >>= shift;
+            xp &= mask;
+            yp &= mask;
+            return;
+        }
+    }
+    return;
+}
 //  SDSL Coders
 // sdsl::coder::elias_delta
 // sdsl::coder::elias_gamma
 // sdsl::coder::fibonacci
 template<class Coder>
-sdsl::enc_vector<Coder, 51000000, 0>* classicEncode(std::vector<uint64_t> &v) {
+sdsl::vlc_vector<Coder, 2046, 0>* classicEncode(std::vector<uint64_t> &v) {
     sdsl::int_vector<> int_v(v.size());
     
     std::vector<uint64_t>::iterator it;
@@ -22,8 +43,8 @@ sdsl::enc_vector<Coder, 51000000, 0>* classicEncode(std::vector<uint64_t> &v) {
         ++i;
     }
     sdsl::util::bit_compress(int_v);
-    sdsl::enc_vector<Coder, 51000000,0>*ev;
-    ev = new sdsl::enc_vector<Coder, 51000000, 0>(int_v);
+    sdsl::vlc_vector<Coder, 2046,0>*ev;
+    ev = new sdsl::vlc_vector<Coder, 2046, 0>(int_v);
     return ev;
 }
 
@@ -54,11 +75,11 @@ int main(int argc, const char** argv) {
         std::cout << "Can't open file " << collection << std::endl;
     }
 
-    // uint64_t gap = 0, rle = 0, trie = 0, trie_run = 0; 
-    uint64_t elias_delta = 0, elias_gamma = 0, fibonacci = 0;
+    int64_t elias_delta = 0, elias_gamma = 0, fibonacci = 0;
     uint64_t nElements = 0, nSets = 0;
     uint64_t n_il = 0;
     uint32_t n, x;
+    uint64_t xp, yp;
     uint32_t u, _1;
     in.read(reinterpret_cast<char*>(&u), 4);
     in.read(reinterpret_cast<char*>(&_1), 4);
@@ -71,19 +92,27 @@ int main(int argc, const char** argv) {
             nElements += n;
             nSets++;
             std::vector<uint64_t> s;
+            std::vector<uint64_t> sp;
             s.reserve(n);
+            sp.reserve(n);
             for (uint64_t i = 0; i < n; ++i) {
                 in.read(reinterpret_cast<char*>(&x), 4);
                 s.push_back((uint64_t)x);
+                if (i == 0) 
+                    sp.push_back((uint64_t)x);
+                else {
+                    prefixOf<uint64_t>((uint64_t)x, s[i-1], xp, yp, 64);
+                    sp.push_back(xp);
+                }
             }
             // Encode sets
-            sdsl::enc_vector<sdsl::coder::elias_delta, 51000000, 0>* ed;
-            sdsl::enc_vector<sdsl::coder::elias_gamma, 51000000, 0>* eg;
-            sdsl::enc_vector<sdsl::coder::fibonacci, 51000000, 0>* fib;
+            sdsl::vlc_vector<sdsl::coder::elias_delta, 2046, 0>* ed;
+            sdsl::vlc_vector<sdsl::coder::elias_gamma, 2046, 0>* eg;
+            sdsl::vlc_vector<sdsl::coder::fibonacci, 2046, 0>* fib;
             
-            ed  = classicEncode<sdsl::coder::elias_delta>(s);
-            eg  = classicEncode<sdsl::coder::elias_gamma>(s);
-            fib = classicEncode<sdsl::coder::fibonacci>(s);
+            ed  = classicEncode<sdsl::coder::elias_delta>(sp);
+            eg  = classicEncode<sdsl::coder::elias_gamma>(sp);
+            fib = classicEncode<sdsl::coder::fibonacci>(sp);
             // Size in bytes
             elias_delta += sdsl::size_in_bytes(*ed);
             elias_gamma += sdsl::size_in_bytes(*eg);

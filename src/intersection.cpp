@@ -103,18 +103,20 @@ void AND(vector<trieType> &Ts, uint64_t &n_tries, uint64_t &max_level, uint64_t 
             tempActiveTries[i] = false;
         }
     }
-    
+    if (result == 0b00 && node00 != 0b00)
+        return;
     if (node00 == 0b00) {
         uint64_t dummy;
         uint64_t below = partial_int;
         uint64_t range = ((uint64_t)1 << (max_level - curr_level))- 1;
         uint64_t above = partial_int | range;
-        for (uint64_t i = below; i <= above; ++i) {
-            // sharedMutex.lock();
-            r.push_back(i);
-            // sharedMutex.unlock();
-            // dummy = i;
-        }
+        std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
+        // for (uint64_t i = below; i <= above; ++i) {
+        //     // sharedMutex.lock();
+        //     r.push_back(i);
+        //     // sharedMutex.unlock();
+        //     // dummy = i;
+        // }
         return;
     }
 
@@ -862,7 +864,7 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
     vector<uint64_t*>           roots2;
     vector<uint64_t> partial_solutions;
     
-    // result.reserve(100000);
+    result.reserve(1000000);
     uint64_t partial_int = 0;
     // Resolve problem until level of cut
     partialAND(Bs, n_tries, max_level2, curr_level, level_of_cut, roots, activeTries, partial_int, result,
@@ -885,7 +887,13 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
         real_threads = roots2.size() - i ;
     }
 
-    vector<vector<uint64_t>> threads_results(real_threads);
+    vector<vector<uint64_t>> threads_results;//(real_threads);
+    for (uint64_t t = 0; t < real_threads; ++t){
+        vector<uint64_t> r;
+        // r.reserve(100000);
+        threads_results.push_back(r);
+        threads_results[t].reserve(1000000);
+    }
     std::mutex tuplesMutex;
     parallel_for(real_threads, real_threads, [&](int start, int end) {
         for (uint16_t threadId = start; threadId < end; ++threadId) {
@@ -896,6 +904,7 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
     });
     
     uint64_t output_size = result.size(); 
+    // cout << result.size() << endl;
     vector<uint64_t> shifts(real_threads);
     uint64_t shift = result.size();
     for(uint64_t t = 0; t < real_threads; ++t){
@@ -903,22 +912,25 @@ void parJoin(vector<trieType> &Bs, vector<uint64_t> &result){
         shifts[t] = shift;
         // cout << "Shift: " << shifts[t] << endl;
         shift += threads_results[t].size();
+        // cout << shift << endl;
     }
-    result.resize(output_size);
+    
     // cout << "Output size: " << output_size - threads_results[real_threads - 1].size()<< endl;
     
     // Write in parallel threads result
     // vector<uint64_t> new_result(output_size);
-    if (output_size > 450000){
+    if (output_size > 100000){
+        result.resize(output_size);
         parallel_for(real_threads, real_threads, [&](int start, int end) {
             for (uint16_t threadId = start; threadId < end; ++threadId) {
-                for (uint64_t i = 0; i < threads_results[threadId].size(); ++i) {
-                    result[i+shifts[threadId]] = threads_results[threadId][i];
+                for (uint64_t j = 0; j < threads_results[threadId].size(); ++j) {
+                    result[j+shifts[threadId]] = threads_results[threadId][j];
                 } 
                 
             }        
         });
-    } else {
+    } 
+    else {
         // Concatenate solutions of threads
         for(uint64_t t=0; t < real_threads; ++t){
             result.insert(  result.end(), 

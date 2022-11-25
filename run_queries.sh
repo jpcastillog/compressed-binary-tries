@@ -32,3 +32,4 @@
 
 ./queries.out "/media/jpcastillog/Respaldo 2/data/Gov2Flat/gov2_rank_v_runs_t.bin" "/media/jpcastillog/Respaldo 2/data/Gov2Flat/1mq.txt" --#sequences 1107204 --rank v --runs t
 
+./queries.out "/media/jpcastillog/Respaldo 2/data/CC-News/cc-news_rank_v_runs_t.bin" "/media/jpcastillog/Respaldo 2/data/CC-News/queries_4096.pisa" --#sequences 79831 --rank v --runs t

@@ -168,7 +168,7 @@ int main(int argc, const char** argv) {
             }
             gap      += Gap(s);
             if (delta >= 0){
-                cout << "delta: " << floor(log2(delta)) + 1 << endl;
+                // cout << "delta: " << floor(log2(delta)) + 1 << endl;
                 gap  += floor(log2(delta)) + 1;
             }
             rle      += Rle(s);
