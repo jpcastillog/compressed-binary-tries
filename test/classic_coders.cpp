@@ -4,8 +4,6 @@
 #include <sdsl/vectors.hpp>
 
 using namespace std;
-// Compile
-// g++ -std=c++11 -O3 -DNDEBUG -I ~/include -L ~/lib classic_coders.cpp -o classic_coders.out -lsdsl -ldivsufsort -ldivsufsort64
 
 //  SDSL Coders
 // sdsl::coder::elias_delta
@@ -54,7 +52,6 @@ int main(int argc, const char** argv) {
         std::cout << "Can't open file " << collection << std::endl;
     }
 
-    // uint64_t gap = 0, rle = 0, trie = 0, trie_run = 0; 
     uint64_t elias_delta = 0, elias_gamma = 0, fibonacci = 0;
     uint64_t nElements = 0, nSets = 0;
     uint64_t n_il = 0;
@@ -106,6 +103,5 @@ int main(int argc, const char** argv) {
     std::cout << "Avg Elias Delta: " << (double)elias_delta*8/nElements << " bpi" << std::endl;
     std::cout << "Avg Elias Gamma: " << (double)elias_gamma*8/nElements << " bpi" << std::endl;
     std::cout << "Avg Fibonacci: " << (double)fibonacci*8/nElements << " bpi" << std::endl;
-    // std::cout << "Trie run: " << (double)trie_run/nElements << "bpi" << std::endl;
     return 0;
 }

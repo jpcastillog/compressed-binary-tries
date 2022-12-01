@@ -74,11 +74,7 @@ void buildCollection(std::string input_path, std::string out_path,
             uint64_t max_value = (*il)[n - 1];
             
             if (rank_type == 0) {
-                // flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, max_value);
                 flatBinTrie<rank_support_v<1>> trie_v;
-                // if (n >= 1000000)
-                //     trie_v = flatBinTrie<rank_support_v<1>>(*il, u, true);
-                // else trie_v = flatBinTrie<rank_support_v<1>>(*il, u, true);
                 trie_v = flatBinTrie<rank_support_v<1>>(*il, u);
                 if (runs)
                     trie_v.encodeRuns();
@@ -91,11 +87,8 @@ void buildCollection(std::string input_path, std::string out_path,
 
             else if (rank_type == 1) {
                 binTrie_il<block_size> trie_il(*il, u);
-                // cout << "Ok create tries" << endl;
                 if (runs) {
-                    // cout << "Init encodeRuns" << endl;
                     trie_il.encodeRuns();
-                    // cout << "OK encode runs" << endl;
                 }
                 if (out_path != "") {
                     trie_il.serialize(out);
@@ -120,7 +113,7 @@ void buildCollection(std::string input_path, std::string out_path,
 
             // cout << "#Elements: " << n << " | Bpi: " << (float)(trie_bytes_size*8)/n << endl;
             if ((n_il % 1000) == 0) {
-                cout << n_il  <<" lists processed " << endl;
+                cout << n_il  <<" Sets processed " << endl;
             }
 
             delete il;
