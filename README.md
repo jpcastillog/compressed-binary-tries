@@ -34,5 +34,5 @@ One example to compute the intersection using a queries file is as following:
 The meaning of parameters are the same of above.
     
 ## Replicate Results
-If you want replicate the results of paper, you can download the collections already processed by Lemire from the Gov2 and Clueweb09 inverted indexes, from the following link: <https://lemire.me/data/integercompression2014.html>. For CC-News collection, you can obtain the inverted index already processed by Mackenzie et al. in CIFF format from here <http://go.unimelb.edu.au/u3nj>, you transform the index from CIFF to PISA format using <https://github.com/pisa-engine/ciff>.
+If you want replicate the results of paper, you can download the collections already processed by Lemire from the Gov2 and Clueweb09 inverted indexes, from the following link: <https://lemire.me/data/integercompression2014.html>. For CC-News collection, you can obtain the inverted index already processed by Mackenzie et al. in CIFF format from here <http://go.unimelb.edu.au/u3nj>, you can transform the index from CIFF to PISA format using <https://github.com/pisa-engine/ciff>.
  
