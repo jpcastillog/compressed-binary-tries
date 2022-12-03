@@ -22,9 +22,6 @@ vector<uint64_t>* read_inv_list(std::ifstream &input_stream, uint32_t n) {
 template <uint32_t block_size>
 void buildCollection(std::string input_path, std::string out_path,
                      uint64_t min_size, int rank_type, bool runs) {
-
-    if (min_size == 0) 
-        min_size = 0xffffffffffffffff;
     
     std::ifstream input_stream;
     input_stream.open(input_path, std::ios::binary | std::ios::in);
@@ -45,9 +42,25 @@ void buildCollection(std::string input_path, std::string out_path,
     // Read universe of collection
     input_stream.read(reinterpret_cast<char *>(&_1), sizeof(_1));
     input_stream.read(reinterpret_cast<char *>(&u), sizeof(u));
-    
+
+    uint32_t nSets = 0;
+    while (true) {
+        uint32_t n;
+        input_stream.read(reinterpret_cast<char *>(&n), 4);
+        if (input_stream.eof()){
+            break;
+        }
+        if (n > min_size) {
+            nSets++;
+        }
+        input_stream.seekg(4*n, ios::cur);
+    }
+    // Set file pointer in first set
+    input_stream.clear();
+    input_stream.seekg(2*sizeof(u), ios::beg);
     // Write universe in out file
     if (out_path != "") {
+        out.write(reinterpret_cast<char *> (&nSets), sizeof(nSets));
         out.write(reinterpret_cast<char *> (&_1), sizeof(_1));
         out.write(reinterpret_cast<char *> (&u), sizeof(u));
     }
@@ -57,12 +70,10 @@ void buildCollection(std::string input_path, std::string out_path,
     uint64_t total_elements = 0;
     uint64_t n_il = 0;
     
-    // for (uint32_t i = 0; i < u; ++i) {
     while (true) {
         
         uint32_t n;
         input_stream.read(reinterpret_cast<char *>(&n), 4);
-
         if (input_stream.eof()){
             break;
         }
@@ -138,10 +149,10 @@ int main(int argc, char** argv) {
     int mandatory = 3;
 
     if (argc < mandatory){
-        std::cout   << "collection filename"
-                        "[--min_size m]"
-                        "[--rank v]"
-                        "[--runs r]"
+        std::cout   << "collection filename "
+                        "[--min_size m] "
+                        "[--rank v] "
+                        "[--runs r] "
                         "[--out output_filename]"
                     <<
         std::endl;
