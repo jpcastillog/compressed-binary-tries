@@ -31,10 +31,6 @@
 *.out
 *.app
 
-# compile program
-program
-queries
-
 # visual studio code files
 .vscode/
 
