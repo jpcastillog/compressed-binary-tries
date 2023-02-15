@@ -3,7 +3,7 @@
 ## Building the code
 The code was tested in ubuntu 20.04 and gcc 9.3.0 version. The code has dependencies on the [**sdsl**](https://github.com/simongog/sdsl-lite) library.
 
-To build the code in linux sistems, run the following comands:
+To build the code in linux sistems, run the following commands:
 
     mkdir build
     make
