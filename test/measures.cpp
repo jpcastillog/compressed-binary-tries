@@ -99,7 +99,7 @@ uint64_t Trie(std::vector<uint64_t> &v, uint32_t u, bool encodeRuns) {
     if (encodeRuns)
         t.encodeRuns();
     uint64_t size = t.trieMeasure();
-    t.free();
+    // t.free();
     return size;
 }
 

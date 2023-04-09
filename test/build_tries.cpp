@@ -1,8 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include "../src/flatBinTrie.hpp"
 #include <sdsl/bit_vectors.hpp>
+#include "../src/flatBinTrie.hpp"
 #include "../src/binTrie_il.hpp"
+#include "../src/binTrie.hpp"
 
 using namespace std;
 using namespace sdsl;
@@ -19,9 +20,10 @@ vector<uint64_t>* read_inv_list(std::ifstream &input_stream, uint32_t n) {
     return il;
 }
 
+
 template <uint32_t block_size>
 void buildCollection(std::string input_path, std::string out_path,
-                     uint64_t min_size, int rank_type, bool runs) {
+                     uint64_t min_size, int rank_type, bool runs, bool levelwise) {
     
     std::ifstream input_stream;
     input_stream.open(input_path, std::ios::binary | std::ios::in);
@@ -85,15 +87,25 @@ void buildCollection(std::string input_path, std::string out_path,
             uint64_t max_value = (*il)[n - 1];
             
             if (rank_type == 0) {
-                flatBinTrie<rank_support_v<1>> trie_v;
-                trie_v = flatBinTrie<rank_support_v<1>>(*il, u);
-                if (runs)
-                    trie_v.encodeRuns();
-                if (out_path != "") {
-                    trie_v.serialize(out);
+                if (levelwise){
+                    binTrie<rank_support_v<1>> trie_v = binTrie<rank_support_v<1>>(*il, u);
+                    if (runs)
+                        trie_v.encodeRuns();
+                    if (out_path != "") {
+                        trie_v.serialize(out);
+                    }
+                    trie_bytes_size = trie_v.size_in_bytes();
                 }
-                trie_bytes_size = trie_v.size_in_bytes();
-                trie_v.free();
+                else {    
+                    flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, u);
+                    if (runs)
+                        trie_v.encodeRuns();
+                    if (out_path != "") {
+                        trie_v.serialize(out);
+                    }
+                    trie_bytes_size = trie_v.size_in_bytes();
+                    // trie_v.free();
+                }
             }
 
             else if (rank_type == 1) {
@@ -105,18 +117,30 @@ void buildCollection(std::string input_path, std::string out_path,
                     trie_il.serialize(out);
                 }
                 trie_bytes_size = trie_il.size_in_bytes();
-                trie_il.free();
+                // trie_il.free();
             }
 
             else {
-                flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, u);
-                if (runs)
-                    trie_v5.encodeRuns();
-                if (out_path != "") {
-                    trie_v5.serialize(out);
+                if (levelwise){
+                    binTrie<rank_support_v5<1>> trie_v5 = binTrie<rank_support_v5<1>>(*il, u);
+                    if (runs)
+                        trie_v5.encodeRuns();
+                    if (out_path != "") {
+                        trie_v5.serialize(out);
+                    }
+                    trie_bytes_size = trie_v5.size_in_bytes();
+                    // trie_v5.free();
                 }
-                trie_bytes_size = trie_v5.size_in_bytes();
-                trie_v5.free();
+                else {
+                    flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, u);
+                    if (runs)
+                        trie_v5.encodeRuns();
+                    if (out_path != "") {
+                        trie_v5.serialize(out);
+                    }
+                    trie_bytes_size = trie_v5.size_in_bytes();
+                    // trie_v5.free();
+                }
             }
             total_size += trie_bytes_size;
             total_elements += n;
@@ -159,10 +183,11 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    int rank;
+    int rank = 0;
     uint64_t min_size = 0;
     uint32_t block_size = 512;
-    bool runs;
+    bool runs = false;
+    bool levelwise = false;
     std::string output_filename = "";
     std::string input_filename = std::string(argv[1]);
     std::cout << input_filename << endl;
@@ -197,6 +222,13 @@ int main(int argc, char** argv) {
             ++i;
             output_filename = std::string(argv[i]);
         }
+        if (std::string(argv[i]) == "--levelwise") {
+            ++i;
+            if (std::string(argv[i]) == "t")
+                levelwise = true;
+            else
+                levelwise = false;
+        }
     }
     
     std::cout << "Min size: " << min_size << std::endl;
@@ -211,16 +243,16 @@ int main(int argc, char** argv) {
         std::cout << "rank v5" << std::endl;
     }
     std::cout << "Runs: " << (runs == 1 ? "true" : "false") << std::endl;
+    std::cout << "Level-wise: " << (levelwise == 1 ? "true" : "false") << std::endl;
     std::cout << "Output file name: "<< output_filename << endl;
     
-    // Call function here
     if (block_size == 512)
-        buildCollection<512>(input_filename, output_filename, min_size, rank, runs);
+        buildCollection<512>(input_filename, output_filename, min_size, rank, runs, levelwise);
     else if (block_size == 256)
-        buildCollection<256>(input_filename, output_filename, min_size, rank, runs);
+        buildCollection<256>(input_filename, output_filename, min_size, rank, runs, levelwise);
     else if (block_size == 128)
-        buildCollection<128>(input_filename, output_filename, min_size, rank, runs);
+        buildCollection<128>(input_filename, output_filename, min_size, rank, runs, levelwise);
     else
-        buildCollection<64> (input_filename, output_filename, min_size, rank, runs);
+        buildCollection<64> (input_filename, output_filename, min_size, rank, runs, levelwise);
 
 }

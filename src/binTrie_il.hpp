@@ -240,27 +240,32 @@ class binTrie_il{
         }
 
         
-        inline uint64_t getNode(uint64_t node_id) {
-            uint64_t node = 0;
-            uint64_t pos;
-            if ((2*node_id) >= (binTrie_il::bTrie -> size())) {
-                pos = (2*node_id) - (binTrie_il::bTrie -> size());
-                if ((*lastLevel)[pos])
-                    node = (node | (1ULL << 1));
-
-                if ((*lastLevel)[pos + 1] == 1)
-                    node = (node | (1ULL << 0));
+        inline uint64_t getNode(uint64_t node_id, uint16_t level) {
+           if (level < binTrie_il::height-1) {
+                return (((*bTrie)[2 * node_id]) << 1) | (*bTrie)[(2 * node_id)+1];
             }
-            else { 
-                pos = 2*node_id;
-                if ((*bTrie)[pos])
-                    node = (node | (1ULL << 1));
+            else 
+                return ((*lastLevel)[2*node_id -binTrie_il::bTrie -> size()] << 1) | (*lastLevel)[(2*node_id -binTrie_il::bTrie -> size())+1];
+            // uint64_t node = 0;
+            // uint64_t pos;
+            // if ((2*node_id) >= (binTrie_il::bTrie -> size())) {
+            //     pos = (2*node_id) - (binTrie_il::bTrie -> size());
+            //     if ((*lastLevel)[pos])
+            //         node = (node | (1ULL << 1));
 
-                if ((*bTrie)[pos + 1] == 1)
-                    node = (node | (1ULL << 0));
-            }
+            //     if ((*lastLevel)[pos + 1] == 1)
+            //         node = (node | (1ULL << 0));
+            // }
+            // else { 
+            //     pos = 2*node_id;
+            //     if ((*bTrie)[pos])
+            //         node = (node | (1ULL << 1));
 
-            return node;
+            //     if ((*bTrie)[pos + 1] == 1)
+            //         node = (node | (1ULL << 0));
+            // }
+
+            // return node;
         };
 
         inline uint64_t getNode1(uint64_t &node_id) {
@@ -274,13 +279,13 @@ class binTrie_il{
         }
 
 
-        inline uint64_t getLeftChild(uint64_t &node_id) {
+        inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
                 uint64_t rank = binTrie_il::b_rank((2*node_id) + 1);
                 return rank;
         };
 
 
-        inline uint64_t getRightChild(uint64_t &node_id) {
+        inline uint64_t getRightChild(uint64_t &node_id, uint16_t level) {
                 return binTrie_il::b_rank((2*node_id) + 2);
         };
 
@@ -355,7 +360,8 @@ class binTrie_il{
                                 uint16_t curr_level, uint64_t node_id, bool &its11){            
             // End condition
             if (curr_level == (binTrie_il::height-1)) {
-                uint64_t node = getNode2(node_id);
+                // uint64_t node = getNode2(node_id);
+                uint64_t node = getNode(node_id, curr_level);
                 // if node == 11
                 if (node == 0b11) {
                     its11 = true;
@@ -371,7 +377,8 @@ class binTrie_il{
                 
                 return;
             }
-            uint64_t node = getNode1(node_id);
+            // uint64_t node = getNode1(node_id);
+            uint64_t node = getNode(node_id, curr_level);
             uint16_t next_level = curr_level + 1;
             uint64_t next_level_pos = level_pos[next_level];
 
@@ -382,7 +389,7 @@ class binTrie_il{
             if (node == 0b11) {
                 actualIts11 = true;
 
-                uint64_t l_child = getLeftChild(node_id);
+                uint64_t l_child = getLeftChild(node_id, curr_level);
                 uint64_t r_child = l_child + 1;
                 writeCompressTrie(ones_to_write, level_pos, next_level, l_child, its11_l);
                 writeCompressTrie(ones_to_write, level_pos, next_level, r_child, its11_r);
@@ -406,13 +413,13 @@ class binTrie_il{
 
             else if (node == 0b10 || node == 0b01){
                 if (node == 0b10){
-                    uint64_t l_child = getLeftChild(node_id);
+                    uint64_t l_child = getLeftChild(node_id, curr_level);
                     ones_to_write[curr_level].push_back(level_pos[curr_level]);
                     writeCompressTrie(ones_to_write, level_pos, next_level, l_child, its11_l);
                 }
                 level_pos[curr_level] += 1;
                 if (node == 0b01) {
-                    uint64_t r_child = getRightChild(node_id);
+                    uint64_t r_child = getRightChild(node_id, curr_level);
                     ones_to_write[curr_level].push_back(level_pos[curr_level]);
                     writeCompressTrie(ones_to_write, level_pos, next_level, r_child, its11_r);
                 }
@@ -488,19 +495,19 @@ class binTrie_il{
                 return;
             }
 
-            uint64_t node = getNode(node_id);
+            uint64_t node = getNode(node_id, curr_level);
             uint16_t next_level = curr_level + 1;
 
             uint64_t leftResult = partial_int;
             uint64_t rightResult = partial_int;
 
             if (node == 0b10 || node == 0b11) {
-                uint64_t left_child = getLeftChild(node_id);
+                uint64_t left_child = getLeftChild(node_id, curr_level);
                 recursiveDecode(decoded, leftResult, left_child, next_level);
             }
             if (node == 0b01 || node == 0b11) {
                 rightResult = (rightResult | (1ULL << (getHeight() - curr_level - 1)));
-                uint64_t right_child = getRightChild(node_id);
+                uint64_t right_child = getRightChild(node_id, curr_level);
                 recursiveDecode(decoded, rightResult, right_child, next_level);
             }
         };
@@ -512,7 +519,7 @@ class binTrie_il{
                 return;
             }
 
-            uint64_t node = getNode(node_id);
+            uint64_t node = getNode(node_id, curr_level);
             uint16_t next_level = curr_level + 1;
 
             if (node == 0b00) { 
@@ -529,12 +536,12 @@ class binTrie_il{
             uint64_t rightResult = partial_int;
 
             if (node == 0b10 || node == 0b11) {
-                uint64_t left_child = getLeftChild(node_id);
+                uint64_t left_child = getLeftChild(node_id, curr_level);
                 runsRecursiveDecode(decoded, leftResult, left_child, next_level);
             }
             if (node == 0b01 || node == 0b11) {
                 rightResult = (rightResult | (1ULL << (getHeight() - curr_level - 1)));
-                uint64_t right_child = getRightChild(node_id);
+                uint64_t right_child = getRightChild(node_id, curr_level);
                 runsRecursiveDecode(decoded, rightResult, right_child, next_level);
             }
         }

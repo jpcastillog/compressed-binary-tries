@@ -9,6 +9,7 @@
 #include "binTrie.hpp"
 #include "flatBinTrie.hpp"
 #include "binTrie_il.hpp"
+#include "binTrie.hpp"
 // #include "util_functions.hpp"
 #include <math.h>
 
@@ -29,9 +30,10 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
     uint64_t orResult = 0b00;
     for (i = 0; i < nTries; ++i) {
         if (activeTries[i]) {
-            uint64_t node_i = (currLevel == maxLevel -1) ?
-                                Ts[i].getNode2(roots[i]):
-                                Ts[i].getNode1(roots[i]);
+            // uint64_t node_i = (currLevel == maxLevel -1) ?
+            //                     Ts[i].getNode2(roots[i]):
+            //                     Ts[i].getNode1(roots[i]);
+            uint64_t node_i = Ts[i].getNode(roots[i], currLevel);
             if (node_i) {
                 tempActiveTries[i] = true;
                 andResult &= node_i;
@@ -65,7 +67,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t leftResult = prefix;
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel - 1) 
-                leftNodes[i] = Ts[i].getLeftChild(roots[i]);
+                leftNodes[i] = Ts[i].getLeftChild(roots[i], currLevel);
         }
         runsAND(Ts, nTries, maxLevel, nextLevel, leftNodes,
                         tempActiveTries, leftResult, r);
@@ -75,7 +77,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel -1)
-                rightNodes[i] = Ts[i].getRightChild(roots[i]);
+                rightNodes[i] = Ts[i].getRightChild(roots[i], currLevel);
         }
         runsAND(Ts, nTries, maxLevel, nextLevel, rightNodes,
                         tempActiveTries, rightResult, r);
@@ -88,7 +90,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));;
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel - 1) {
-                uint64_t leftNode = Ts[i].getLeftChild(roots[i]);
+                uint64_t leftNode = Ts[i].getLeftChild(roots[i], currLevel);
                 leftNodes[i] = leftNode;
                 rightNodes[i] = leftNode + 1;
             }
@@ -112,9 +114,10 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
     uint64_t i;
     uint64_t andResult = 0b11;
     for (i = 0; i < nTries; ++i) {
-        uint64_t node_i = (currLevel == maxLevel -1) ?
-                            Ts[i].getNode2(roots[i]):
-                            Ts[i].getNode1(roots[i]);
+        // uint64_t node_i = (currLevel == maxLevel -1) ?
+        //                     Ts[i].getNode2(roots[i]):
+        //                     Ts[i].getNode1(roots[i]);
+        uint64_t node_i = Ts[i].getNode(roots[i], currLevel);
         andResult &= node_i;
         
     }
@@ -129,7 +132,7 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t leftResult = prefix;
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel - 1) 
-                leftNodes[i] = Ts[i].getLeftChild(roots[i]);
+                leftNodes[i] = Ts[i].getLeftChild(roots[i], currLevel);
         }
         existLeft = AND(Ts, nTries, maxLevel, nextLevel, leftNodes, leftResult, r);
     }
@@ -138,7 +141,7 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel -1)
-                rightNodes[i] = Ts[i].getRightChild(roots[i]);
+                rightNodes[i] = Ts[i].getRightChild(roots[i], currLevel);
         }
         existRight = AND(Ts, nTries, maxLevel, nextLevel, rightNodes, rightResult, r);
 
@@ -150,7 +153,7 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));;
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel - 1) {
-                uint64_t leftNode = Ts[i].getLeftChild(roots[i]);
+                uint64_t leftNode = Ts[i].getLeftChild(roots[i], currLevel);
                 leftNodes[i] = leftNode;
                 rightNodes[i] = leftNode + 1;
             }
@@ -193,9 +196,10 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
     for (uint16_t i = 0;  i < n_tries; ++i) {
         if (runs){
             if (activeTries[i]) {
-                uint64_t node_i = (curr_level == max_level - 1) ?
-                                    Ts[i].getNode2(roots[i]):
-                                    Ts[i].getNode1(roots[i]);
+                // uint64_t node_i = (curr_level == max_level - 1) ?
+                //                     Ts[i].getNode2(roots[i]):
+                //                     Ts[i].getNode1(roots[i]);
+                uint64_t node_i = Ts[i].getNode(roots[i], curr_level);
                 if (node_i || runs) {
                     tempActiveTries[i] = true;
                     result &= node_i;
@@ -208,9 +212,10 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
             }
         }
         else {
-            uint64_t node_i = (curr_level == max_level - 1) ?
-                                    Ts[i].getNode2(roots[i]):
-                                    Ts[i].getNode1(roots[i]);
+            // uint64_t node_i = (curr_level == max_level - 1) ?
+            //                         Ts[i].getNode2(roots[i]):
+            //                         Ts[i].getNode1(roots[i]);
+            uint64_t node_i = Ts[i].getNode(roots[i], curr_level);
             result &= node_i;
         }
     }
@@ -234,9 +239,9 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         uint64_t leftResult = partial_int;
         for (uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i])
-                left_nodes[i] = Ts[i].getLeftChild(roots[i]);
+                left_nodes[i] = Ts[i].getLeftChild(roots[i], curr_level);
             else 
-                left_nodes[i] = Ts[i].getLeftChild(roots[i]);
+                left_nodes[i] = Ts[i].getLeftChild(roots[i], curr_level);
         }
         partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level, 
             left_nodes, tempActiveTries, leftResult, r, partial_ints,
@@ -249,9 +254,9 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
         for (uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i])
-                right_nodes[i] = Ts[i].getRightChild(roots[i]);
+                right_nodes[i] = Ts[i].getRightChild(roots[i], curr_level);
             else
-                right_nodes[i] = Ts[i].getRightChild(roots[i]);
+                right_nodes[i] = Ts[i].getRightChild(roots[i], curr_level);
         }
         partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level,
             right_nodes, tempActiveTries, rightResult, r, partial_ints,
@@ -266,12 +271,12 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
         for(uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i]) {
-                uint64_t left_node = Ts[i].getLeftChild(roots[i]);
+                uint64_t left_node = Ts[i].getLeftChild(roots[i], curr_level);
                 left_nodes[i]  = left_node;
                 right_nodes[i] = left_node + 1; 
             }
             else {
-                uint64_t left_node = Ts[i].getLeftChild(roots[i]);
+                uint64_t left_node = Ts[i].getLeftChild(roots[i], curr_level);
                 left_nodes[i]  = left_node;
                 right_nodes[i] = left_node + 1;
             }
@@ -411,3 +416,7 @@ template void
 Intersect<binTrie_il<128>>(vector<binTrie_il<128>> &Bs, vector<uint64_t> &result, bool runs);
 template void 
 Intersect<binTrie_il<64>>(vector<binTrie_il<64>> &Bs, vector<uint64_t> &result, bool runs);
+template void 
+Intersect<binTrie<rank_support_v5<1>>>(vector<binTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result, bool runs);
+template void 
+Intersect<binTrie<rank_support_v<1>>>(vector<binTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result, bool runs);
