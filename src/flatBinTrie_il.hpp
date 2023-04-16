@@ -1,55 +1,51 @@
-#ifndef FLAT_BINTRIE
-#define FLAT_BINTRIE
+#ifndef FLATBINTRIE_IL
+#define FLATBINTRIE_IL
+
 
 #include <iostream>
-#include <sdsl/bit_vectors.hpp>
-#include <sdsl/int_vector.hpp>
 #include <vector>
 #include <queue>
-#include <math.h>
-#include <thread>
-#include "parallel_for.hpp"
+#include <sdsl/bit_vectors.hpp>
+#include <sdsl/bit_vector_il.hpp>
 
-using namespace sdsl;
 using namespace std;
+using namespace sdsl;
 
-template <class rankType>
-class flatBinTrie{
+
+template <uint32_t block_size = 512>
+class flatBinTrie_il{
     private:
         uint16_t height; // original height of trie
         uint16_t height_with_runs; // height with runs encoded
         bool empty_trie = false;
         bool runs_encoded;
 
-        sdsl::bit_vector *bTrie;
+        sdsl::bit_vector_il<block_size> *bTrie;
         sdsl::bit_vector *lastLevel;     
-        rankType b_rank;
-        // vector<uint64_t> level_pos;
+        sdsl::rank_support_il<1, block_size> b_rank;
         uint64_t* level_pos;
-        
 
     public:
+        flatBinTrie_il() = default;
 
-        flatBinTrie() = default;
-        
-        ~flatBinTrie(){
-            delete flatBinTrie::lastLevel;
-            delete flatBinTrie::bTrie; 
+        ~flatBinTrie_il(){
+            delete flatBinTrie_il::lastLevel;
+            delete flatBinTrie_il::bTrie; 
         };
 
-        flatBinTrie(vector<uint64_t> &set, uint64_t u) {
-            flatBinTrie::runs_encoded = false;
+        flatBinTrie_il(vector<uint64_t> &set, uint64_t u) {
+            flatBinTrie_il::runs_encoded = false;
             uint32_t n = set.size();
 
             uint16_t height = floor(log2(u - 1)) +  1;
-            flatBinTrie::height = height;
-            flatBinTrie::level_pos = new uint64_t[height];
+            flatBinTrie_il::height = height;
+            flatBinTrie_il::level_pos = new uint64_t[height];
             
             uint64_t max_nodes            = 2 * (pow(2, height) - 1);
             uint64_t max_nodes_last_level = pow(2, height);  
             
-            flatBinTrie::bTrie     = new bit_vector(max_nodes, 0);
-            flatBinTrie::lastLevel = new bit_vector(max_nodes_last_level, 0);
+            bit_vector* _bTrie     = new bit_vector(max_nodes, 0);
+            flatBinTrie_il::lastLevel = new bit_vector(max_nodes_last_level, 0);
             
             queue<tuple<uint64_t, uint64_t, uint64_t>> q;         
             // add all set to split
@@ -102,7 +98,7 @@ class flatBinTrie{
                     if (level == height-1)
                         (*lastLevel)[index] = 1;
                     else
-                        (*bTrie)[index] = 1;
+                        (*_bTrie)[index] = 1;
                     tuple<uint64_t,uint64_t,uint64_t> left_split(ll, lr, left_elements);
                     q.push(left_split);
                     nodes_next_level++;
@@ -121,7 +117,7 @@ class flatBinTrie{
                     if (level == height-1)
                         (*lastLevel)[index] = 1;
                     else
-                        (*bTrie)[index] = 1;
+                        (*_bTrie)[index] = 1;
                     tuple<uint64_t,uint64_t,uint64_t> right_split(rl, rr, right_elements);
                     q.push(right_split);
                     nodes_next_level++;
@@ -136,7 +132,6 @@ class flatBinTrie{
                 }
 
                 if (count_nodes == nodes_curr_level) {
-                    // bTrie[level].resize(2*count_nodes);'
                     level_pos[level] = index;
                     if (level == height-2){
                         nodes_last_level = nodes_next_level;
@@ -149,131 +144,24 @@ class flatBinTrie{
                     level++;
                     
                 }
-                if (level == flatBinTrie::height) {
+                if (level == flatBinTrie_il::height) {
                     break;
                 }
             }
 
-            flatBinTrie::bTrie -> resize(total_nodes - 2*nodes_last_level);
-            flatBinTrie::lastLevel -> resize(2*nodes_last_level);
-            flatBinTrie::b_rank = rankType(bTrie);
+            _bTrie -> resize(total_nodes - 2*nodes_last_level);
+            lastLevel -> resize(2*nodes_last_level);
+            flatBinTrie_il::bTrie = new bit_vector_il<block_size>(*_bTrie);
+            delete _bTrie;
+            flatBinTrie_il::b_rank = rank_support_il<1, block_size>(bTrie);
         }
 
-        
-        flatBinTrie(int_vector<> &set) {
-            flatBinTrie::runs_encoded = false;
-            uint32_t n = set.size();
-            
-            util::bit_compress(set);
-            flatBinTrie::height = (uint16_t)set.width();
-            flatBinTrie::level_pos = new uint64_t[height];
-            
-            uint64_t max_nodes = 2*(pow(2, height+1) - 1);
-            flatBinTrie::bTrie = new bit_vector(max_nodes, 0); 
-            
 
-            queue<tuple<uint64_t, uint64_t, uint64_t>> q;
-            
-            // add all set to split
-            tuple<uint64_t, uint64_t, uint64_t> split(0, n-1, n);
-            q.push(split);
-
-            uint16_t level            = 0;
-            uint64_t nodes_curr_level = 1; 
-            uint64_t count_nodes      = 0;
-            uint64_t nodes_next_level = 0;
-            uint64_t index            = 0;
-            uint64_t total_nodes      = 0;
-
-            while (!q.empty()) {
-                count_nodes++; // count node visited
-                // Get node to write
-                tuple<uint64_t, uint64_t, uint64_t> s = q.front();
-                q.pop(); 
-                
-                uint64_t l, r, n;
-                std::tie(l, r, n) = s;
-                uint64_t left_elements  = 0;
-                uint64_t right_elements = 0;
-
-                // j-th most significative bit
-                uint8_t j = height - level;
-                uint64_t ll, lr, rl, rr;
-                for (uint64_t i = l; i < r+1; ++i) {
-                    if ((set[i] >> j-1) & 1) {                        
-                        right_elements = r-i+1;
-                        rl = i;
-                        rr = r;
-                        break;
-                    }
-                    else {
-                        if (i == l){
-                            ll = l;
-                        }
-                        lr = i;    
-                        left_elements++;
-                    }
-                }
-                // Add to queue split sets and write nodes
-                tuple<uint64_t,uint64_t,uint64_t> left_split;
-                tuple<uint64_t,uint64_t,uint64_t> right_split;
-                // left child
-                if (left_elements > 0) {
-                    // write 1
-                    (*bTrie)[index] = 1;
-                    tuple<uint64_t,uint64_t,uint64_t> left_split(ll, lr, left_elements);
-                    q.push(left_split);
-                    nodes_next_level++;
-                    index++;
-                    total_nodes++;
-                }
-                else {
-                    // write 0
-                    (*bTrie)[index] = 0;
-                    index++;
-                    total_nodes++;
-                }
-                // right child
-                if (right_elements > 0) {
-                    // write 1
-                    (*bTrie)[index] = 1;
-                    tuple<uint64_t,uint64_t,uint64_t> right_split(rl, rr, right_elements);
-                    q.push(right_split);
-                    nodes_next_level++;
-                    index++;
-                    total_nodes++;
-                }
-                else {
-                    // write 0
-                    (*bTrie)[index] = 0;
-                    index++;
-                    total_nodes++;
-                }
-
-                if (count_nodes == nodes_curr_level) {
-                    // bTrie[level].resize(2*count_nodes);
-                    level_pos[level] = index;
-                    nodes_curr_level = nodes_next_level;
-                    nodes_next_level = 0;
-                    count_nodes = 0;
-                    level++;
-                    
-                }
-                if (level == flatBinTrie::height) {
-                    break;
-                }
-            }
-            flatBinTrie::bTrie -> resize(total_nodes);
-            flatBinTrie::b_rank = rankType(bTrie);
-        };
-
-
-        flatBinTrie(vector<uint64_t> ones_to_write[], uint16_t height, 
-                    // vector<uint64_t> &level_pos,
+        flatBinTrie_il(vector<uint64_t> ones_to_write[], uint16_t height, 
                     uint64_t* level_pos, 
                     bool runs_encoded) {
-            flatBinTrie::runs_encoded = runs_encoded;
-            flatBinTrie::height = height;
+            flatBinTrie_il::runs_encoded = runs_encoded;
+            flatBinTrie_il::height = height;
             
             uint64_t bits_n = 0;
             uint16_t all_levels_empty = 0;
@@ -290,51 +178,44 @@ class flatBinTrie{
                     
             }
 
-            if (all_levels_empty == flatBinTrie::height) {
-                flatBinTrie::empty_trie = true;
+            if (all_levels_empty == flatBinTrie_il::height) {
+                flatBinTrie_il::empty_trie = true;
             }
             else {
-                flatBinTrie::empty_trie = false;
+                flatBinTrie_il::empty_trie = false;
             }
 
-            flatBinTrie::height_with_runs = max_level_not_empty + 1;
+            flatBinTrie_il::height_with_runs = max_level_not_empty + 1;
 
-            flatBinTrie::bTrie     = new bit_vector(bits_n - level_pos[max_level_not_empty], 0);
-            flatBinTrie::lastLevel = new bit_vector(level_pos[max_level_not_empty], 0); 
-            // flatBinTrie::level_pos = vector<uint64_t>(height, 0);
-            flatBinTrie::level_pos = new uint64_t[height];
+            bit_vector* _bTrie    = new bit_vector(bits_n - level_pos[max_level_not_empty], 0);
+            flatBinTrie_il::lastLevel = new bit_vector(level_pos[max_level_not_empty], 0); 
+            flatBinTrie_il::level_pos = new uint64_t[height]; 
 
             uint64_t global_level_pos = 0;
             for (uint16_t level = 0; level < height; ++level) {
                 for (uint64_t i = 0; i < ones_to_write[level].size(); ++i) {
                     if (level == max_level_not_empty) {
                         uint64_t pos = ones_to_write[level][i];
-                        (*flatBinTrie::lastLevel)[pos] = 1;
+                        (*flatBinTrie_il::lastLevel)[pos] = 1;
                     }
                     else {
                         uint64_t pos = global_level_pos + ones_to_write[level][i];
-                        (*flatBinTrie::bTrie)[pos] = 1;
+                        (*_bTrie)[pos] = 1;
                     }
                 }
-                // cout << endl;
                 if (level == max_level_not_empty) {
-                    flatBinTrie::level_pos[level] = level_pos[level];
+                    flatBinTrie_il::level_pos[level] = level_pos[level];
                 }
                 else {
                     global_level_pos += level_pos[level];
-                    flatBinTrie::level_pos[level] = global_level_pos;
+                    flatBinTrie_il::level_pos[level] = global_level_pos;
                 }
                 
             }
-            flatBinTrie::b_rank = rankType(flatBinTrie::bTrie);
+            flatBinTrie_il::bTrie = new bit_vector_il<block_size>(*_bTrie);
+            delete _bTrie;
+            flatBinTrie_il::b_rank = rank_support_il<1, block_size>(flatBinTrie_il::bTrie);
         };
-        
-
-        // free memory of bit vectors
-        // inline void free(){
-        //     delete flatBinTrie::bTrie;
-        //     delete flatBinTrie::lastLevel;
-        // }
 
         // return number of elements of bit_vector
         inline uint64_t size(){
@@ -343,35 +224,34 @@ class flatBinTrie{
 
 
         inline uint16_t getHeight(){
-            return flatBinTrie::height;
+            return flatBinTrie_il::height;
         };
 
-        // // Return number of elements coded in a trie
-        // inline uint64_t elements_coded() {
-        //     uint64_t counter_ones = 0;
-        //     for (uint64_t i = 0; i < flatBinTrie::lastLevel -> size(); ++i) {
-        //         if ((*flatBinTrie::lastLevel)[i] == 1) 
-        //             counter_ones++;
-        //     }
-        //     return counter_ones;
-        // }
+        // Return number of elements coded in a trie
+        inline uint64_t elements_coded() {
+            uint64_t counter_ones = 0;
+            for (uint64_t i = 0; i < flatBinTrie_il::lastLevel -> size(); ++i) {
+                if ((*flatBinTrie_il::lastLevel)[i] == 1) 
+                    counter_ones++;
+            }
+            return counter_ones;
+        }
 
-        // Aqui deberia colocar el nivel aunque no lo ocupe
-        // solo para homologar con binTrie...
-        inline uint64_t getNode(uint64_t &node_id, uint16_t level) {
-            if (level < flatBinTrie::height-1) {
+        
+        inline uint64_t getNode(uint64_t node_id, uint16_t level) {
+           if (level < flatBinTrie_il::height-1) {
                 return (((*bTrie)[2 * node_id]) << 1) | (*bTrie)[(2 * node_id)+1];
             }
             else 
-                return ((*lastLevel)[2*node_id -flatBinTrie::bTrie -> size()] << 1) | (*lastLevel)[(2*node_id -flatBinTrie::bTrie -> size())+1];
+                return ((*lastLevel)[2*node_id -flatBinTrie_il::bTrie -> size()] << 1) | (*lastLevel)[(2*node_id -flatBinTrie_il::bTrie -> size())+1];
             // uint64_t node = 0;
             // uint64_t pos;
-            // if ((2*node_id) >= (flatBinTrie::bTrie -> size())) {
-            //     pos = (2*node_id) - (flatBinTrie::bTrie -> size());
+            // if ((2*node_id) >= (flatBinTrie_il::bTrie -> size())) {
+            //     pos = (2*node_id) - (flatBinTrie_il::bTrie -> size());
             //     if ((*lastLevel)[pos])
             //         node = (node | (1ULL << 1));
 
-            //     if ((*lastLevel)[pos + 1])
+            //     if ((*lastLevel)[pos + 1] == 1)
             //         node = (node | (1ULL << 0));
             // }
             // else { 
@@ -379,46 +259,48 @@ class flatBinTrie{
             //     if ((*bTrie)[pos])
             //         node = (node | (1ULL << 1));
 
-            //     if ((*bTrie)[pos + 1])
+            //     if ((*bTrie)[pos + 1] == 1)
             //         node = (node | (1ULL << 0));
             // }
 
             // return node;
         };
 
-        // GetNode in h-1 levels
         inline uint64_t getNode1(uint64_t &node_id) {
-                return (((*bTrie)[2 * node_id]) << 1) | (*bTrie)[(2 * node_id)+1];
+            uint64_t pos  = 2 * node_id;
+                return (((*bTrie)[pos]) << 1) | (*bTrie)[pos+1];
         }
 
-        // GetNode in last level
-        inline int64_t getNode2(uint64_t &node_id) {
-            return ((*lastLevel)[2*node_id -flatBinTrie::bTrie -> size()] << 1) | (*lastLevel)[(2*node_id -flatBinTrie::bTrie -> size())+1];
+        uint64_t getNode2(uint64_t &node_id) {
+            uint64_t pos = 2*node_id - (bTrie -> size());
+            return ((*lastLevel)[pos] << 1) | (*lastLevel)[pos+1];
         }
 
 
         inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
-                return flatBinTrie::b_rank((2*node_id) + 1);;
+                uint64_t rank = flatBinTrie_il::b_rank((2*node_id) + 1);
+                return rank;
         };
 
 
         inline uint64_t getRightChild(uint64_t &node_id, uint16_t level) {
-                return flatBinTrie::b_rank((2*node_id) + 2);
+                return flatBinTrie_il::b_rank((2*node_id) + 2);
         };
 
-        // return size of bytes of all structure
+
         inline uint64_t size_in_bytes() {
-            uint64_t bv_size = sdsl::size_in_bytes(*(flatBinTrie::bTrie));
-            uint64_t lastL_size = sdsl::size_in_bytes(*(flatBinTrie::lastLevel));
-            uint64_t rank_size = sdsl::size_in_bytes(flatBinTrie::b_rank);
+            uint64_t bv_size    = sdsl::size_in_bytes(*(flatBinTrie_il::bTrie));
+            uint64_t lastL_size = sdsl::size_in_bytes(*(flatBinTrie_il::lastLevel));
+            uint64_t rank_size  = sdsl::size_in_bytes(flatBinTrie_il::b_rank);
             return bv_size +
                     rank_size +
                     lastL_size +
                     2 * sizeof(bool) +
                     2 * sizeof(uint8_t);
         };
-        
-        uint64_t serialize(std::ostream &out) {
+
+        // return size of bytes of all structure
+        inline uint64_t serialize(std::ostream &out) {
 
             out.write(reinterpret_cast<char*>(&height)          , sizeof(height));
             out.write(reinterpret_cast<char*>(&height_with_runs), sizeof(height_with_runs));
@@ -435,33 +317,34 @@ class flatBinTrie{
         }
 
         // load structure from in stream
-        void load(std::istream &in){
+        inline void load(std::istream &in){
             in.read(reinterpret_cast<char*>(&height)          , sizeof(height));
             in.read(reinterpret_cast<char*>(&height_with_runs), sizeof(height_with_runs));
             in.read(reinterpret_cast<char*>(&empty_trie)      , sizeof(empty_trie));
             in.read(reinterpret_cast<char*>(&runs_encoded)    , sizeof(runs_encoded));
 
-            flatBinTrie::bTrie = new sdsl::bit_vector();
-            flatBinTrie::lastLevel = new sdsl::bit_vector();
+            flatBinTrie_il::bTrie      = new sdsl::bit_vector_il<block_size>();
+            flatBinTrie_il::lastLevel = new sdsl::bit_vector();
 
-            flatBinTrie::bTrie     -> load(in);
-            flatBinTrie::lastLevel -> load(in);
+            bTrie     -> load(in);
+            lastLevel -> load(in);
             b_rank.load(in, bTrie);
         }
 
 
         inline void print() {
             uint64_t i = 0;
-            for (uint16_t level=0; level < flatBinTrie::height; ++level) {
-                uint64_t next_level_pos = flatBinTrie::level_pos[level];
-                if (level == flatBinTrie::height - 1) {
+            for (uint16_t level=0; level < flatBinTrie_il::height; ++level) {
+                uint64_t next_level_pos = flatBinTrie_il::level_pos[level];
+                if (level == flatBinTrie_il::height - 1) {
+                    // next_level_pos = ;
                     i = 0;
                 }
                 while (i < next_level_pos) {
-                    if (level < flatBinTrie::height - 1)
-                        cout << (*flatBinTrie::bTrie)[i] << (*flatBinTrie::bTrie)[i+1] << " ";
+                    if (level < flatBinTrie_il::height - 1)
+                        cout << (*flatBinTrie_il::bTrie)[i] << (*flatBinTrie_il::bTrie)[i+1] << " ";
                     else{ 
-                        cout << (*flatBinTrie::lastLevel)[i] << (*flatBinTrie::lastLevel)[i+1] << " ";
+                        cout << (*flatBinTrie_il::lastLevel)[i] << (*flatBinTrie_il::lastLevel)[i+1] << " ";
                     }
                     ++(++i);
                 }
@@ -470,12 +353,14 @@ class flatBinTrie{
         };
 
 
-        void writeCompressTrie(vector<uint64_t> ones_to_write[], 
+        inline void writeCompressTrie(vector<uint64_t> ones_to_write[], 
                                 uint64_t* level_pos, 
-                                uint16_t curr_level, uint64_t node_id, bool &its11){
+                                uint16_t curr_level, uint64_t node_id, bool &its11){            
             // End condition
-            if (curr_level == (flatBinTrie::height-1)) {
+            if (curr_level == (flatBinTrie_il::height-1)) {
+                // uint64_t node = getNode2(node_id);
                 uint64_t node = getNode(node_id, curr_level);
+                // if node == 11
                 if (node == 0b11) {
                     its11 = true;
                 }
@@ -490,6 +375,7 @@ class flatBinTrie{
                 
                 return;
             }
+            // uint64_t node = getNode1(node_id);
             uint64_t node = getNode(node_id, curr_level);
             uint16_t next_level = curr_level + 1;
             uint64_t next_level_pos = level_pos[next_level];
@@ -509,7 +395,7 @@ class flatBinTrie{
                 its11 = true && its11_l && its11_r;
                 if (its11) {
                     level_pos[next_level] -= 4;
-                    if (curr_level == flatBinTrie::height -2){
+                    if (curr_level == flatBinTrie_il::height -2){
                         for (uint64_t i = 0; i < 4; ++i) {
                             ones_to_write[next_level].pop_back();
                         }
@@ -539,70 +425,70 @@ class flatBinTrie{
             }
         };
 
-        // Method write ones in a bit vector
-        void writeOnes(vector<uint64_t> ones_to_write[], 
-                                // vector<uint64_t> level_pos
-                                uint64_t* level_pos){
-            flatBinTrie::runs_encoded = true;
+        // Method write ones in bit vector
+        inline void writeOnes(vector<uint64_t> ones_to_write[], uint64_t* level_pos){
+            flatBinTrie_il::runs_encoded = true;
             uint64_t bits_n = 0;
             uint16_t last_level = 0;
             uint64_t bits_before_last_level;
-            for (uint16_t level = 0; level < flatBinTrie::height; ++level) {
+            for (uint16_t level = 0; level < flatBinTrie_il::height; ++level) {
                 bits_n += level_pos[level];
                 if (level_pos[level] > 0) {
                     last_level = level; 
-                }               
+                }
+                
             }
 
-            flatBinTrie::height_with_runs = last_level + 1;
-            delete flatBinTrie::bTrie;
-            delete flatBinTrie::lastLevel;
-            
-            flatBinTrie::bTrie     = new bit_vector(bits_n - level_pos[last_level], 0);
-            flatBinTrie::lastLevel = new bit_vector(level_pos[last_level], 0);
-            flatBinTrie::level_pos = new uint64_t[height];
+            flatBinTrie_il::height_with_runs = last_level + 1;
+            delete flatBinTrie_il::bTrie;
+            delete flatBinTrie_il::lastLevel;
+            bit_vector* _bTrie     = new bit_vector(bits_n - level_pos[last_level], 0);
+            flatBinTrie_il::lastLevel  = new bit_vector(level_pos[last_level], 0);
+            flatBinTrie_il::level_pos = new uint64_t[height];
+            // cout << "Ok operador new " << endl;
             uint64_t global_level_pos = 0;
             for (uint16_t level = 0; level < height_with_runs; ++level) {
                 for (uint64_t i = 0; i < ones_to_write[level].size(); ++i) {
+
                     if (level == last_level){
                         uint64_t pos = ones_to_write[level][i];
-                        (*flatBinTrie::lastLevel)[pos] = 1;
+                        (*flatBinTrie_il::lastLevel)[pos] = 1;
                     }
                     else {
                         uint64_t pos = global_level_pos + ones_to_write[level][i];
-                        (*flatBinTrie::bTrie)[pos] = 1;
+                        (*_bTrie)[pos] = 1;
                         
                     }
                 }
 
                 if (level == last_level) {
-                    flatBinTrie::level_pos[level] = level_pos[level];
+                    flatBinTrie_il::level_pos[level] = level_pos[level];
                 }
                 else {
                     global_level_pos += level_pos[level];
-                    flatBinTrie::level_pos[level] = global_level_pos;
+                    flatBinTrie_il::level_pos[level] = global_level_pos;
                 }
             }
+            flatBinTrie_il::bTrie = new bit_vector_il<block_size>(*_bTrie);
+            delete _bTrie;
+            flatBinTrie_il::b_rank = rank_support_il<1, block_size>(flatBinTrie_il::bTrie);
             delete[] level_pos;
-            flatBinTrie::b_rank = rankType(flatBinTrie::bTrie);
         };
 
 
         inline void encodeRuns() {
-            flatBinTrie::runs_encoded = true;
-            vector<uint64_t> ones_to_write[flatBinTrie::height];
-            flatBinTrie::level_pos = new uint64_t[height];
-            for(uint64_t i = 0; i < flatBinTrie::height; ++i) level_pos[i] = 0;
+            vector<uint64_t> ones_to_write[flatBinTrie_il::height];
+            uint64_t* level_pos = new uint64_t[height];
+            for (uint64_t i = 0; i < height; ++i) level_pos[i] = 0;
             bool itsOneOne = false;
-
-            flatBinTrie::writeCompressTrie(ones_to_write, level_pos, 0, 0, itsOneOne);
+            flatBinTrie_il::writeCompressTrie(ones_to_write, level_pos, 0, 0, itsOneOne);
             writeOnes(ones_to_write, level_pos);
         };
 
         
         inline void recursiveDecode(vector<uint64_t> &decoded, uint64_t partial_int, uint64_t node_id, uint16_t curr_level) {
             
-            if (curr_level == flatBinTrie::height) {
+            if (curr_level == flatBinTrie_il::height) {
                 decoded.push_back(partial_int);
                 return;
             }
@@ -626,7 +512,7 @@ class flatBinTrie{
 
 
         inline void runsRecursiveDecode(vector<uint64_t> &decoded, uint64_t partial_int, uint64_t node_id, uint16_t curr_level) {
-            if (curr_level == flatBinTrie::height) {
+            if (curr_level == flatBinTrie_il::height) {
                 decoded.push_back(partial_int);
                 return;
             }
@@ -660,8 +546,8 @@ class flatBinTrie{
 
 
         inline void decode( vector<uint64_t> &decoded) {
-            if (flatBinTrie::runs_encoded) {
-                if (flatBinTrie::empty_trie) {
+            if (flatBinTrie_il::runs_encoded) {
+                if (flatBinTrie_il::empty_trie) {
                     return;
                 }
                 else {
@@ -675,19 +561,6 @@ class flatBinTrie{
                 uint64_t partial_int = 0x00;
                 recursiveDecode(decoded, partial_int, 0, 0);
             }
-        }
-
-        // If runs are encoded, this measure it's trie-run
-        inline uint32_t trieMeasure() {
-            uint64_t nEdgesLastLevel = 0;
-            for (uint64_t i = 0; i < flatBinTrie::bTrie -> size(); ++i){
-                if((*bTrie)[i] == 1) nEdgesLastLevel++;
-            }
-            for (uint64_t i = 0; i < flatBinTrie::lastLevel -> size(); ++i){
-                if ((*lastLevel)[i] == 1) nEdgesLastLevel++;
-            }
-            return 
-            nEdgesLastLevel;
         }
     
 };

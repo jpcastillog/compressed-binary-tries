@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sdsl/bit_vectors.hpp>
 #include "../src/flatBinTrie.hpp"
+#include "../src/flatBinTrie_il.hpp"
 #include "../src/binTrie_il.hpp"
 #include "../src/binTrie.hpp"
 
@@ -57,7 +58,7 @@ void buildCollection(std::string input_path, std::string out_path,
         }
         input_stream.seekg(4*n, ios::cur);
     }
-    // Set file pointer in first set
+    // Set file pointer on the first set
     input_stream.clear();
     input_stream.seekg(2*sizeof(u), ios::beg);
     // Write universe in out file
@@ -109,15 +110,29 @@ void buildCollection(std::string input_path, std::string out_path,
             }
 
             else if (rank_type == 1) {
-                binTrie_il<block_size> trie_il(*il, u);
-                if (runs) {
-                    trie_il.encodeRuns();
+                if (levelwise) {
+                    binTrie_il<block_size> trie_il(*il, u);
+                    if (runs) {
+                        trie_il.encodeRuns();
+                    }
+                    if (out_path != "") {
+                        trie_il.serialize(out);
+                    }
+                    trie_bytes_size = trie_il.size_in_bytes();
+                    // trie_il.free();
                 }
-                if (out_path != "") {
-                    trie_il.serialize(out);
+                else {
+                    flatBinTrie_il<block_size> trie_il(*il, u);
+                    if (runs) {
+                        trie_il.encodeRuns();
+                    }
+                    if (out_path != "") {
+                        trie_il.serialize(out);
+                    }
+                    trie_bytes_size = trie_il.size_in_bytes();
+                    // trie_il.free();
                 }
-                trie_bytes_size = trie_il.size_in_bytes();
-                // trie_il.free();
+
             }
 
             else {
