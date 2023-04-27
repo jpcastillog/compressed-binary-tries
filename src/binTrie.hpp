@@ -234,7 +234,7 @@ class binTrie {
                 }
             }
 
-            for (uint16_t i = 0; i < height; ++i) {
+            for (uint16_t i = 0; i < height-1; ++i) {
                 // binTrie::bv_rank[i] = sdsl::rank_support_v<1>(&bTrie[i]);
                 binTrie::bv_rank.push_back(rankType(&bTrie[i]));                
             }
@@ -269,6 +269,7 @@ class binTrie {
         }
 
         inline uint64_t getNode(uint64_t node_id, uint16_t level){
+            // cout << "level: " << level << ", node_id: "<< node_id << ", size of level: " << bTrie[level].size() << endl;
             return ((bTrie[level][2*node_id]) << 1) | bTrie[level][(2*node_id) + 1];
         };
 
@@ -279,14 +280,16 @@ class binTrie {
 
         
         inline uint64_t getLeftChild(uint64_t node_id, uint16_t level) {
-            uint64_t node = binTrie::bv_rank[level].rank(2*node_id + 1);
-            return node - 1;
+            // cout << "Get Left Child -> level: " << level << ", node_id: "<< node_id << ", rank: " << bv_rank[level](2*node_id) << endl;
+            return binTrie::bv_rank[level](2*node_id);
+            // return node - 1;
         };
 
 
         inline uint64_t getRightChild(uint64_t node_id, uint16_t level) {
-            uint64_t node = binTrie::bv_rank[level].rank((2*node_id + 1) + 1);
-            return node - 1;
+            // cout << "Get Right Child -> level: " << level << ", node_id: "<< node_id << ", rank: " << bv_rank[level](2*node_id+1) << endl;
+            return binTrie::bv_rank[level](2*node_id + 1);
+            // return node - 1;
         };
         
         
@@ -309,7 +312,7 @@ class binTrie {
         uint64_t serialize(std::ostream &out){
             uint16_t height = (uint16_t)(binTrie::bTrie.size());
             
-            out.write(reinterpret_cast<char*>(height) , sizeof(height));
+            out.write(reinterpret_cast<char*>(&height) , sizeof(height));
             out.write(reinterpret_cast<char*>(&height_with_runs), sizeof(height_with_runs));
             out.write(reinterpret_cast<char*>(&empty_trie)      , sizeof(empty_trie));
             out.write(reinterpret_cast<char*>(&runs_encoded)    , sizeof(runs_encoded));
@@ -317,10 +320,11 @@ class binTrie {
             uint64_t bvs_size=0, rank_size=0;
             
             for (uint16_t lvl=0; lvl < height; ++lvl) {
-                bvs_size += binTrie::bTrie[lvl].serialize(out);
-                if (lvl != height-1)
-                    rank_size += binTrie::bv_rank[lvl].serialize(out);
+                bvs_size += binTrie::bTrie[lvl].serialize(out);                    
             }
+            for (uint16_t lvl=0; lvl < height-1; ++lvl) {
+                rank_size += binTrie::bv_rank[lvl].serialize(out);
+            } 
             return bvs_size + rank_size + 
                    sizeof(height) + sizeof(height_with_runs) +
                    sizeof(empty_trie) + sizeof(runs_encoded);
@@ -339,8 +343,9 @@ class binTrie {
             
             for (uint16_t lvl=0; lvl < height; ++lvl) {
                 binTrie::bTrie[lvl].load(in);
-                if (lvl != height-1)
-                    binTrie::bv_rank[lvl].load(in);   
+            }
+            for (uint16_t lvl=0; lvl < height-1; ++lvl) {
+                binTrie::bv_rank[lvl].load(in, &(binTrie::bTrie[lvl]));   
             }
         };
 
@@ -417,7 +422,7 @@ class binTrie {
         // Method write ones in binary trie and delete previous 
         void writeOnes(vector<uint64_t> ones_to_write[], uint64_t* level_pos){
             vector <sdsl::bit_vector> new_bTrie(getHeight());
-            vector <rankType> new_b_rank(getHeight());
+            vector <rankType> new_b_rank(getHeight()-1);
             uint16_t last_level = 0;
             for (uint16_t level = 0; level < binTrie::bTrie.size(); ++level) {
                 if (level_pos[level] > 0) {
@@ -428,7 +433,7 @@ class binTrie {
 
             binTrie::height_with_runs = last_level + 1;
             
-            for (uint16_t level = 0; level < binTrie::height_with_runs; ++level) {
+            for (uint16_t level = 0; level < getHeight(); ++level) {
                 for (uint64_t i = 0; i < ones_to_write[level].size(); ++i) {
                     uint64_t pos = ones_to_write[level][i];
                     // binTrie::bTrie[level][pos] = 1;
@@ -436,10 +441,12 @@ class binTrie {
                 }
             }
             binTrie::bTrie = new_bTrie;
-            for (uint16_t i = 0; i < last_level-1; ++i)
+            for (uint16_t i = 0; i < getHeight()-1; ++i) {
+                new_b_rank[i] = rankType(&(binTrie::bTrie[i]));
+            }
                 // rankType lvl_rbv(&(binTrie::bTrie[i]));
-                if (i < getHeight()-1)
-                    new_b_rank[i] = rankType(&(binTrie::bTrie[i]));
+                // if (i < getHeight()-1)
+                
             binTrie::bv_rank = new_b_rank;
         };
 

@@ -63,6 +63,11 @@ void buildCollection(std::string input_path, std::string out_path,
     input_stream.seekg(2*sizeof(u), ios::beg);
     // Write universe in out file
     if (out_path != "") {
+        out.write(reinterpret_cast<char *> (&rank_type), sizeof(rank_type));
+        if (rank_type == 1) 
+            out.write(reinterpret_cast<char *> (block_size), sizeof(block_size));
+        out.write(reinterpret_cast<char *> (&runs), sizeof(runs));
+        out.write(reinterpret_cast<char *> (&levelwise), sizeof(levelwise));
         out.write(reinterpret_cast<char *> (&nSets), sizeof(nSets));
         out.write(reinterpret_cast<char *> (&_1), sizeof(_1));
         out.write(reinterpret_cast<char *> (&u), sizeof(u));
@@ -144,6 +149,8 @@ void buildCollection(std::string input_path, std::string out_path,
                         trie_v5.serialize(out);
                     }
                     trie_bytes_size = trie_v5.size_in_bytes();
+                    vector<uint64_t> decoded;
+                    trie_v5.decode(decoded);
                     // trie_v5.free();
                 }
                 else {

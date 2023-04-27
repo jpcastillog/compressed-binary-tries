@@ -2,7 +2,7 @@ CFLAGS = -std=c++11 -O3 -march=native
 CC = g++
 OBJDIR = obj
 BUILDIR = build
-SDSLFLAGS = -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64
+SDSLFLAGS = -DNDEBUG -I ~/include -L ~/lib -lsdsl -ldivsufsort -ldivsufsort64 --debug -DTEST
 vpath %.cpp src
 vpath %.hpp src
 

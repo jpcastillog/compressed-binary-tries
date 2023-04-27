@@ -15,26 +15,27 @@ using namespace std;
 template <uint32_t block_size = 512>
 class binTrie_il{
     
-    private:
+    public:
         vector <sdsl::bit_vector_il<block_size>> bTrie;
         vector<sdsl::rank_support_il<1, block_size>> bv_rank;
         uint16_t height_with_runs;
         bool runs_encoded;
         bool empty_trie;
     
-    public:
+    // public:
         binTrie_il() = default;
-
+        
 
         binTrie_il(vector<uint64_t> set, uint64_t u) {
             uint64_t n = set.size();
             uint16_t height = floor(log2(u - 1)) +  1;
             vector<sdsl::bit_vector> _bTrie;
 
-            uint64_t max_nodes_level;
+            // uint64_t max_nodes_level;
             for (uint16_t level = 0; level < height; ++level) {
-                max_nodes_level = 2 * pow(2, level);
-                _bTrie.push_back(sdsl::bit_vector(max_nodes_level, 0));
+                uint64_t max_nodes_level = 2 * pow(2, level);
+                sdsl::bit_vector level_bv(max_nodes_level, 0);
+                _bTrie.push_back(level_bv);
             }
 
             queue<tuple<uint64_t, uint64_t, uint64_t>> q;
@@ -124,10 +125,12 @@ class binTrie_il{
                 }
             }
 
-            for (uint16_t i = 0; i < height; ++i) {
+            for (uint16_t i = 0; i < height; ++i)
                 binTrie_il::bTrie.push_back(sdsl::bit_vector_il<block_size>(_bTrie[i]));
-                if (i < height -1)
-                    binTrie_il::bv_rank.push_back(sdsl::rank_support_il<1, block_size>(&bTrie[i]));
+
+            for (uint16_t i = 0; i < height-1; ++i) {
+                sdsl::rank_support_il<1, block_size>r(&(bTrie[i]));
+                binTrie_il::bv_rank.push_back(r);
             }
         };
 
@@ -253,14 +256,13 @@ class binTrie_il{
 
         
         inline uint64_t getLeftChild(uint64_t node_id, uint16_t level) {
-            uint64_t node = binTrie_il::bv_rank[level].rank(2*node_id + 1);
-            return node - 1;
+            return (binTrie_il::bv_rank[level])(2*node_id + 1) - 1;
         };
 
 
         inline uint64_t getRightChild(uint64_t node_id, uint16_t level) {
-            uint64_t node = binTrie_il::bv_rank[level].rank((2*node_id + 1) + 1);
-            return node - 1;
+            // if (level == 0) return 1;
+            return binTrie_il::bv_rank[level]((2*node_id + 1) + 1) - 1;
         };
         
         
@@ -320,11 +322,11 @@ class binTrie_il{
 
 
         void writeCompressTrie(vector<uint64_t> ones_to_write[], 
-                                uint64_t* level_pos, 
+                                uint64_t level_pos[], 
                                 uint16_t curr_level, uint64_t node_id, bool &its11){
             uint64_t node = getNode(node_id, curr_level);
             // End condition
-            if (curr_level == (binTrie_il::bTrie.size()-1)) {
+            if (curr_level == getHeight()-1) {
                 if (node == 0b11) {
                     its11 = true;
                 }
@@ -391,7 +393,7 @@ class binTrie_il{
         // Method write ones in binary trie and delete previous 
         void writeOnes(vector<uint64_t> ones_to_write[], uint64_t* level_pos){
             vector <sdsl::bit_vector> new_bTrie(getHeight());
-            vector <sdsl::rank_support_il<1, block_size> > new_b_rank(getHeight());
+            vector <sdsl::rank_support_il<1, block_size> > new_b_rank(getHeight()-1);
             
             uint16_t last_level = 0;
             for (uint16_t level = 0; level < getHeight(); ++level) {
@@ -411,16 +413,15 @@ class binTrie_il{
                 }
             }
             // binTrie_il::bTrie = new_bTrie;
-            cout << "write ones" << endl;
-            binTrie_il::bv_rank.clear();
-            binTrie_il::bTrie.clear();
-            for (uint16_t i = 0; i < getHeight(); ++i) {
-                binTrie_il::bTrie.push_back(sdsl::bit_vector_il<block_size>(new_bTrie[i]));
-                if (i < getHeight()-1)
-                    binTrie_il::bv_rank.push_back(sdsl::rank_support_il<1, block_size> (&(binTrie_il::bTrie[i])));
+            // binTrie_il::bv_rank.clear();
+            // binTrie_il::bTrie.clear();
+            for (uint16_t i = 0; i < getHeight(); ++i)
+                binTrie_il::bTrie[i] = sdsl::bit_vector_il<block_size>(new_bTrie[i]);
+    
+            for (uint16_t i = 0; i < getHeight()-1; ++i) {
+                sdsl::rank_support_il<1, block_size> r(&(binTrie_il::bTrie[i]));
+                binTrie_il::bv_rank[i] = r;
             }
-            cout << "OK write ones" << endl;
-            // binTrie_il::bv_rank = new_b_rank;
         };
 
 
@@ -428,12 +429,13 @@ class binTrie_il{
             uint16_t height = getHeight();
             binTrie_il::runs_encoded = true;
 
-            vector<vector<uint64_t>>ones_to_write(height);
+            // vector<vector<uint64_t>>ones_to_write(height);
+            vector<uint64_t> ones_to_write[height];
             vector<uint64_t> level_pos(height, 0);
             bool itsOneOne = false;
-            writeCompressTrie(ones_to_write.data(), level_pos.data(), 0, 0, itsOneOne);
-            cout << "encode runs" << endl;
-            writeOnes(ones_to_write.data(), level_pos.data());
+
+            writeCompressTrie(ones_to_write, level_pos.data(), 0, 0, itsOneOne);
+            writeOnes(ones_to_write, level_pos.data());
         };
 
 

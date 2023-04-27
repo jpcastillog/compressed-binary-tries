@@ -398,7 +398,7 @@ class flatBinTrie{
 
 
         inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
-                return flatBinTrie::b_rank((2*node_id) + 1);;
+                return flatBinTrie::b_rank((2*node_id) + 1);
         };
 
 

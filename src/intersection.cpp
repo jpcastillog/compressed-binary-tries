@@ -7,6 +7,7 @@
 #include <queue>
 #include <tuple>
 #include "binTrie.hpp"
+#include "flatBinTrie_il.hpp"
 #include "flatBinTrie.hpp"
 #include "binTrie_il.hpp"
 #include "binTrie.hpp"
@@ -21,6 +22,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t currLevel, uint64_t roots[], bool activeTries[], 
         uint64_t prefix, vector<uint64_t> &r){
     if (currLevel == maxLevel) {
+        // cout << r.size() << endl;
         r.push_back(prefix);
         return;
     }
@@ -34,7 +36,8 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
             //                     Ts[i].getNode2(roots[i]):
             //                     Ts[i].getNode1(roots[i]);
             uint64_t node_i = Ts[i].getNode(roots[i], currLevel);
-            if (node_i) {
+            // cout << "Trie:" << i << ", level: " << currLevel << ", node: " << node_i << ", max level: " << maxLevel<< endl;
+            if (node_i != 0b00) {
                 tempActiveTries[i] = true;
                 andResult &= node_i;
             } else {
@@ -178,7 +181,7 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         uint64_t* rts = new uint64_t[16];
         bool* atrs;
         // if (runs) 
-        atrs = new bool[16];
+            atrs = new bool[16];
         for (uint64_t i = 0; i < n_tries; ++i){
             rts[i] = roots[i];
             if (runs)
@@ -186,7 +189,7 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         }
         threads_roots.push_back(rts);
         // if (runs) 
-        threads_activeTries.push_back(atrs);
+            threads_activeTries.push_back(atrs);
         return;
     }
     
@@ -200,6 +203,7 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
                 //                     Ts[i].getNode2(roots[i]):
                 //                     Ts[i].getNode1(roots[i]);
                 uint64_t node_i = Ts[i].getNode(roots[i], curr_level);
+                // cout << "Trie:" << i << ", level: " << curr_level << ", node: " << node_i << endl;
                 if (node_i || runs) {
                     tempActiveTries[i] = true;
                     result &= node_i;
@@ -226,10 +230,10 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         uint64_t below = partial_int;
         uint64_t range = ((uint64_t)1 << (max_level - curr_level))- 1;
         uint64_t above = partial_int | range;
-        std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
-        // for (uint64_t i = below; i <= above; ++i) {
-        //     r.push_back(i);
-        // }
+        // std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
+        for (uint64_t i = below; i <= above; ++i) {
+            r.push_back(i);
+        }
         return;
     }
 
@@ -271,7 +275,9 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
         for(uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i]) {
+                // cout << "before getLeftChild" << endl;
                 uint64_t left_node = Ts[i].getLeftChild(roots[i], curr_level);
+                // cout << "after getLeftChild" << endl;
                 left_nodes[i]  = left_node;
                 right_nodes[i] = left_node + 1; 
             }
@@ -312,7 +318,8 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
     unsigned nb_threads_hint = std::thread::hardware_concurrency();
     uint64_t level_of_cut     = floor(log2(nb_threads_hint));
     unsigned int nb_threads   = pow(2, level_of_cut);
-    uint64_t init_of_level     = pow(2, level_of_cut) - 1;
+
+    // cout << "Threads: " << nb_threads << endl;
     
     vector<bool*>       activeTries2;
     vector<uint64_t*>   roots2;
@@ -323,11 +330,14 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
     uint64_t partial_int = 0;
     partialAND(Bs, n_tries, max_level, curr_level, level_of_cut, roots, activeTries, partial_int, result,
                 partial_solutions, roots2, activeTries2, runs);
+    // cout << "PARTIAL AND OK" << endl;
     uint16_t real_threads = roots2.size();
+    // cout << "REAL THREADS: " << real_threads << endl;
     uint16_t init_threads = real_threads;
     vector<uint64_t> init_level(real_threads, level_of_cut);
     uint64_t i = 0;
     while (nb_threads - real_threads > 1 && i < init_threads) {
+        // cout << "entra al while" << endl;
         partialAND( Bs, n_tries, max_level, level_of_cut, level_of_cut + 1,
                     roots2[i], activeTries2[i], partial_solutions[i], result,
                     partial_solutions, roots2, activeTries2, runs
@@ -338,13 +348,14 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
         }
          ++i;
         real_threads = roots2.size() - i ;
-    }
+    } 
     vector<vector<uint64_t>> threads_results;//(real_threads);
     for (uint64_t t = 0; t < real_threads; ++t){
         vector<uint64_t> r;
         threads_results.push_back(r);
         threads_results[t].reserve(1000000);
     }
+    // cout << "OK all before parallellization" << endl;
     if (runs){
         parallel_for(real_threads, real_threads, [&](int start, int end) {
             for (uint16_t threadId = start; threadId < end; ++threadId) {
@@ -364,7 +375,7 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
         });
 
     }
-        
+    // cout << "OK Intersection" << endl;   
     uint64_t output_size = result.size(); 
     vector<uint64_t> shifts(real_threads);
     uint64_t shift = result.size();
@@ -394,29 +405,40 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
         }
 
     }
-    
     // Free memory
     for (uint64_t i = 0; i < real_threads; ++i) {
-        // if (runs) 
-        delete[] activeTries2[i];
+        if (runs) 
+            delete[] activeTries2[i];
         delete[] roots2[i];
     }
     
     return;
 }
 template void 
+Intersect<binTrie<rank_support_v5<1>>>(vector<binTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result, bool runs);
+template void 
 Intersect<flatBinTrie<rank_support_v5<1>>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result, bool runs);
+template void 
+Intersect<binTrie<rank_support_v<1>>>(vector<binTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result, bool runs);
 template void 
 Intersect<flatBinTrie<rank_support_v<1>>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result, bool runs);
 template void 
 Intersect<binTrie_il<512>>(vector<binTrie_il<512>> &Bs, vector<uint64_t> &result, bool runs);
+template void 
+Intersect<flatBinTrie_il<512>>(vector<flatBinTrie_il<512>> &Bs, vector<uint64_t> &result, bool runs);
 template void
 Intersect<binTrie_il<256>>(vector<binTrie_il<256>> &Bs, vector<uint64_t> &result, bool runs);
 template void
+Intersect<flatBinTrie_il<256>>(vector<flatBinTrie_il<256>> &Bs, vector<uint64_t> &result, bool runs);
+template void
 Intersect<binTrie_il<128>>(vector<binTrie_il<128>> &Bs, vector<uint64_t> &result, bool runs);
+template void
+Intersect<flatBinTrie_il<128>>(vector<flatBinTrie_il<128>> &Bs, vector<uint64_t> &result, bool runs);
 template void 
 Intersect<binTrie_il<64>>(vector<binTrie_il<64>> &Bs, vector<uint64_t> &result, bool runs);
 template void 
-Intersect<binTrie<rank_support_v5<1>>>(vector<binTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result, bool runs);
-template void 
-Intersect<binTrie<rank_support_v<1>>>(vector<binTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result, bool runs);
+Intersect<flatBinTrie_il<64>>(vector<flatBinTrie_il<64>> &Bs, vector<uint64_t> &result, bool runs);
+// template void 
+// Intersect<binTrie<rank_support_v5<1>>>(vector<binTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result, bool runs);
+// template void 
+// Intersect<binTrie<rank_support_v<1>>>(vector<binTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result, bool runs);
