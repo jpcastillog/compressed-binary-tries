@@ -120,16 +120,17 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
     uint64_t time_of_ranks = 0;
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < queries -> size(); ++i) {
-        vector<trieType> Bs;
-        Bs.reserve(16);
+        vector<trieType> Bs((*queries)[i].size());
+        // Bs.reserve(16);
         for(int j = 0; j < (*queries)[i].size(); ++j) {
-            Bs.push_back((*sequences)[(*queries)[i][j]]);
+            // Bs.push_back((*sequences)[(*queries)[i][j]]);
+            Bs[j] = (*sequences)[(*queries)[i][j]];
         }
         vector<uint64_t> intersection;
         if (Bs.size() <= 16){
             uint64_t time_10 = 0;
             for(int rep = 0; rep < trep; ++rep) {
-                cout << "before intersection" << endl;
+                // cout << "before intersection" << endl;
                 auto start = std::chrono::high_resolution_clock::now();
                 Intersect(Bs, intersection, runs_encoded);
                 auto end = std::chrono::high_resolution_clock::now();
@@ -144,9 +145,9 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
             if (out.is_open()) {
                 out << Bs.size() << "," << (float)time_10/trep<< "," << intersection.size() << std::endl;
             }
-            std::cout << nq <<"|Time execution: " << (double)(time_10*1e-3)/(trep) << "[ms] " << intersection.size() << std::endl;
+            // std::cout << nq <<"|Time execution: " << (double)(time_10*1e-3)/(trep) << "[ms] " << intersection.size() << std::endl;
             ++nq;
-            if (nq % 1 == 0) {
+            if (nq % 1000 == 0) {
                 std::cout << nq << " queries processed" << std::endl;
             }
         }

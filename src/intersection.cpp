@@ -56,10 +56,10 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t below = prefix;
         uint64_t range = ((uint64_t)1 << (maxLevel - currLevel))- 1;
         uint64_t above = prefix | range;
-        // std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
-        for (uint64_t i = below; i <= above; ++i) {
-            r.push_back(i);
-        }
+        std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
+        // for (uint64_t i = below; i <= above; ++i) {
+        //     r.push_back(i);
+        // }
         return;
     }
 
@@ -230,10 +230,10 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         uint64_t below = partial_int;
         uint64_t range = ((uint64_t)1 << (max_level - curr_level))- 1;
         uint64_t above = partial_int | range;
-        // std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
-        for (uint64_t i = below; i <= above; ++i) {
-            r.push_back(i);
-        }
+        std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
+        // for (uint64_t i = below; i <= above; ++i) {
+        //     r.push_back(i);
+        // }
         return;
     }
 
