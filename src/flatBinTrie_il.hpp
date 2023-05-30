@@ -1,19 +1,19 @@
 #ifndef FLATBINTRIE_IL
 #define FLATBINTRIE_IL
 
-
 #include <iostream>
 #include <vector>
 #include <queue>
 #include <sdsl/bit_vectors.hpp>
 #include <sdsl/bit_vector_il.hpp>
+#include "binaryTrie.hpp"
 
 using namespace std;
 using namespace sdsl;
 
 
 template <uint32_t block_size = 512>
-class flatBinTrie_il{
+class flatBinTrie_il: public binaryTrie{
     private:
         uint16_t height; // original height of trie
         uint16_t height_with_runs; // height with runs encoded
@@ -238,7 +238,7 @@ class flatBinTrie_il{
         }
 
         
-        inline uint64_t getNode(uint64_t node_id, uint16_t level) {
+        inline uint64_t getNode(uint64_t &node_id, uint16_t level) {
            if (level < flatBinTrie_il::height-1) {
                 return (((*bTrie)[2 * node_id]) << 1) | (*bTrie)[(2 * node_id)+1];
             }

@@ -8,38 +8,37 @@
 #include <math.h>
 #include <vector>
 #include <tuple>
+#include "binaryTrie.hpp"
 
 using namespace sdsl;
 using namespace std;
 
 template <uint32_t block_size = 512>
-class binTrie_il{
-    
-    public:
+class binTrie_il: public binaryTrie{
+    protected:
         vector <sdsl::bit_vector_il<block_size>> bTrie;
         vector<sdsl::rank_support_il<1, block_size>> bv_rank;
-        uint16_t height_with_runs;
-        bool runs_encoded;
-        bool empty_trie;
     
-    // public:
+    public:
         binTrie_il() = default;
-        
-
+        ~binTrie_il() = default;
+        /*
+        The constructor receives:
+        * set: a vector of unsigned integers of 64 bits, the vector
+            needs to be sorted
+        * u: the size of universe to build the trie
+        */
         binTrie_il(vector<uint64_t> set, uint64_t u) {
             uint64_t n = set.size();
             uint16_t height = floor(log2(u - 1)) +  1;
             vector<sdsl::bit_vector> _bTrie;
 
-            // uint64_t max_nodes_level;
             for (uint16_t level = 0; level < height; ++level) {
                 uint64_t max_nodes_level = 2 * pow(2, level);
                 sdsl::bit_vector level_bv(max_nodes_level, 0);
                 _bTrie.push_back(level_bv);
-            }
-
+            } 
             queue<tuple<uint64_t, uint64_t, uint64_t>> q;
-            
             // add all set to split
             tuple<uint64_t, uint64_t, uint64_t> split(0, n-1, n);
             q.push(split);
@@ -50,7 +49,7 @@ class binTrie_il{
             uint64_t nodes_next_level = 0;
             uint64_t index            = 0;
 
-            while (!q.empty()) {
+            while (!q.empty() && level != height) {
                 count_nodes++; // count node visited
                 // Get node to write
                 tuple<uint64_t, uint64_t, uint64_t> s = q.front();
@@ -79,22 +78,17 @@ class binTrie_il{
                         left_elements++;
                     }
                 }
-                
                 // left child
                 if (left_elements > 0) {
-                    // write 1
-                    _bTrie[level][index] = 1;
-                    // Add to queue split sets and write nodes
+                    _bTrie[level][index] = 1; // write 1
+                    // Add to queue, split the set and write nodes
                     tuple<uint64_t,uint64_t,uint64_t> left_split(ll, lr, left_elements);
                     q.push(left_split);
                     nodes_next_level++;
                     index++;
                 }
-                else {
-                    // write 0
-                    // _bTrie[level][index] = 0;
-                    index++;
-                }
+                else index++; // write 0
+
                 // right child
                 if (right_elements > 0) {
                     // write 1
@@ -105,11 +99,7 @@ class binTrie_il{
                     nodes_next_level++;
                     index++;
                 }
-                else {
-                    // write 0
-                    // _bTrie[level][index] = 0;
-                    index++;
-                }
+                else index++; // write 0
 
                 if (count_nodes == nodes_curr_level) {
                     _bTrie[level].resize(2*count_nodes);
@@ -118,16 +108,17 @@ class binTrie_il{
                     count_nodes = 0;
                     index = 0;
                     level++;
-                    
                 }
                 if (level == height) {
                     break;
                 }
             }
 
-            for (uint16_t i = 0; i < height; ++i)
-                binTrie_il::bTrie.push_back(sdsl::bit_vector_il<block_size>(_bTrie[i]));
-
+            // for (uint16_t i = 0; i < height; ++i)
+            for (auto bv: _bTrie)
+                binTrie_il::bTrie.push_back(sdsl::bit_vector_il<block_size>(bv));
+                // binTrie_il::bTrie.push_back(sdsl::bit_vector_il<block_size>(_bTrie[i]));
+            // Create the rank data structure, but except for last level.
             for (uint16_t i = 0; i < height-1; ++i) {
                 sdsl::rank_support_il<1, block_size>r(&(bTrie[i]));
                 binTrie_il::bv_rank.push_back(r);
@@ -245,7 +236,7 @@ class binTrie_il{
         };
 
 
-        inline uint64_t getNode(uint64_t node_id, uint16_t level){
+        inline uint64_t getNode(uint64_t &node_id, uint16_t level){
             return ((bTrie[level][2*node_id]) << 1) | bTrie[level][(2*node_id) + 1];
         };
 
@@ -255,12 +246,12 @@ class binTrie_il{
         };
 
         
-        inline uint64_t getLeftChild(uint64_t node_id, uint16_t level) {
+        inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
             return (binTrie_il::bv_rank[level])(2*node_id + 1) - 1;
         };
 
 
-        inline uint64_t getRightChild(uint64_t node_id, uint16_t level) {
+        inline uint64_t getRightChild(uint64_t &node_id, uint16_t level) {
             // if (level == 0) return 1;
             return binTrie_il::bv_rank[level]((2*node_id + 1) + 1) - 1;
         };

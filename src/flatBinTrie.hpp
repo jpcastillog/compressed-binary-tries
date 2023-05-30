@@ -8,13 +8,13 @@
 #include <queue>
 #include <math.h>
 #include <thread>
-#include "parallel_for.hpp"
+#include "binaryTrie.hpp"
 
 using namespace sdsl;
 using namespace std;
 
 template <class rankType>
-class flatBinTrie{
+class flatBinTrie: public binaryTrie{
     private:
         uint16_t height; // original height of trie
         uint16_t height_with_runs; // height with runs encoded
@@ -359,34 +359,20 @@ class flatBinTrie{
         // Aqui deberia colocar el nivel aunque no lo ocupe
         // solo para homologar con binTrie...
         inline uint64_t getNode(uint64_t &node_id, uint16_t level) {
+            // cout << "Node: " << node_id << ", Level: " << level << "\n";
             if (level < flatBinTrie::height-1) {
                 return (((*bTrie)[2 * node_id]) << 1) | (*bTrie)[(2 * node_id)+1];
             }
-            else 
+            else {
+                // cout << height <<endl;
+                // cout << node_id << endl;
+                // cout << ((2*node_id) - (uint64_t)(flatBinTrie::bTrie -> size()))+1 << endl;
+                // cout << bTrie->size() << endl;
                 return ((*lastLevel)[2*node_id -flatBinTrie::bTrie -> size()] << 1) | (*lastLevel)[(2*node_id -flatBinTrie::bTrie -> size())+1];
-            // uint64_t node = 0;
-            // uint64_t pos;
-            // if ((2*node_id) >= (flatBinTrie::bTrie -> size())) {
-            //     pos = (2*node_id) - (flatBinTrie::bTrie -> size());
-            //     if ((*lastLevel)[pos])
-            //         node = (node | (1ULL << 1));
-
-            //     if ((*lastLevel)[pos + 1])
-            //         node = (node | (1ULL << 0));
-            // }
-            // else { 
-            //     pos = 2*node_id;
-            //     if ((*bTrie)[pos])
-            //         node = (node | (1ULL << 1));
-
-            //     if ((*bTrie)[pos + 1])
-            //         node = (node | (1ULL << 0));
-            // }
-
-            // return node;
+            }
         };
 
-        // GetNode in h-1 levels
+        // GetNode in h-1 levels 
         inline uint64_t getNode1(uint64_t &node_id) {
                 return (((*bTrie)[2 * node_id]) << 1) | (*bTrie)[(2 * node_id)+1];
         }
@@ -398,12 +384,18 @@ class flatBinTrie{
 
 
         inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
+            // if (level < getHeight()-1)
                 return flatBinTrie::b_rank((2*node_id) + 1);
+            // else 
+                // return flatBinTrie::b_rank((2*node_id));
         };
 
 
         inline uint64_t getRightChild(uint64_t &node_id, uint16_t level) {
-                return flatBinTrie::b_rank((2*node_id) + 2);
+                // if (level < getHeight()-1)
+                    return flatBinTrie::b_rank((2*node_id) + 2);
+                // else
+                //     return flatBinTrie::b_rank((2*node_id) + 1);
         };
 
         // return size of bytes of all structure

@@ -4,23 +4,27 @@
 #include<stdint.h>
 #include<vector>
 
-template<class rankType>
-class binaryTrie{
-private:
-    uint16_t height;
-    bool runsEncoded;
-    bool emptyTrie;
+class binaryTrie {
+protected:
+    uint16_t height_with_runs;
+    bool runs_encoded;
+    bool empty_trie;
 public:
-    binaryTrie()=default;
-    ~binaryTrie();
+    binaryTrie(){
+        height_with_runs = 0;
+        runs_encoded = false;
+        empty_trie = false;
+    };
+    virtual ~binaryTrie()=default;
     
-    virtual uint64_t getNode(uint64_t &nodeId, uint16_t level);
-    virtual uint64_t getLeftChild(uint64_t &nodeId, uint16_t level);
-    virtual uint64_t getRightChild(uint64_t &nodeId, uint64_t level);
-    virtual uint64_t size_in_bytes();
-    virtual void serialize(std::ostrean &out);
-    virtual void load(std::istream &in);
-    virtual void encodeRuns();
-    virtual void decode(std::vector<uint64_t> &decoded);
+    virtual uint16_t getHeight()= 0;
+    virtual uint64_t getNode(uint64_t &nodeId, uint16_t level)= 0;
+    virtual uint64_t getLeftChild(uint64_t &nodeId, uint16_t level)= 0;
+    virtual uint64_t getRightChild(uint64_t &nodeId, uint16_t level)= 0;
+    virtual uint64_t size_in_bytes()= 0;
+    virtual uint64_t serialize(std::ostream &out)= 0;
+    virtual void load(std::istream &in)= 0;
+    virtual void encodeRuns()= 0;
+    virtual void decode(std::vector<uint64_t> &decoded)= 0;
 };
 #endif

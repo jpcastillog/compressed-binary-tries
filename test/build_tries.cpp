@@ -5,10 +5,11 @@
 #include "../src/flatBinTrie_il.hpp"
 #include "../src/binTrie_il.hpp"
 #include "../src/binTrie.hpp"
+#include "../src/binaryTrie.hpp"
 
 using namespace std;
 using namespace sdsl;
-
+// Aqui no es necesario retornar un puntero a vector
 vector<uint64_t>* read_inv_list(std::ifstream &input_stream, uint32_t n) {
 
     vector <uint64_t>* il = new vector<uint64_t>();

@@ -2,35 +2,34 @@
 #define BINTRIE
 
 #include <iostream>
-#include <sdsl/int_vector.hpp>
+// #include <sdsl/int_vector.hpp>
 #include <sdsl/bit_vectors.hpp>
 #include <queue>
 #include <math.h>
 #include <vector>
 #include <tuple>
+#include "binaryTrie.hpp"
 
 using namespace sdsl;
 using namespace std;
 
-template <class rankType>
-class binTrie {
+template <typename rankType>
+class binTrie : public binaryTrie{
     
     private:
         vector <sdsl::bit_vector>* bTrie;
         // sdsl::rank_support_v<>* bv_rank;
         vector<rankType> bv_rank;
-        uint16_t height_with_runs;
-        bool runs_encoded;
-        bool empty_trie;
+        // uint16_t height_with_runs;
+        // bool runs_encoded;
+        // bool empty_trie;
     
     public:
-        binTrie() = default;
+        binTrie()=default;
 
-        // ~binTrie() {
-        //     for (int i = 0; i < bTrie.size(); ++i) {
-        //         delete bTrie[i];
-        //     }
-        // }
+        ~binTrie() {
+            delete bTrie;
+        }
 
         binTrie(vector<uint64_t> set, uint64_t u) {
             uint64_t n = set.size();
@@ -265,8 +264,7 @@ class binTrie {
             }
         }
 
-        inline uint64_t getNode(uint64_t node_id, uint16_t level){
-            // cout << "level: " << level << ", node_id: "<< node_id << ", size of level: " << bTrie[level].size() << endl;
+        inline uint64_t getNode(uint64_t &node_id, uint16_t level){
             return ( (((*bTrie)[level])[2*node_id]) << 1 ) | ((*bTrie)[level])[(2*node_id) + 1];
         };
 
@@ -276,14 +274,12 @@ class binTrie {
         };
 
         
-        inline uint64_t getLeftChild(uint64_t node_id, uint16_t level) {
-            // cout << "Get Left Child -> level: " << level << ", node_id: "<< node_id << ", rank: " << bv_rank[level](2*node_id) << endl;
+        inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
             return binTrie::bv_rank[level](2*node_id);
-            // return node - 1;
         };
 
 
-        inline uint64_t getRightChild(uint64_t node_id, uint16_t level) {
+        inline uint64_t getRightChild(uint64_t &node_id, uint16_t level) {
             // cout << "Get Right Child -> level: " << level << ", node_id: "<< node_id << ", rank: " << bv_rank[level](2*node_id+1) << endl;
             return binTrie::bv_rank[level](2*node_id + 1);
             // return node - 1;
@@ -346,7 +342,7 @@ class binTrie {
 
             }
             for (uint16_t lvl=0; lvl < height-1; ++lvl) {
-                binTrie::bv_rank[lvl].load(in, binTrie::bTrie[lvl]);   
+                binTrie::bv_rank[lvl].load(in, &(*binTrie::bTrie)[lvl]);   
             }
         };
 
@@ -529,8 +525,8 @@ class binTrie {
 
 
         inline void decode( vector<uint64_t> &decoded) {
-            if (binTrie::runs_encoded) {
-                if (binTrie::empty_trie) {
+            if (binaryTrie::runs_encoded) {
+                if (binaryTrie::empty_trie) {
                     return;
                 }
                 else {

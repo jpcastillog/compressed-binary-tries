@@ -1,28 +1,23 @@
 #include <iostream>
 #include <vector>
-#include <stack>
 #include <chrono>
 #include <thread>
 #include <mutex>
-#include <queue>
-#include <tuple>
 #include "binTrie.hpp"
 #include "flatBinTrie_il.hpp"
 #include "flatBinTrie.hpp"
 #include "binTrie_il.hpp"
-#include "binTrie.hpp"
-// #include "util_functions.hpp"
+#include "binaryTrie.hpp"
 #include <math.h>
+#include "parallel_for.hpp"
 
 using namespace std;
 
 
-template<class trieType>
-void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
+void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t currLevel, uint64_t roots[], bool activeTries[], 
         uint64_t prefix, vector<uint64_t> &r){
     if (currLevel == maxLevel) {
-        // cout << r.size() << endl;
         r.push_back(prefix);
         return;
     }
@@ -32,11 +27,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
     uint64_t orResult = 0b00;
     for (i = 0; i < nTries; ++i) {
         if (activeTries[i]) {
-            // uint64_t node_i = (currLevel == maxLevel -1) ?
-            //                     Ts[i].getNode2(roots[i]):
-            //                     Ts[i].getNode1(roots[i]);
-            uint64_t node_i = Ts[i].getNode(roots[i], currLevel);
-            // cout << "Trie:" << i << ", level: " << currLevel << ", node: " << node_i << ", max level: " << maxLevel<< endl;
+            uint64_t node_i = Ts[i] -> getNode(roots[i], currLevel);
             if (node_i != 0b00) {
                 tempActiveTries[i] = true;
                 andResult &= node_i;
@@ -70,7 +61,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t leftResult = prefix;
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel - 1) 
-                leftNodes[i] = Ts[i].getLeftChild(roots[i], currLevel);
+                leftNodes[i] = Ts[i] -> getLeftChild(roots[i], currLevel);
         }
         runsAND(Ts, nTries, maxLevel, nextLevel, leftNodes,
                         tempActiveTries, leftResult, r);
@@ -80,7 +71,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel -1)
-                rightNodes[i] = Ts[i].getRightChild(roots[i], currLevel);
+                rightNodes[i] = Ts[i] -> getRightChild(roots[i], currLevel);
         }
         runsAND(Ts, nTries, maxLevel, nextLevel, rightNodes,
                         tempActiveTries, rightResult, r);
@@ -93,7 +84,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));;
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel - 1) {
-                uint64_t leftNode = Ts[i].getLeftChild(roots[i], currLevel);
+                uint64_t leftNode = Ts[i] -> getLeftChild(roots[i], currLevel);
                 leftNodes[i] = leftNode;
                 rightNodes[i] = leftNode + 1;
             }
@@ -107,8 +98,7 @@ void runsAND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
 };
 
 
-template<class trieType>
-bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
+bool AND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t currLevel, uint64_t roots[], uint64_t prefix, vector<uint64_t> &r){
     if (currLevel == maxLevel) {
         r.push_back(prefix);
@@ -117,10 +107,7 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
     uint64_t i;
     uint64_t andResult = 0b11;
     for (i = 0; i < nTries; ++i) {
-        // uint64_t node_i = (currLevel == maxLevel -1) ?
-        //                     Ts[i].getNode2(roots[i]):
-        //                     Ts[i].getNode1(roots[i]);
-        uint64_t node_i = Ts[i].getNode(roots[i], currLevel);
+        uint64_t node_i = Ts[i] -> getNode(roots[i], currLevel);
         andResult &= node_i;
         
     }
@@ -135,7 +122,7 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t leftResult = prefix;
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel - 1) 
-                leftNodes[i] = Ts[i].getLeftChild(roots[i], currLevel);
+                leftNodes[i] = Ts[i] -> getLeftChild(roots[i], currLevel);
         }
         existLeft = AND(Ts, nTries, maxLevel, nextLevel, leftNodes, leftResult, r);
     }
@@ -144,7 +131,7 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel -1)
-                rightNodes[i] = Ts[i].getRightChild(roots[i], currLevel);
+                rightNodes[i] = Ts[i] -> getRightChild(roots[i], currLevel);
         }
         existRight = AND(Ts, nTries, maxLevel, nextLevel, rightNodes, rightResult, r);
 
@@ -156,7 +143,7 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));;
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel - 1) {
-                uint64_t leftNode = Ts[i].getLeftChild(roots[i], currLevel);
+                uint64_t leftNode = Ts[i] -> getLeftChild(roots[i], currLevel);
                 leftNodes[i] = leftNode;
                 rightNodes[i] = leftNode + 1;
             }
@@ -170,8 +157,7 @@ bool AND(vector<trieType> &Ts, uint64_t nTries, uint64_t &maxLevel,
 };
 
 
-template <class trieType>
-void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level, 
+void partialAND(vector<binaryTrie*> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level, 
                 uint64_t cut_level, uint64_t roots[], bool activeTries[], uint64_t partial_int,
                 vector <uint64_t> &r, vector<uint64_t> &partial_ints, vector<uint64_t*> &threads_roots,
                 vector<bool*> &threads_activeTries, bool runs) {
@@ -199,11 +185,7 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
     for (uint16_t i = 0;  i < n_tries; ++i) {
         if (runs){
             if (activeTries[i]) {
-                // uint64_t node_i = (curr_level == max_level - 1) ?
-                //                     Ts[i].getNode2(roots[i]):
-                //                     Ts[i].getNode1(roots[i]);
-                uint64_t node_i = Ts[i].getNode(roots[i], curr_level);
-                // cout << "Trie:" << i << ", level: " << curr_level << ", node: " << node_i << endl;
+                uint64_t node_i = Ts[i] -> getNode(roots[i], curr_level);
                 if (node_i || runs) {
                     tempActiveTries[i] = true;
                     result &= node_i;
@@ -216,10 +198,7 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
             }
         }
         else {
-            // uint64_t node_i = (curr_level == max_level - 1) ?
-            //                         Ts[i].getNode2(roots[i]):
-            //                         Ts[i].getNode1(roots[i]);
-            uint64_t node_i = Ts[i].getNode(roots[i], curr_level);
+            uint64_t node_i = Ts[i] -> getNode(roots[i], curr_level);
             result &= node_i;
         }
     }
@@ -243,9 +222,9 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         uint64_t leftResult = partial_int;
         for (uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i])
-                left_nodes[i] = Ts[i].getLeftChild(roots[i], curr_level);
+                left_nodes[i] = Ts[i] -> getLeftChild(roots[i], curr_level);
             else 
-                left_nodes[i] = Ts[i].getLeftChild(roots[i], curr_level);
+                left_nodes[i] = Ts[i] -> getLeftChild(roots[i], curr_level);
         }
         partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level, 
             left_nodes, tempActiveTries, leftResult, r, partial_ints,
@@ -258,9 +237,9 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
         for (uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i])
-                right_nodes[i] = Ts[i].getRightChild(roots[i], curr_level);
+                right_nodes[i] = Ts[i] -> getRightChild(roots[i], curr_level);
             else
-                right_nodes[i] = Ts[i].getRightChild(roots[i], curr_level);
+                right_nodes[i] = Ts[i] -> getRightChild(roots[i], curr_level);
         }
         partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level,
             right_nodes, tempActiveTries, rightResult, r, partial_ints,
@@ -275,14 +254,12 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
         rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
         for(uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i]) {
-                // cout << "before getLeftChild" << endl;
-                uint64_t left_node = Ts[i].getLeftChild(roots[i], curr_level);
-                // cout << "after getLeftChild" << endl;
+                uint64_t left_node = Ts[i] -> getLeftChild(roots[i], curr_level);
                 left_nodes[i]  = left_node;
                 right_nodes[i] = left_node + 1; 
             }
             else {
-                uint64_t left_node = Ts[i].getLeftChild(roots[i], curr_level);
+                uint64_t left_node = Ts[i] -> getLeftChild(roots[i], curr_level);
                 left_nodes[i]  = left_node;
                 right_nodes[i] = left_node + 1;
             }
@@ -299,11 +276,9 @@ void partialAND(vector<trieType> &Ts, uint16_t n_tries, uint64_t max_level, uint
 }
 
 
-template <class trieType>
-void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
-    
-    uint64_t max_level = Bs[0].getHeight();
-    uint64_t n_tries = Bs.size();
+vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs){
+    uint64_t max_level = Ts[0] -> getHeight();
+    uint64_t n_tries = Ts.size();
     // max 16 relations
     bool activeTries[16] = { true, true, true, true,
                              true, true, true, true,
@@ -311,35 +286,28 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
                              true, true, true, true };
     uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
-    
     uint64_t curr_level = 0;
-    
     // Hint of threads avaible in our CPU
     unsigned nb_threads_hint = std::thread::hardware_concurrency();
     uint64_t level_of_cut     = floor(log2(nb_threads_hint));
     unsigned int nb_threads   = pow(2, level_of_cut);
-
-    // cout << "Threads: " << nb_threads << endl;
     
     vector<bool*>       activeTries2;
     vector<uint64_t*>   roots2;
     vector<uint64_t>    partial_solutions;
-    
-    result.reserve(1000000);
+    vector<uint64_t> intersection;
+    intersection.reserve(1000000);
     
     uint64_t partial_int = 0;
-    partialAND(Bs, n_tries, max_level, curr_level, level_of_cut, roots, activeTries, partial_int, result,
+    partialAND(Ts, n_tries, max_level, curr_level, level_of_cut, roots, activeTries, partial_int, intersection,
                 partial_solutions, roots2, activeTries2, runs);
-    // cout << "PARTIAL AND OK" << endl;
     uint16_t real_threads = roots2.size();
-    // cout << "REAL THREADS: " << real_threads << endl;
     uint16_t init_threads = real_threads;
     vector<uint64_t> init_level(real_threads, level_of_cut);
     uint64_t i = 0;
     while (nb_threads - real_threads > 1 && i < init_threads) {
-        // cout << "entra al while" << endl;
-        partialAND( Bs, n_tries, max_level, level_of_cut, level_of_cut + 1,
-                    roots2[i], activeTries2[i], partial_solutions[i], result,
+        partialAND( Ts, n_tries, max_level, level_of_cut, level_of_cut + 1,
+                    roots2[i], activeTries2[i], partial_solutions[i], intersection,
                     partial_solutions, roots2, activeTries2, runs
                     );
         uint64_t dif = roots2.size() - real_threads;
@@ -349,17 +317,18 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
          ++i;
         real_threads = roots2.size() - i ;
     } 
+    // init the vector to contain threads solutions
     vector<vector<uint64_t>> threads_results;//(real_threads);
     for (uint64_t t = 0; t < real_threads; ++t){
         vector<uint64_t> r;
         threads_results.push_back(r);
         threads_results[t].reserve(1000000);
     }
-    // cout << "OK all before parallellization" << endl;
+    // cout << "Parallel intersection"<< endl;
     if (runs){
         parallel_for(real_threads, real_threads, [&](int start, int end) {
             for (uint16_t threadId = start; threadId < end; ++threadId) {
-                runsAND(Bs, n_tries, max_level, init_level[threadId+i], 
+                runsAND(Ts, n_tries, max_level, init_level[threadId+i], 
                     roots2[threadId+i], activeTries2[threadId+i],
                     partial_solutions[threadId+i], threads_results[threadId]);
             }
@@ -368,17 +337,17 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
     else {
         parallel_for(real_threads, real_threads, [&](int start, int end) {
             for (uint16_t threadId = start; threadId < end; ++threadId) {
-                AND(Bs, n_tries, max_level, init_level[threadId+i], 
+                AND(Ts, n_tries, max_level, init_level[threadId+i], 
                     roots2[threadId+i], partial_solutions[threadId+i], 
                     threads_results[threadId]);
             }
         });
 
     }
-    // cout << "OK Intersection" << endl;   
-    uint64_t output_size = result.size(); 
+    // cout << "end parallel intersection" << endl;
+    uint64_t output_size = intersection.size(); 
     vector<uint64_t> shifts(real_threads);
-    uint64_t shift = result.size();
+    uint64_t shift = intersection.size();
     for(uint64_t t = 0; t < real_threads; ++t){
         output_size += threads_results[t].size();
         shifts[t] = shift;
@@ -386,11 +355,11 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
     }
     // Write in parallel threads result
     if (output_size > 450000){
-        result.resize(output_size);
+        intersection.resize(output_size);
         parallel_for(real_threads, real_threads, [&](int start, int end) {
             for (uint16_t threadId = start; threadId < end; ++threadId) {
                 for (uint64_t j = 0; j < threads_results[threadId].size(); ++j) {
-                    result[j+shifts[threadId]] = threads_results[threadId][j];
+                    intersection[j+shifts[threadId]] = threads_results[threadId][j];
                 } 
             }        
         });
@@ -398,12 +367,11 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
     else {
         // Concatenate solutions of threads
         for(uint64_t t=0; t < real_threads; ++t){
-            result.insert(  result.end(), 
-                            threads_results[t].begin(),
-                            threads_results[t].end()
-                        );
+            intersection.insert(intersection.end(), 
+                                threads_results[t].begin(),
+                                threads_results[t].end()
+                                );
         }
-
     }
     // Free memory
     for (uint64_t i = 0; i < real_threads; ++i) {
@@ -411,34 +379,5 @@ void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs){
             delete[] activeTries2[i];
         delete[] roots2[i];
     }
-    
-    return;
+    return intersection;
 }
-template void 
-Intersect<binTrie<rank_support_v5<1>>>(vector<binTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result, bool runs);
-template void 
-Intersect<flatBinTrie<rank_support_v5<1>>>(vector<flatBinTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result, bool runs);
-template void 
-Intersect<binTrie<rank_support_v<1>>>(vector<binTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result, bool runs);
-template void 
-Intersect<flatBinTrie<rank_support_v<1>>>(vector<flatBinTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result, bool runs);
-template void 
-Intersect<binTrie_il<512>>(vector<binTrie_il<512>> &Bs, vector<uint64_t> &result, bool runs);
-template void 
-Intersect<flatBinTrie_il<512>>(vector<flatBinTrie_il<512>> &Bs, vector<uint64_t> &result, bool runs);
-template void
-Intersect<binTrie_il<256>>(vector<binTrie_il<256>> &Bs, vector<uint64_t> &result, bool runs);
-template void
-Intersect<flatBinTrie_il<256>>(vector<flatBinTrie_il<256>> &Bs, vector<uint64_t> &result, bool runs);
-template void
-Intersect<binTrie_il<128>>(vector<binTrie_il<128>> &Bs, vector<uint64_t> &result, bool runs);
-template void
-Intersect<flatBinTrie_il<128>>(vector<flatBinTrie_il<128>> &Bs, vector<uint64_t> &result, bool runs);
-template void 
-Intersect<binTrie_il<64>>(vector<binTrie_il<64>> &Bs, vector<uint64_t> &result, bool runs);
-template void 
-Intersect<flatBinTrie_il<64>>(vector<flatBinTrie_il<64>> &Bs, vector<uint64_t> &result, bool runs);
-// template void 
-// Intersect<binTrie<rank_support_v5<1>>>(vector<binTrie<rank_support_v5<1>>> &Bs, vector<uint64_t> &result, bool runs);
-// template void 
-// Intersect<binTrie<rank_support_v<1>>>(vector<binTrie<rank_support_v<1>>> &Bs, vector<uint64_t> &result, bool runs);
