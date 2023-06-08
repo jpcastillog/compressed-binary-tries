@@ -5,13 +5,12 @@
 #include <sdsl/rank_support.hpp>
 #include <sdsl/rank_support_v.hpp>
 #include <sdsl/rank_support_v5.hpp>
-// #include "../src/intersection.hpp"
-#include "../src/binTrie.hpp"
-#include "../src/flatBinTrie.hpp"
-#include "../src/binTrie_il.hpp"
-#include "../src/flatBinTrie_il.hpp"
-#include "../src/intersection.hpp"
-#include "../src/binaryTrie.hpp"
+#include "../include/binTrie.hpp"
+#include "../include/flatBinTrie.hpp"
+#include "../include/binTrie_il.hpp"
+#include "../include/flatBinTrie_il.hpp"
+#include "../include/intersection.hpp"
+#include "../include/binaryTrie.hpp"
 
 using namespace std;
 using namespace sdsl;
@@ -49,19 +48,19 @@ vector<binaryTrie*> loadSequences(std::ifstream &in) {
                 trie = new flatBinTrie<rank_support_v<1>>();
         }
         else if(rankType == 1){
-            if(block_size = 128){
+            if(block_size == 128){
                 if (levelwise)
                     trie = new binTrie_il<128>;
                 else 
                     trie = new flatBinTrie_il<128>;
             }
-            if (block_size = 256){
+            if (block_size == 256){
                 if (levelwise)
                     trie = new binTrie_il<256>;
                 else 
                     trie = new flatBinTrie_il<256>;
             }
-            if (block_size = 512){
+            if (block_size == 512){
                 if (levelwise)
                     trie = new binTrie_il<512>;
                 else 

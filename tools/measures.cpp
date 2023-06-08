@@ -2,7 +2,7 @@
 #include <fstream>
 #include <math.h>
 #include <vector>
-#include "../src/flatBinTrie.hpp"
+#include "../include/flatBinTrie.hpp"
 #include <sdsl/bit_vectors.hpp>
 #include <sdsl/int_vector.hpp>
 

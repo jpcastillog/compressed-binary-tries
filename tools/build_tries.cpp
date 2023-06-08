@@ -1,23 +1,23 @@
 #include <iostream>
 #include <fstream>
 #include <sdsl/bit_vectors.hpp>
-#include "../src/flatBinTrie.hpp"
-#include "../src/flatBinTrie_il.hpp"
-#include "../src/binTrie_il.hpp"
-#include "../src/binTrie.hpp"
-#include "../src/binaryTrie.hpp"
+#include "../include/flatBinTrie.hpp"
+#include "../include/flatBinTrie_il.hpp"
+#include "../include/binTrie_il.hpp"
+#include "../include/binTrie.hpp"
+#include "../include/binaryTrie.hpp"
 
 using namespace std;
 using namespace sdsl;
 // Aqui no es necesario retornar un puntero a vector
-vector<uint64_t>* read_inv_list(std::ifstream &input_stream, uint32_t n) {
+vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
 
-    vector <uint64_t>* il = new vector<uint64_t>();
-    il -> reserve(n);
+    vector <uint64_t> il;
+    il.reserve(n);
     for (uint32_t i = 0; i < n; ++i) {
         uint32_t x;
         input_stream.read(reinterpret_cast<char *>(&x), 4);
-        il -> push_back((uint64_t)x);
+        il.push_back((uint64_t)x);
     }
     return il;
 }
@@ -90,12 +90,12 @@ void buildCollection(std::string input_path, std::string out_path,
         uint64_t trie_bytes_size;
         if (n > min_size){
 
-            vector <uint64_t> *il = read_inv_list(input_stream, n);
-            uint64_t max_value = (*il)[n - 1];
+            vector <uint64_t> il = read_inv_list(input_stream, n);
+            uint64_t max_value = il[n - 1];
             
             if (rank_type == 0) {
                 if (levelwise){
-                    binTrie<rank_support_v<1>> trie_v = binTrie<rank_support_v<1>>(*il, u);
+                    binTrie<rank_support_v<1>> trie_v = binTrie<rank_support_v<1>>(il, u);
                     if (runs)
                         trie_v.encodeRuns();
                     if (out_path != "") {
@@ -104,7 +104,7 @@ void buildCollection(std::string input_path, std::string out_path,
                     trie_bytes_size = trie_v.size_in_bytes();
                 }
                 else {    
-                    flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(*il, u);
+                    flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(il, u);
                     if (runs)
                         trie_v.encodeRuns();
                     if (out_path != "") {
@@ -117,7 +117,7 @@ void buildCollection(std::string input_path, std::string out_path,
 
             else if (rank_type == 1) {
                 if (levelwise) {
-                    binTrie_il<block_size> trie_il(*il, u);
+                    binTrie_il<block_size> trie_il(il, u);
                     if (runs) {
                         trie_il.encodeRuns();
                     }
@@ -128,7 +128,7 @@ void buildCollection(std::string input_path, std::string out_path,
                     // trie_il.free();
                 }
                 else {
-                    flatBinTrie_il<block_size> trie_il(*il, u);
+                    flatBinTrie_il<block_size> trie_il(il, u);
                     if (runs) {
                         trie_il.encodeRuns();
                     }
@@ -143,7 +143,7 @@ void buildCollection(std::string input_path, std::string out_path,
 
             else {
                 if (levelwise){
-                    binTrie<rank_support_v5<1>> trie_v5 = binTrie<rank_support_v5<1>>(*il, u);
+                    binTrie<rank_support_v5<1>> trie_v5 = binTrie<rank_support_v5<1>>(il, u);
                     if (runs)
                         trie_v5.encodeRuns();
                     if (out_path != "") {
@@ -155,7 +155,7 @@ void buildCollection(std::string input_path, std::string out_path,
                     // trie_v5.free();
                 }
                 else {
-                    flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(*il, u);
+                    flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(il, u);
                     if (runs)
                         trie_v5.encodeRuns();
                     if (out_path != "") {
@@ -173,10 +173,7 @@ void buildCollection(std::string input_path, std::string out_path,
             if ((n_il % 1000) == 0) {
                 cout << n_il  <<" Sets processed " << endl;
             }
-
-            delete il;
         }
-
         else {
             input_stream.seekg(4*n, ios::cur);
         }

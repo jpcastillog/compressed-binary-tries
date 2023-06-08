@@ -9,9 +9,44 @@
 #include "binTrie_il.hpp"
 #include "binaryTrie.hpp"
 #include <math.h>
+#ifdef LINUX
 #include "parallel_for.hpp"
+#elif MACOS
+#include "parallel_for_macos.hpp"
+#else
+#error No operating system supported to parallel for
+#endif
 
 using namespace std;
+
+
+vector<uint64_t> forceBruteIntersection(vector<vector<uint64_t>> S){
+    // Sort sets by size
+    sort(S.begin(), S.end(),
+         [](const vector<uint64_t> &a, const vector<uint64_t> &b){
+            return a.size() < b.size();
+         }
+    ); 
+    vector<uint64_t> intersection;
+    uint64_t k, e, occur, pos;
+    k = S.size();
+    for (uint64_t i = 0; i < S[0].size(); ++i) {
+        e = S[0][i];
+        occur = 0;
+        for (auto s: S){
+            pos = 0;
+            while (s[pos] < e && pos < s.size())
+                pos++;
+            if (s[pos] == e){
+                if (++occur == k)
+                    intersection.push_back(e);
+            }
+            else 
+                break;
+        }
+    }
+    return intersection;
+}
 
 
 void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
@@ -43,7 +78,7 @@ void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
     if (andResult == 0b00 && orResult != 0b00)
         return;
 
-    if (orResult = 0b00) {
+    if (orResult == 0b00) {
         uint64_t below = prefix;
         uint64_t range = ((uint64_t)1 << (maxLevel - currLevel))- 1;
         uint64_t above = prefix | range;
@@ -68,7 +103,7 @@ void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
     }
     else if (andResult == 0b01) {
         uint64_t rightNodes[16];
-        uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));
+        uint64_t rightResult = (prefix | ((uint64_t)1 << (maxLevel- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel -1)
                 rightNodes[i] = Ts[i] -> getRightChild(roots[i], currLevel);
@@ -128,7 +163,7 @@ bool AND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
     }
     else if (andResult == 0b01) {
         uint64_t rightNodes[16];
-        uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));
+        uint64_t rightResult = (prefix | ((uint64_t)1 << (maxLevel- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel -1)
                 rightNodes[i] = Ts[i] -> getRightChild(roots[i], currLevel);
@@ -276,9 +311,136 @@ void partialAND(vector<binaryTrie*> &Ts, uint16_t n_tries, uint64_t max_level, u
 }
 
 
+// vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs){
+//     uint64_t height = Ts[0] -> getHeight();
+//     for (auto T: Ts){
+//         if (T->getHeight() != height){
+//             cerr << "All tries need to be of same height\n"; 
+//             return vector<uint64_t>();
+//         }
+//     }
+//     uint64_t nTries = Ts.size();
+//     // max 16 relations
+//     bool activeTries[16] = { true, true, true, true,
+//                              true, true, true, true,
+//                              true, true, true, true,
+//                              true, true, true, true };
+//     uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+//                            0, 0, 0, 0, 0, 0, 0, 0 };
+//     uint64_t curr_level = 0;
+//     // Hint of threads avaible in our CPU
+//     unsigned nb_threads_hint  = std::thread::hardware_concurrency();
+//     uint64_t level_of_cut     = floor(log2(nb_threads_hint));
+//     unsigned int nb_threads   = pow(2, level_of_cut);
+    
+//     vector<bool*> activeTries2;
+//     vector<uint64_t*>   roots2;
+//     // vector<uint64_t>    partial_solutions;
+//     vector<uint64_t> intersection, partial_solutions;
+//     intersection.reserve(1000000);
+//     uint64_t partial_int = 0;
+//     // Resolve the problem until level of cut
+//     partialAND(Ts, nTries, height, 0, level_of_cut, 
+//                 roots, activeTries, partial_int, intersection,
+//                 partial_solutions, roots2, activeTries2, runs);
+    
+//     uint16_t usedThreads = roots2.size(); //number of thereads to use until level of cut
+//     uint16_t totalThreads = usedThreads;
+//     vector<uint64_t> init_level(usedThreads, level_of_cut);
+//     // Go down one more level to fill all threads
+//     vector<bool*> activeTries3;
+//     vector<uint64_t*> roots3;
+//     uint64_t i = 0;
+//     while (nb_threads - usedThreads > 1 && i < totalThreads) {
+//         // partialAND( Ts, n_tries, height, level_of_cut, level_of_cut + 1,
+//         //             roots2[i], activeTries2[i], partial_solutions[i], intersection,
+//         //             partial_solutions, roots2, activeTries2, runs
+//         //         );
+//         partialAND(Ts, nTries, height, level_of_cut, level_of_cut+1, roots2[i], 
+//                     activeTries2[i], partial_solutions[i], intersection, 
+//                     partial_solutions, roots3, activeTries3, runs);
+//         uint64_t dif = roots2.size() - usedThreads;
+//         for (uint64_t j = 0; j < dif; ++j) {
+//             init_level.push_back(level_of_cut + 1);
+//         }
+//         ++i;
+//         usedThreads = roots2.size() - i ;
+//     }
+//     // Init the vector to contain threads solutions
+//     vector<vector<uint64_t>> threads_results;//(real_threads);
+//     for (uint64_t t = 0; t < usedThreads; ++t){
+//         vector<uint64_t> r;
+//         threads_results.push_back(r);
+//         threads_results[t].reserve(1000000);
+//     }
+
+//     if (runs){
+//         parallel_for(usedThreads, usedThreads, [&](int start, int end) {
+//             for (uint16_t threadId = start; threadId < end; ++threadId) {
+//                 runsAND(Ts, nTries, height, init_level[threadId+i], 
+//                     roots2[threadId+i], activeTries2[threadId+i],
+//                     partial_solutions[threadId+i], threads_results[threadId]);
+//             }
+//         });
+//     }
+//     else {
+//         parallel_for(usedThreads, usedThreads, [&](int start, int end) {
+//             for (uint16_t threadId = start; threadId < end; ++threadId) {
+//                 AND(Ts, nTries, height, init_level[threadId+i], 
+//                     roots2[threadId+i], partial_solutions[threadId+i], 
+//                     threads_results[threadId]);
+//             }
+//         });
+
+//     }
+//     // cout << "end parallel intersection" << endl;
+//     uint64_t output_size = intersection.size(); 
+//     vector<uint64_t> shifts(usedThreads);
+//     uint64_t shift = intersection.size();
+//     for(uint64_t t = 0; t < usedThreads; ++t){
+//         output_size += threads_results[t].size();
+//         shifts[t] = shift;
+//         shift += threads_results[t].size();
+//     }
+//     // Write in parallel threads result
+//     if (output_size > 450000){
+//         intersection.resize(output_size);
+//         parallel_for(usedThreads, usedThreads, [&](int start, int end) {
+//             for (uint16_t threadId = start; threadId < end; ++threadId) {
+//                 for (uint64_t j = 0; j < threads_results[threadId].size(); ++j) {
+//                     intersection[j+shifts[threadId]] = threads_results[threadId][j];
+//                 } 
+//             }        
+//         });
+//     } 
+//     else {
+//         // Concatenate solutions of threads
+//         for(uint64_t t=0; t < usedThreads; ++t){
+//             intersection.insert(intersection.end(), 
+//                                 threads_results[t].begin(),
+//                                 threads_results[t].end()
+//                                 );
+//         }
+//     }
+//     // Free memory
+//     for (uint64_t i = 0; i < usedThreads; ++i) {
+//         if (runs) 
+//             delete[] activeTries2[i];
+//         delete[] roots2[i];
+//     }
+//     return intersection;
+// }
+
+
 vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs){
-    uint64_t max_level = Ts[0] -> getHeight();
-    uint64_t n_tries = Ts.size();
+    uint64_t height = Ts[0] -> getHeight();
+    for (auto T: Ts){
+        if (T->getHeight() != height){
+            cerr << "All tries need to be of same height\n"; 
+            return vector<uint64_t>(); // return empty vector
+        }
+    }
+    uint64_t nTries = Ts.size();
     // max 16 relations
     bool activeTries[16] = { true, true, true, true,
                              true, true, true, true,
@@ -286,69 +448,76 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs){
                              true, true, true, true };
     uint64_t roots[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
-    uint64_t curr_level = 0;
+
     // Hint of threads avaible in our CPU
     unsigned nb_threads_hint = std::thread::hardware_concurrency();
-    uint64_t level_of_cut     = floor(log2(nb_threads_hint));
-    unsigned int nb_threads   = pow(2, level_of_cut);
+    uint64_t level_of_cut   = floor(log2(nb_threads_hint));
+    unsigned int nThreads   = pow(2, level_of_cut); // Max number of threads to use in level of cut
     
-    vector<bool*>       activeTries2;
-    vector<uint64_t*>   roots2;
-    vector<uint64_t>    partial_solutions;
-    vector<uint64_t> intersection;
+    vector<bool*> threadActiveTries;
+    vector<uint64_t*> threadRoots;
+    vector<uint64_t> intersection, tpartialSolutions;
     intersection.reserve(1000000);
+    // uint64_t partial_int = 0;
+    // uint64_t curr_level = 0;
+    // Resolve the problem until level of cut
+    partialAND(Ts, nTries, height, 0, level_of_cut, 
+                roots, activeTries, 0, intersection,
+                tpartialSolutions, threadRoots, threadActiveTries, runs);
     
-    uint64_t partial_int = 0;
-    partialAND(Ts, n_tries, max_level, curr_level, level_of_cut, roots, activeTries, partial_int, intersection,
-                partial_solutions, roots2, activeTries2, runs);
-    uint16_t real_threads = roots2.size();
-    uint16_t init_threads = real_threads;
-    vector<uint64_t> init_level(real_threads, level_of_cut);
+    uint16_t usedThreads = threadRoots.size(); //Number of threads to use until level of cut
+    uint16_t totalThreads = usedThreads;
+    vector<uint64_t> initLevel(usedThreads, level_of_cut);
+    // Go down one more level to fill all threads
+    vector<bool*> nextActiveTries;
+    vector<uint64_t*> nextRoots;
+    vector<uint64_t> nextPartialSolutions;
     uint64_t i = 0;
-    while (nb_threads - real_threads > 1 && i < init_threads) {
-        partialAND( Ts, n_tries, max_level, level_of_cut, level_of_cut + 1,
-                    roots2[i], activeTries2[i], partial_solutions[i], intersection,
-                    partial_solutions, roots2, activeTries2, runs
-                    );
-        uint64_t dif = roots2.size() - real_threads;
-        for (uint64_t j = 0; j < dif; ++j) {
-            init_level.push_back(level_of_cut + 1);
-        }
-         ++i;
-        real_threads = roots2.size() - i ;
-    } 
-    // init the vector to contain threads solutions
-    vector<vector<uint64_t>> threads_results;//(real_threads);
-    for (uint64_t t = 0; t < real_threads; ++t){
-        vector<uint64_t> r;
-        threads_results.push_back(r);
-        threads_results[t].reserve(1000000);
+    while ((nThreads - usedThreads > 1) && (i < totalThreads)) {
+        partialAND(Ts, nTries, height, level_of_cut, level_of_cut+1, threadRoots[i], 
+                    threadActiveTries[i], tpartialSolutions[i], intersection, 
+                    nextPartialSolutions, nextRoots, nextActiveTries, runs);
+        usedThreads = totalThreads + nextRoots.size() - (++i);
     }
-    // cout << "Parallel intersection"<< endl;
+    vector<uint64_t> nextInitLevel(nextRoots.size(), level_of_cut+1);
+
+    for(uint16_t j = i; j < totalThreads; ++j) {
+        nextRoots.push_back(threadRoots[j]);
+        nextActiveTries.push_back(threadActiveTries[j]);
+        nextPartialSolutions.push_back(tpartialSolutions[j]);
+        nextInitLevel.push_back(level_of_cut);
+    }
+    // Init the vector to contain threads solutions
+    vector<vector<uint64_t>> threads_results(usedThreads);
+    for (auto tr: threads_results) tr.reserve(1000000);
+    //     vector<uint64_t> r;
+    //     threads_results.push_back(r);
+    //     threads_results[t].reserve(1000000);
+    // }
+
     if (runs){
-        parallel_for(real_threads, real_threads, [&](int start, int end) {
+        parallel_for(usedThreads, usedThreads, [&](int start, int end) {
             for (uint16_t threadId = start; threadId < end; ++threadId) {
-                runsAND(Ts, n_tries, max_level, init_level[threadId+i], 
-                    roots2[threadId+i], activeTries2[threadId+i],
-                    partial_solutions[threadId+i], threads_results[threadId]);
+                runsAND(Ts, nTries, height, nextInitLevel[threadId], 
+                    nextRoots[threadId], nextActiveTries[threadId],
+                    nextPartialSolutions[threadId], threads_results[threadId]);
             }
         });
     }
     else {
-        parallel_for(real_threads, real_threads, [&](int start, int end) {
+        parallel_for(usedThreads, usedThreads, [&](int start, int end) {
             for (uint16_t threadId = start; threadId < end; ++threadId) {
-                AND(Ts, n_tries, max_level, init_level[threadId+i], 
-                    roots2[threadId+i], partial_solutions[threadId+i], 
+                AND(Ts, nTries, height, nextInitLevel[threadId], 
+                    nextRoots[threadId], nextPartialSolutions[threadId], 
                     threads_results[threadId]);
             }
         });
 
     }
-    // cout << "end parallel intersection" << endl;
     uint64_t output_size = intersection.size(); 
-    vector<uint64_t> shifts(real_threads);
+    vector<uint64_t> shifts(usedThreads);
     uint64_t shift = intersection.size();
-    for(uint64_t t = 0; t < real_threads; ++t){
+    for(uint64_t t = 0; t < usedThreads; ++t){
         output_size += threads_results[t].size();
         shifts[t] = shift;
         shift += threads_results[t].size();
@@ -356,7 +525,7 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs){
     // Write in parallel threads result
     if (output_size > 450000){
         intersection.resize(output_size);
-        parallel_for(real_threads, real_threads, [&](int start, int end) {
+        parallel_for(usedThreads, usedThreads, [&](int start, int end) {
             for (uint16_t threadId = start; threadId < end; ++threadId) {
                 for (uint64_t j = 0; j < threads_results[threadId].size(); ++j) {
                     intersection[j+shifts[threadId]] = threads_results[threadId][j];
@@ -366,7 +535,7 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs){
     } 
     else {
         // Concatenate solutions of threads
-        for(uint64_t t=0; t < real_threads; ++t){
+        for(uint64_t t=0; t < usedThreads; ++t){
             intersection.insert(intersection.end(), 
                                 threads_results[t].begin(),
                                 threads_results[t].end()
@@ -374,10 +543,10 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs){
         }
     }
     // Free memory
-    for (uint64_t i = 0; i < real_threads; ++i) {
+    for (uint64_t i = 0; i < usedThreads; ++i) {
         if (runs) 
-            delete[] activeTries2[i];
-        delete[] roots2[i];
+            delete[] nextActiveTries[i];
+        delete[] nextRoots[i];
     }
     return intersection;
 }

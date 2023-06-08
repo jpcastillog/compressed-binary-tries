@@ -4,8 +4,8 @@
 #include <vector>
 #include "binaryTrie.hpp"
 
-// template <class trieType>
-// void Intersect(vector<trieType> &Bs, vector<uint64_t> &result, bool runs);
+using namespace std;
+
 vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs);
 
 #endif

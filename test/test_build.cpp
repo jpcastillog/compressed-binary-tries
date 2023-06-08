@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include "../src/flatBinTrie.hpp"
+#include "../include/flatBinTrie.hpp"
 #include <sdsl/bit_vectors.hpp>
-#include "../src/binTrie_il.hpp"
+#include "../include/binTrie_il.hpp"
 
 using namespace std;
 using namespace sdsl;
