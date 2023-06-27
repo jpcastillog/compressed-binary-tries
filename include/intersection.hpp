@@ -6,6 +6,7 @@
 
 using namespace std;
 
-vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs);
+vector<uint64_t> forceBruteIntersection(vector<vector<uint64_t>> &S);
+vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs, bool parallel);
 
 #endif

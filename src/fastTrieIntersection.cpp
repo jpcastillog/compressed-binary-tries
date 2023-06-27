@@ -2,12 +2,8 @@
 #include <vector>
 #include <chrono>
 #include <thread>
-#include <mutex>
-#include "binTrie.hpp"
-#include "flatBinTrie_il.hpp"
-#include "flatBinTrie.hpp"
-#include "binTrie_il.hpp"
-#include "binaryTrie.hpp"
+#include "fastBinaryTrie.hpp"
+// #include "fastTrieIntersection.hpp"
 #include <math.h>
 #include <algorithm>
 #ifdef LINUX
@@ -20,7 +16,6 @@
 
 
 using namespace std;
-
 
 vector<uint64_t> forceBruteIntersection(vector<vector<uint64_t>> &S){
     sort(S.begin(), S.end(),
@@ -41,12 +36,24 @@ vector<uint64_t> forceBruteIntersection(vector<vector<uint64_t>> &S){
     return intersection;
 }
 
-
-void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
-        uint64_t currLevel, uint64_t roots[], bool activeTries[], 
-        uint64_t prefix, vector<uint64_t> &r){
-    if (currLevel == maxLevel) {
-        r.push_back(prefix);
+template<class rankType>
+void runsAND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &maxLevel,
+            uint64_t currLevel, uint64_t roots[], bool activeTries[], 
+            uint64_t prefix, vector<uint64_t> &r){
+            
+    if (currLevel == maxLevel-1) {
+        uint64_t w =(~0);
+        for (uint16_t i = 0; i < nTries; ++i) {
+            if (activeTries[i])
+                w &= Ts[i]->getNode(roots[i], currLevel);
+        }
+        // prefix = prefix << 5;
+        while (w != 0){
+            uint64_t t = w & (~w + 1);            
+            uint64_t z = __builtin_ctzll(w);
+            r.push_back(z + prefix);
+            w ^= t;
+        }
         return;
     }
     uint64_t i;
@@ -73,8 +80,8 @@ void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
 
     if (orResult == 0b00) {
         uint64_t below = prefix;
-        uint64_t range = ((uint64_t)1 << (maxLevel - currLevel))- 1;
-        uint64_t above = prefix | range;
+        uint64_t range = ((uint64_t)1 << ((maxLevel+6-1) - currLevel))- 1;
+        uint64_t above = (prefix) | range;
         // std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
         for (uint64_t i = below; i <= above; ++i) {
             r.push_back(i);
@@ -91,17 +98,17 @@ void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
             if (tempActiveTries[i] && currLevel != maxLevel - 1) 
                 leftNodes[i] = Ts[i] -> getLeftChild(roots[i], currLevel);
         }
-        runsAND(Ts, nTries, maxLevel, nextLevel, leftNodes,
+        runsAND<rankType>(Ts, nTries, maxLevel, nextLevel, leftNodes,
                         tempActiveTries, leftResult, r);
     }
     else if (andResult == 0b01) {
         uint64_t rightNodes[16];
-        uint64_t rightResult = (prefix | ((uint64_t)1 << (maxLevel- currLevel - 1)));
+        uint64_t rightResult = (prefix | ((uint64_t)1 << ((maxLevel+5)- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel -1)
                 rightNodes[i] = Ts[i] -> getRightChild(roots[i], currLevel);
         }
-        runsAND(Ts, nTries, maxLevel, nextLevel, rightNodes,
+        runsAND<rankType>(Ts, nTries, maxLevel, nextLevel, rightNodes,
                         tempActiveTries, rightResult, r);
 
     }
@@ -109,7 +116,7 @@ void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t leftNodes[16];
         uint64_t rightNodes[16];
         uint64_t leftResult = prefix;
-        uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));;
+        uint64_t rightResult = (prefix | ((uint64_t)1 << ((maxLevel+5)- currLevel - 1)));;
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel - 1) {
                 uint64_t leftNode = Ts[i] -> getLeftChild(roots[i], currLevel);
@@ -117,19 +124,28 @@ void runsAND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
                 rightNodes[i] = leftNode + 1;
             }
         }
-        runsAND(Ts, nTries, maxLevel, nextLevel, leftNodes,
+        runsAND<rankType>(Ts, nTries, maxLevel, nextLevel, leftNodes,
                         tempActiveTries, leftResult, r);
-        runsAND(Ts, nTries, maxLevel, nextLevel, rightNodes,
+        runsAND<rankType>(Ts, nTries, maxLevel, nextLevel, rightNodes,
                         tempActiveTries, rightResult, r);
     }
     return;
 };
 
-
-bool AND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
+template<class rankType>
+bool AND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t currLevel, uint64_t roots[], uint64_t prefix, vector<uint64_t> &r){
-    if (currLevel == maxLevel) {
-        r.push_back(prefix);
+    if (currLevel == maxLevel-1) {
+        uint64_t w = ~0;
+        for (uint16_t i = 0; i < nTries; ++i) 
+            w &= Ts[i] -> getNode(roots[i], currLevel);
+        prefix <<= 6;
+        while (w != 0){
+            uint64_t t = w & (~w + 1);            
+            uint64_t z = __builtin_ctzll(w);
+            r.push_back(z + prefix);
+            w ^= t;
+        }
         return true;
     }
     uint64_t i;
@@ -152,7 +168,7 @@ bool AND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
             if (currLevel != maxLevel - 1) 
                 leftNodes[i] = Ts[i] -> getLeftChild(roots[i], currLevel);
         }
-        existLeft = AND(Ts, nTries, maxLevel, nextLevel, leftNodes, leftResult, r);
+        existLeft = AND<rankType>(Ts, nTries, maxLevel, nextLevel, leftNodes, leftResult, r);
     }
     else if (andResult == 0b01) {
         uint64_t rightNodes[16];
@@ -161,7 +177,7 @@ bool AND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
             if (currLevel != maxLevel -1)
                 rightNodes[i] = Ts[i] -> getRightChild(roots[i], currLevel);
         }
-        existRight = AND(Ts, nTries, maxLevel, nextLevel, rightNodes, rightResult, r);
+        existRight = AND<rankType>(Ts, nTries, maxLevel, nextLevel, rightNodes, rightResult, r);
 
     }
     else if (andResult == 0b11) {
@@ -176,16 +192,16 @@ bool AND(vector<binaryTrie*> &Ts, uint64_t nTries, uint64_t &maxLevel,
                 rightNodes[i] = leftNode + 1;
             }
         }
-        existLeft = AND(Ts, nTries, maxLevel, nextLevel, leftNodes, leftResult, r);
-        existRight = AND(Ts, nTries, maxLevel, nextLevel, rightNodes, rightResult, r);
+        existLeft = AND<rankType>(Ts, nTries, maxLevel, nextLevel, leftNodes, leftResult, r);
+        existRight = AND<rankType>(Ts, nTries, maxLevel, nextLevel, rightNodes, rightResult, r);
     }
     if (existLeft || existRight)
         return true;
     return false;
 };
 
-
-void partialAND(vector<binaryTrie*> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level, 
+template<class rankType>
+void partialAND(vector<fastBinaryTrie<rankType>*> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level, 
                 uint64_t cut_level, uint64_t roots[], bool activeTries[], uint64_t partial_int,
                 vector <uint64_t> &r, vector<uint64_t> &partial_ints, vector<uint64_t*> &threads_roots,
                 vector<bool*> &threads_activeTries, bool runs) {
@@ -235,7 +251,7 @@ void partialAND(vector<binaryTrie*> &Ts, uint16_t n_tries, uint64_t max_level, u
         return;
     if (runs && node00 == 0b00) {
         uint64_t below = partial_int;
-        uint64_t range = ((uint64_t)1 << (max_level - curr_level))- 1;
+        uint64_t range = ((uint64_t)1 << ((max_level+5) - curr_level))- 1;
         uint64_t above = partial_int | range;
         // std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
         for (uint64_t i = below; i <= above; ++i) r.push_back(i);
@@ -252,7 +268,7 @@ void partialAND(vector<binaryTrie*> &Ts, uint16_t n_tries, uint64_t max_level, u
             else 
                 left_nodes[i] = Ts[i] -> getLeftChild(roots[i], curr_level);
         }
-        partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level, 
+        partialAND<rankType>(Ts, n_tries, max_level, curr_level + 1, cut_level, 
             left_nodes, tempActiveTries, leftResult, r, partial_ints,
             threads_roots, threads_activeTries, runs);
 
@@ -260,14 +276,14 @@ void partialAND(vector<binaryTrie*> &Ts, uint16_t n_tries, uint64_t max_level, u
     else if (result == 0b01){
         uint64_t right_nodes[16];
         uint64_t rightResult = partial_int;
-        rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
+        rightResult = (rightResult | ((uint64_t)1 << ((max_level+5)- curr_level - 1)));
         for (uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i])
                 right_nodes[i] = Ts[i] -> getRightChild(roots[i], curr_level);
             else
                 right_nodes[i] = Ts[i] -> getRightChild(roots[i], curr_level);
         }
-        partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level,
+        partialAND<rankType>(Ts, n_tries, max_level, curr_level + 1, cut_level,
             right_nodes, tempActiveTries, rightResult, r, partial_ints,
             threads_roots, threads_activeTries, runs);
 
@@ -277,7 +293,7 @@ void partialAND(vector<binaryTrie*> &Ts, uint16_t n_tries, uint64_t max_level, u
         uint64_t right_nodes[16];
         uint64_t leftResult = partial_int;
         uint64_t rightResult = partial_int;
-        rightResult = (rightResult | (1ULL << (max_level- curr_level - 1)));
+        rightResult = (rightResult | ((uint64_t)1 << ((max_level+5)- curr_level - 1)));
         for(uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i]) {
                 uint64_t left_node = Ts[i] -> getLeftChild(roots[i], curr_level);
@@ -291,18 +307,18 @@ void partialAND(vector<binaryTrie*> &Ts, uint16_t n_tries, uint64_t max_level, u
             }
         }
         // Left Childs
-        partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level, 
+        partialAND<rankType>(Ts, n_tries, max_level, curr_level + 1, cut_level, 
             left_nodes, tempActiveTries, leftResult, r, partial_ints,
             threads_roots, threads_activeTries, runs);
         // Right Childs
-        partialAND(Ts, n_tries, max_level, curr_level + 1, cut_level,
+        partialAND<rankType>(Ts, n_tries, max_level, curr_level + 1, cut_level,
             right_nodes, tempActiveTries, rightResult, r, partial_ints,
             threads_roots, threads_activeTries, runs);
     }
 }
 
-
-vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs, bool parallel){
+template<class rankType>
+vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, bool parallel){
     uint64_t height = Ts[0] -> getHeight();
     for (auto T: Ts){
         if (T->getHeight() != height){
@@ -331,20 +347,20 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs, bool parallel){
         vector<uint64_t*> threadRoots;
         vector<uint64_t> tpartialSolutions;
 
-        partialAND(Ts, nTries, height, 0, level_of_cut, 
+        partialAND<rankType>(Ts, nTries, height, 0, level_of_cut, 
                     roots, activeTries, 0, intersection,
                     tpartialSolutions, threadRoots, threadActiveTries, runs);
         
         uint16_t usedThreads = threadRoots.size(); //Number of threads to use until level of cut
         uint16_t totalThreads = usedThreads;
         vector<uint64_t> initLevel(usedThreads, level_of_cut);
-        // Go down one more level to fill all threads
+        // Go down one more level to (try) fill all threads
         vector<bool*> nextActiveTries;
         vector<uint64_t*> nextRoots;
         vector<uint64_t> nextPartialSolutions;
         uint64_t i = 0;
         while ((nThreads - usedThreads > 1) && (i < totalThreads)) {
-            partialAND(Ts, nTries, height, level_of_cut, level_of_cut+1, threadRoots[i], 
+            partialAND<rankType>(Ts, nTries, height, level_of_cut, level_of_cut+1, threadRoots[i], 
                         threadActiveTries[i], tpartialSolutions[i], intersection, 
                         nextPartialSolutions, nextRoots, nextActiveTries, runs);
             usedThreads = totalThreads + nextRoots.size() - (++i);
@@ -364,7 +380,7 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs, bool parallel){
         if (runs){
             parallel_for(usedThreads, usedThreads, [&](int start, int end) {
                 for (uint16_t threadId = start; threadId < end; ++threadId) {
-                    runsAND(Ts, nTries, height, nextInitLevel[threadId], 
+                    runsAND<rankType>(Ts, nTries, height, nextInitLevel[threadId], 
                         nextRoots[threadId], nextActiveTries[threadId],
                         nextPartialSolutions[threadId], threads_results[threadId]);
                 }
@@ -373,7 +389,7 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs, bool parallel){
         else {
             parallel_for(usedThreads, usedThreads, [&](int start, int end) {
                 for (uint16_t threadId = start; threadId < end; ++threadId) {
-                    AND(Ts, nTries, height, nextInitLevel[threadId], 
+                    AND<rankType>(Ts, nTries, height, nextInitLevel[threadId], 
                         nextRoots[threadId], nextPartialSolutions[threadId], 
                         threads_results[threadId]);
                 }
@@ -417,10 +433,14 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs, bool parallel){
     }
     else {
         if (runs)
-            runsAND(Ts, nTries, height, 0, roots, activeTries, 0, intersection);
+            runsAND<rankType>(Ts, nTries, height, 0, roots, activeTries, 0, intersection);
         else 
-            AND(Ts, nTries, height, 0, roots, 0, intersection);
+            AND<rankType>(Ts, nTries, height, 0, roots, 0, intersection);
     }
 
     return intersection;
 }
+template
+vector<uint64_t> Intersect<rank_support_v<1>>(vector<fastBinaryTrie<rank_support_v<1>>*> &Ts, bool runs, bool parallel);
+template
+vector<uint64_t> Intersect<rank_support_v5<1>>(vector<fastBinaryTrie<rank_support_v5<1>>*> &Ts, bool runs, bool parallel);

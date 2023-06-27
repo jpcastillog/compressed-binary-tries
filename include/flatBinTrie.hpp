@@ -204,12 +204,26 @@ class flatBinTrie: public binaryTrie{
 
 
         inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
-            return flatBinTrie::b_rank((2*node_id) + 1);
+            // if (level == getHeight()-2)
+            //     return flatBinTrie::b_rank((2*node_id));
+            // else 
+            if (level >= getHeight() - 1)
+                return 0;
+            else 
+                return flatBinTrie::b_rank((2*node_id)+1);
+                
         };
 
 
         inline uint64_t getRightChild(uint64_t &node_id, uint16_t level) {
-            return flatBinTrie::b_rank((2*node_id) + 2);
+            // if (level == getHeight()-2)
+            //     return flatBinTrie::b_rank((2*node_id) + 1);
+            // else
+             if (level >= getHeight() - 1)
+                return 0;
+            else
+                return flatBinTrie::b_rank((2*node_id)+2);
+                
         };
 
         // return size of bytes of all structure
@@ -378,19 +392,19 @@ class flatBinTrie: public binaryTrie{
             }
 
             uint64_t node = getNode(node_id, curr_level);
-            uint16_t next_level = curr_level + 1;
+            // uint16_t next_level = curr_level + 1;
 
             uint64_t leftResult = partial_int;
             uint64_t rightResult = partial_int;
 
             if (node == 0b10 || node == 0b11) {
-                uint64_t left_child = getLeftChild(node_id, curr_level);
-                recursiveDecode(decoded, leftResult, left_child, next_level);
+                // uint64_t left_child = getLeftChild(node_id, curr_level);
+                recursiveDecode(decoded, leftResult, getLeftChild(node_id, curr_level), curr_level+1);
             }
             if (node == 0b01 || node == 0b11) {
-                rightResult = (rightResult | ((uint64_t)1 << (getHeight() - curr_level - 1)));
-                uint64_t right_child = getRightChild(node_id, curr_level);
-                recursiveDecode(decoded, rightResult, right_child, next_level);
+                rightResult = (rightResult | (1ULL << (getHeight() - curr_level - 1)));
+                // uint64_t right_child = getRightChild(node_id, curr_level);
+                recursiveDecode(decoded, rightResult, getRightChild(node_id, curr_level), curr_level+1);
             }
         };
 
@@ -402,7 +416,7 @@ class flatBinTrie: public binaryTrie{
             }
 
             uint64_t node = getNode(node_id, curr_level);
-            uint16_t next_level = curr_level + 1;
+            // uint16_t next_level = curr_level + 1;
 
             if (node == 0b00) { 
                 uint64_t below = partial_int;
@@ -418,13 +432,13 @@ class flatBinTrie: public binaryTrie{
             uint64_t rightResult = partial_int;
 
             if (node == 0b10 || node == 0b11) {
-                uint64_t left_child = getLeftChild(node_id, curr_level);
-                runsRecursiveDecode(decoded, leftResult, left_child, next_level);
+                // uint64_t left_child = getLeftChild(node_id, curr_level);
+                runsRecursiveDecode(decoded, leftResult, getLeftChild(node_id, curr_level), curr_level+1);
             }
             if (node == 0b01 || node == 0b11) {
                 rightResult = (rightResult | (1ULL << (getHeight() - curr_level - 1)));
-                uint64_t right_child = getRightChild(node_id, curr_level);
-                runsRecursiveDecode(decoded, rightResult, right_child, next_level);
+                // uint64_t right_child = getRightChild(node_id, curr_level);
+                runsRecursiveDecode(decoded, rightResult, getRightChild(node_id, curr_level), curr_level+1);
             }
         };
 

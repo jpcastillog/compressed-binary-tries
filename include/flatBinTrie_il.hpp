@@ -216,24 +216,21 @@ class flatBinTrie_il: public binaryTrie{
                 return ((lastLevel[2*node_id -flatBinTrie_il::bTrie.size()]) << 1) | (lastLevel[(2*node_id -flatBinTrie_il::bTrie.size())+1]);
         };
 
-        inline uint64_t getNode1(uint64_t &node_id) {
-            uint64_t pos  = 2 * node_id;
-                return (((*bTrie)[pos]) << 1) | (*bTrie)[pos+1];
-        }
-
-        uint64_t getNode2(uint64_t &node_id) {
-            uint64_t pos = 2*node_id - (bTrie -> size());
-            return ((*lastLevel)[pos] << 1) | (*lastLevel)[pos+1];
-        }
-
 
         inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
-                uint64_t rank = flatBinTrie_il::b_rank((2*node_id) + 1);
-                return rank;
+                if (level >= getHeight()-1) // Last level don't have rank structure
+                    return 0;
+                else 
+                    return flatBinTrie_il::b_rank((2*node_id) + 1);
+                // uint64_t rank = flatBinTrie_il::b_rank((2*node_id) + 1);
+                // return rank;
         };
 
 
         inline uint64_t getRightChild(uint64_t &node_id, uint16_t level) {
+            if (level >= getHeight()-1) // Last level don't have rank structure
+                return 0; 
+            else
                 return flatBinTrie_il::b_rank((2*node_id) + 2);
         };
 

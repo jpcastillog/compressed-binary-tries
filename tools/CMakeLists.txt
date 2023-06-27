@@ -1,7 +1,18 @@
-# add_library(intersection ../src/intersection.cpp ../include/intersection.hpp)
-
 add_executable(build build_tries.cpp)
 add_executable(queries intersection_query_log.cpp)
+add_executable(cbv_coding cbv_coding.cpp)
+add_executable(classic_coders classic_coders.cpp)
+add_executable(measures measures.cpp)
+add_executable(pom pom.cpp)
+add_executable(build_fastTries build_fastTries.cpp)
+add_executable(intersection_querylog_fastTrie intersection_querylog_fastTrie.cpp)
 
 target_link_libraries(queries PUBLIC intersection pthread sdsl divsufsort divsufsort64)
+target_link_libraries(intersection_querylog_fastTrie PUBLIC fastTrieIntersection pthread sdsl divsufsort divsufsort64)
 target_link_libraries(build PUBLIC sdsl divsufsort divsufsort64)
+target_link_libraries(cbv_coding PUBLIC sdsl divsufsort divsufsort64)
+target_link_libraries(classic_coders PUBLIC sdsl divsufsort divsufsort64)
+target_link_libraries(measures PUBLIC sdsl divsufsort divsufsort64)
+target_link_libraries(pom PUBLIC sdsl divsufsort divsufsort64)
+target_link_libraries(build_fastTries PUBLIC sdsl divsufsort divsufsort64)
+

@@ -160,12 +160,18 @@ class binTrie : public binaryTrie{
 
         
         inline uint64_t getLeftChild(uint64_t &node_id, uint16_t level) {
-            return binTrie::bv_rank[level](2*node_id);
+            if (level >= getHeight()-1) 
+                return 0;
+            else
+                return binTrie::bv_rank[level](2*node_id);
         };
 
 
         inline uint64_t getRightChild(uint64_t &node_id, uint16_t level) {
-            return binTrie::bv_rank[level](2*node_id + 1);
+            if (level >= getHeight()-1)
+                return 0;
+            else
+                return binTrie::bv_rank[level](2*node_id + 1);
         };
         
         

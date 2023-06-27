@@ -1,11 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sdsl/bit_vectors.hpp>
-#include "../include/flatBinTrie.hpp"
-#include "../include/flatBinTrie_il.hpp"
-#include "../include/binTrie_il.hpp"
-#include "../include/binTrie.hpp"
-#include "../include/binaryTrie.hpp"
+#include "fastBinaryTrie.hpp"
 
 using namespace std;
 using namespace sdsl;
@@ -24,7 +20,6 @@ vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
 }
 
 
-template <uint32_t block_size>
 void buildCollection(std::string input_path, std::string out_path,
                      uint64_t min_size, int rank_type, bool runs, bool levelwise) {
     
@@ -66,8 +61,8 @@ void buildCollection(std::string input_path, std::string out_path,
     // Write universe in out file
     if (out_path != "") {
         out.write(reinterpret_cast<char *> (&rank_type), sizeof(rank_type));
-        if (rank_type == 1) 
-            out.write(reinterpret_cast<char *> (block_size), sizeof(block_size));
+        // if (rank_type == 1) 
+        //     out.write(reinterpret_cast<char *> (block_size), sizeof(block_size));
         out.write(reinterpret_cast<char *> (&runs), sizeof(runs));
         out.write(reinterpret_cast<char *> (&levelwise), sizeof(levelwise));
         out.write(reinterpret_cast<char *> (&nSets), sizeof(nSets));
@@ -95,71 +90,49 @@ void buildCollection(std::string input_path, std::string out_path,
             uint64_t max_value = il[n - 1];
             
             if (rank_type == 0) {
-                if (levelwise){
-                    binTrie<rank_support_v<1>> trie_v = binTrie<rank_support_v<1>>(il, u);
-                    if (runs)
-                        trie_v.encodeRuns();
-                    if (out_path != "") {
-                        trie_v.serialize(out);
-                    }
-                    trie_bytes_size = trie_v.size_in_bytes();
+                fastBinaryTrie<rank_support_v<1>> trie_v = fastBinaryTrie<rank_support_v<1>>(il, u);
+                if (runs)
+                    trie_v.encodeRuns();
+                if (out_path != "") {
+                    trie_v.serialize(out);
                 }
-                else {    
-                    flatBinTrie<rank_support_v<1>> trie_v = flatBinTrie<rank_support_v<1>>(il, u);
-                    if (runs)
-                        trie_v.encodeRuns();
-                    if (out_path != "") {
-                        trie_v.serialize(out);
-                    }
-                    trie_bytes_size = trie_v.size_in_bytes();
-                }
+                trie_bytes_size = trie_v.size_in_bytes();
             }
 
-            else if (rank_type == 1) {
-                if (levelwise) {
-                    binTrie_il<block_size> trie_il(il, u);
-                    if (runs) {
-                        trie_il.encodeRuns();
-                    }
-                    if (out_path != "") {
-                        trie_il.serialize(out);
-                    }
-                    trie_bytes_size = trie_il.size_in_bytes();
-                }
-                else {
-                    flatBinTrie_il<block_size> trie_il(il, u);
-                    if (runs) {
-                        trie_il.encodeRuns();
-                    }
-                    if (out_path != "") {
-                        trie_il.serialize(out);
-                    }
-                    trie_bytes_size = trie_il.size_in_bytes();
-                }
+            // else if (rank_type == 1) {
+            //     if (levelwise) {
+            //         binTrie_il<block_size> trie_il(il, u);
+            //         if (runs) {
+            //             trie_il.encodeRuns();
+            //         }
+            //         if (out_path != "") {
+            //             trie_il.serialize(out);
+            //         }
+            //         trie_bytes_size = trie_il.size_in_bytes();
+            //     }
+            //     else {
+            //         flatBinTrie_il<block_size> trie_il(il, u);
+            //         if (runs) {
+            //             trie_il.encodeRuns();
+            //         }
+            //         if (out_path != "") {
+            //             trie_il.serialize(out);
+            //         }
+            //         trie_bytes_size = trie_il.size_in_bytes();
+            //     }
 
-            }
+            // }
 
             else {
-                if (levelwise){
-                    binTrie<rank_support_v5<1>> trie_v5 = binTrie<rank_support_v5<1>>(il, u);
-                    if (runs)
-                        trie_v5.encodeRuns();
-                    if (out_path != "") {
-                        trie_v5.serialize(out);
-                    }
-                    trie_bytes_size = trie_v5.size_in_bytes();
-                    // vector<uint64_t> decoded;
-                    // trie_v5.decode(decoded);
+                fastBinaryTrie<rank_support_v5<1>> trie_v5 = fastBinaryTrie<rank_support_v5<1>>(il, u);
+                if (runs)
+                    trie_v5.encodeRuns();
+                if (out_path != "") {
+                    trie_v5.serialize(out);
                 }
-                else {
-                    flatBinTrie<rank_support_v5<1>> trie_v5 = flatBinTrie<rank_support_v5<1>>(il, u);
-                    if (runs)
-                        trie_v5.encodeRuns();
-                    if (out_path != "") {
-                        trie_v5.serialize(out);
-                    }
-                    trie_bytes_size = trie_v5.size_in_bytes();
-                }
+                trie_bytes_size = trie_v5.size_in_bytes();
+                // vector<uint64_t> decoded;
+                // trie_v5.decode(decoded);
             }
             total_size += trie_bytes_size;
             total_elements += n;
@@ -264,13 +237,13 @@ int main(int argc, char** argv) {
     std::cout << "* Level-wise: " << (levelwise == 1 ? "true" : "false") << std::endl;
     std::cout << "Output file name: "<< output_filename << endl;
     
-    if (block_size == 512)
-        buildCollection<512>(input_filename, output_filename, min_size, rank, runs, levelwise);
-    else if (block_size == 256)
-        buildCollection<256>(input_filename, output_filename, min_size, rank, runs, levelwise);
-    else if (block_size == 128)
-        buildCollection<128>(input_filename, output_filename, min_size, rank, runs, levelwise);
-    else
-        buildCollection<64> (input_filename, output_filename, min_size, rank, runs, levelwise);
+    // if (block_size == 512)
+        buildCollection(input_filename, output_filename, min_size, rank, runs, levelwise);
+    // else if (block_size == 256)
+    //     buildCollection<256>(input_filename, output_filename, min_size, rank, runs, levelwise);
+    // else if (block_size == 128)
+    //     buildCollection<128>(input_filename, output_filename, min_size, rank, runs, levelwise);
+    // else
+    //     buildCollection<64> (input_filename, output_filename, min_size, rank, runs, levelwise);
 
 }
