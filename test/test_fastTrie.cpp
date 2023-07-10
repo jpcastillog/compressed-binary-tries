@@ -19,7 +19,7 @@ vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
     return il;
 }
 
-template<uint32_t block_size>
+template<class wordType>
 void verifyEncode(std::string input_path, uint32_t min_size, bool rank_type, bool runs) {
     std::ifstream input_stream;
     input_stream.open(input_path, std::ios::binary | std::ios::in);
@@ -67,7 +67,7 @@ void verifyEncode(std::string input_path, uint32_t min_size, bool rank_type, boo
             vector <uint64_t> il = read_inv_list(input_stream, n);
             uint64_t max_value = il[n - 1];
             if (rank_type == 0) {
-                fastBinaryTrie<rank_support_v<1>> trie(il, u);
+                fastBinaryTrie<rank_support_v<1>, wordType> trie(il, u);
                 // cout << "trie encoded" << endl;
                 if (runs)
                     trie.encodeRuns();
@@ -106,7 +106,7 @@ void verifyEncode(std::string input_path, uint32_t min_size, bool rank_type, boo
 
             // }
             else {
-                fastBinaryTrie<rank_support_v5<1>> trie(il, u);
+                fastBinaryTrie<rank_support_v5<1>, wordType> trie(il, u);
                 // if (runs)
                 //     trie->encodeRuns();
                 trie_bytes_size = trie.size_in_bytes();
@@ -150,6 +150,7 @@ int main(int argc, char** argv) {
     }
 
     int rank = 0;
+    uint16_t wsize = 64;
     uint64_t min_size = 0;
     uint32_t block_size = 512;
     bool runs = false;
@@ -187,9 +188,15 @@ int main(int argc, char** argv) {
             ++i;
             output_filename = std::string(argv[i]);
         }
+        if (std::string(argv[i]) == "--wsize") {
+            ++i;
+            wsize= atoi(argv[i]);
+
+        }
     }
     
     std::cout << "Min size: " << min_size << std::endl;
+    std::cout << "Word size: " << wsize << std:: endl;
     std::cout << "Rank: ";
     if (rank  == 0){
         std::cout << "rank v" << std::endl;
@@ -203,14 +210,14 @@ int main(int argc, char** argv) {
     std::cout << "Runs: " << (runs == 1 ? "true" : "false") << std::endl;
     std::cout << "Output file name: "<< output_filename << endl;
     
-    if (block_size == 512)
-        verifyEncode<512>(input_filename, min_size, rank, runs);
-    else if (block_size == 256)
-        verifyEncode<256>(input_filename, min_size, rank, runs);
-    else if (block_size == 128)
-        verifyEncode<128>(input_filename, min_size, rank, runs);
+    if (wsize == 64)
+        verifyEncode<uint64_t>(input_filename, min_size, rank, runs);
+    else if (wsize == 32)
+        verifyEncode<uint32_t>(input_filename, min_size, rank, runs);
+    else if (wsize == 16)
+        verifyEncode<uint16_t>(input_filename, min_size, rank, runs);
     else
-        verifyEncode<64> (input_filename, min_size, rank, runs);
+        verifyEncode<uint8_t> (input_filename, min_size, rank, runs);
     
     return 0;
 }

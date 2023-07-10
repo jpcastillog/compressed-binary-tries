@@ -15,7 +15,7 @@
 using namespace sdsl;
 using namespace std;
 
-template <class rankType>
+template <class rankType, class wordType>
 class fastBinaryTrie{
     private:
         uint16_t height; // original height of trie
@@ -24,7 +24,7 @@ class fastBinaryTrie{
         bool runs_encoded;
         bool empty_trie;
         sdsl::bit_vector bTrie;
-        vector<uint64_t> lastLevel;     
+        vector<wordType> lastLevel;     
         rankType b_rank;        
 
     public:
@@ -36,7 +36,7 @@ class fastBinaryTrie{
             uint32_t n = set.size();
 
             fastBinaryTrie::height_u = floor(log2(u - 1)) +  1;
-            fastBinaryTrie::height = height_u - log2(64) + 1; //only works for height > 6
+            fastBinaryTrie::height = height_u - floor(log2(sizeof(wordType)*8)) + 1; //only works for height > 6
             uint64_t max_nodes     = 2 * (pow(2, height_u) - 1);
             
             fastBinaryTrie::bTrie = bit_vector(max_nodes, 0);
@@ -65,7 +65,7 @@ class fastBinaryTrie{
                 if (level == height-1){
                     uint64_t word = 0;
                     for (uint64_t i = l; i < r+1; ++i){
-                        uint64_t element = set[i] & (((uint64_t)1 << 6) - 1);
+                        uint64_t element = set[i] & (((uint64_t)1 << (uint64_t)(log2(sizeof(wordType)*8))) - 1);
                         word |= ((uint64_t)1 << element);
                     }
                     fastBinaryTrie::lastLevel.push_back(word);
@@ -160,13 +160,17 @@ class fastBinaryTrie{
 
 
         inline uint64_t getNode(uint64_t &node_id, uint16_t level) {
-            if (level < fastBinaryTrie::height-1) {
+            // if (level < fastBinaryTrie::height-1) {
                 return ((bTrie[2 * node_id]) << 1) | bTrie[(2 * node_id)+1];
-            }
-            else {
-                // cout << nodev_id << ", " << (fastBinaryTrie::bTrie.size()/2) << endl;
-                return lastLevel[node_id - (fastBinaryTrie::bTrie.size()/2)];
-            }
+            // }
+            // else {
+            //     // cout << nodev_id << ", " << (fastBinaryTrie::bTrie.size()/2) << endl;
+            //     return lastLevel[node_id - (fastBinaryTrie::bTrie.size()/2)];
+            // }
+        };
+
+        inline wordType getWord(uint64_t &node_id){
+            return lastLevel[node_id - (fastBinaryTrie::bTrie.size()/2)];
         };
 
 
@@ -186,12 +190,11 @@ class fastBinaryTrie{
                 
         };
 
-        // return size of bytes of all structure
+        // return size of bytes of all data structure
         inline uint64_t size_in_bytes() {
             uint64_t bv_size = sdsl::size_in_bytes(fastBinaryTrie::bTrie);
-            uint64_t lastL_size = 
-                                    //sizeof(fastBinaryTrie::lastLevel)+ 
-                                  sizeof(uint64_t)*fastBinaryTrie::lastLevel.size();
+            uint64_t lastL_size = sizeof(fastBinaryTrie::lastLevel) + 
+                                  sizeof(wordType)*fastBinaryTrie::lastLevel.size();
             uint64_t rank_size = sdsl::size_in_bytes(fastBinaryTrie::b_rank);
             return bv_size +
                     rank_size +
@@ -201,7 +204,6 @@ class fastBinaryTrie{
         };
         
         uint64_t serialize(std::ostream &out) {
-
             out.write(reinterpret_cast<char*>(&height)          , sizeof(height));
             out.write(reinterpret_cast<char*>(&(fastBinaryTrie::height_with_runs)), sizeof(fastBinaryTrie::height_with_runs));
             out.write(reinterpret_cast<char*>(&(fastBinaryTrie::empty_trie))      , sizeof(fastBinaryTrie::empty_trie));
@@ -213,8 +215,8 @@ class fastBinaryTrie{
             
             uint64_t size_last_level = lastLevel.size();
             out.write(reinterpret_cast<char*>(&size_last_level), sizeof(uint64_t));
-            for (uint64_t x: lastLevel)
-                out.write(reinterpret_cast<char*>(&x), sizeof(uint64_t));
+            for (wordType x: lastLevel)
+                out.write(reinterpret_cast<char*>(&x), sizeof(wordType));
 
             return bvs_size + rank_size + sizeof(lastLevel) + 
                    sizeof(height) + sizeof(height_with_runs) +
@@ -235,22 +237,23 @@ class fastBinaryTrie{
             in.read(reinterpret_cast<char*>(&sizeLastLevel), sizeof(uint64_t));
             lastLevel.reserve(sizeLastLevel);
             for (uint64_t i = 0; i < sizeLastLevel; ++i){
-                uint64_t x;
-                in.read(reinterpret_cast<char*>(&x), sizeof(uint64_t));
+                wordType x;
+                in.read(reinterpret_cast<char*>(&x), sizeof(wordType));
                 lastLevel.push_back(x);
             }
-            height_u = height + 6 - 1;
+            height_u = height + (uint16_t)(log2(sizeof(wordType)*8)) - 1;
         };
 
 
         void writeCompressTrie(vector<uint64_t> ones_to_write[], //vector array
-                                vector<uint64_t> &newLastLevel,
+                                vector<wordType> &newLastLevel,
                                 uint64_t* level_pos, 
                                 uint16_t curr_level, uint64_t node_id, bool &its11){
             // End condition
             if (curr_level == (fastBinaryTrie::height-1)) {
-                uint64_t w = getNode(node_id, curr_level);
-                if (w == ~((uint64_t)0)) {
+                // uint64_t w = getNode(node_id, curr_level);
+                wordType w = getWord(node_id);
+                if (w == ~((wordType)0)) {
                     its11 = true;
                 }
                 newLastLevel.push_back(w);
@@ -341,7 +344,7 @@ class fastBinaryTrie{
             uint64_t *level_pos = new uint64_t[fastBinaryTrie::height];
             for(uint64_t i = 0; i < fastBinaryTrie::height; ++i) level_pos[i] = 0;
             
-            vector<uint64_t> newLastLevel;
+            vector<wordType> newLastLevel;
             bool itsOneOne = false;
             writeCompressTrie(ones_to_write, newLastLevel, level_pos, 0, 0, itsOneOne);
             fastBinaryTrie::lastLevel = newLastLevel;
@@ -357,10 +360,11 @@ class fastBinaryTrie{
         inline void recursiveDecode(vector<uint64_t> &decoded, uint64_t partial_int, uint64_t node_id, uint16_t curr_level) {
             
             if (curr_level == fastBinaryTrie::height-1) {
-                uint64_t node = getNode(node_id, curr_level);
-                uint64_t w = node;
+                // uint64_t node = getNode(node_id, curr_level);
+                wordType w = getWord(node_id);
+                // uint64_t w = node;
                 while (w != 0){
-                    uint64_t t = w & (~w + 1);            
+                    wordType t = w & (~w + 1);            
                     uint64_t r = __builtin_ctzll(w);
                     decoded.push_back(r + partial_int);
                     w ^= t;
@@ -385,10 +389,11 @@ class fastBinaryTrie{
         inline void runsRecursiveDecode(vector<uint64_t> &decoded, uint64_t partial_int, uint64_t node_id, uint16_t curr_level) {
             
             if (curr_level == fastBinaryTrie::height-1) {
-                uint64_t node = getNode(node_id, curr_level);
-                uint64_t w = node;
+                // uint64_t node = getNode(node_id, curr_level);
+                wordType w = getWord(node_id);
+                // uint64_t w = node;
                 while (w != 0){
-                    uint64_t t = w & (~w + 1);            
+                    wordType t = w & (~w + 1);            
                     uint64_t r = __builtin_ctzll(w);
                     decoded.push_back(r + partial_int);
                     w ^= t;

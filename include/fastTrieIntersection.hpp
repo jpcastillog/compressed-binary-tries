@@ -9,8 +9,8 @@
 using namespace std;
 using namespace sdsl;
 
-template<class rankType>
-vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, bool parallel);
+template<class rankType, class wordType>
+vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType, wordType>*> &Ts, bool runs, bool parallel);
 
 vector<uint64_t> forceBruteIntersection(vector<vector<uint64_t>> &S);
 // template<>

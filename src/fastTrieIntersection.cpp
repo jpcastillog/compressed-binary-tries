@@ -36,20 +36,22 @@ vector<uint64_t> forceBruteIntersection(vector<vector<uint64_t>> &S){
     return intersection;
 }
 
-template<class rankType>
-void runsAND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &maxLevel,
+
+template<class rankType, class wordType>
+void runsAND(vector<fastBinaryTrie<rankType, wordType>*> &Ts, uint64_t nTries, uint64_t &maxLevel,
             uint64_t currLevel, uint64_t roots[], bool activeTries[], 
             uint64_t prefix, vector<uint64_t> &r){
             
     if (currLevel == maxLevel-1) {
-        uint64_t w =(~0);
+        wordType w =(~0);
         for (uint16_t i = 0; i < nTries; ++i) {
             if (activeTries[i])
-                w &= Ts[i]->getNode(roots[i], currLevel);
+                // w &= Ts[i]->getNode(roots[i], currLevel);
+                w &= Ts[i] -> getWord(roots[i]);
         }
         // prefix = prefix << 5;
         while (w != 0){
-            uint64_t t = w & (~w + 1);            
+            wordType t = w & (~w + 1);            
             uint64_t z = __builtin_ctzll(w);
             r.push_back(z + prefix);
             w ^= t;
@@ -80,7 +82,7 @@ void runsAND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &m
 
     if (orResult == 0b00) {
         uint64_t below = prefix;
-        uint64_t range = ((uint64_t)1 << ((maxLevel+6-1) - currLevel))- 1;
+        uint64_t range = ((uint64_t)1 << ((maxLevel+(uint64_t)(log2(sizeof(wordType)*8))-1) - currLevel))- 1;
         uint64_t above = (prefix) | range;
         // std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
         for (uint64_t i = below; i <= above; ++i) {
@@ -103,7 +105,7 @@ void runsAND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &m
     }
     else if (andResult == 0b01) {
         uint64_t rightNodes[16];
-        uint64_t rightResult = (prefix | ((uint64_t)1 << ((maxLevel+5)- currLevel - 1)));
+        uint64_t rightResult = (prefix | ((uint64_t)1 << ((maxLevel+(uint64_t)(log2(sizeof(wordType)*8))-1)- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel -1)
                 rightNodes[i] = Ts[i] -> getRightChild(roots[i], currLevel);
@@ -116,7 +118,7 @@ void runsAND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &m
         uint64_t leftNodes[16];
         uint64_t rightNodes[16];
         uint64_t leftResult = prefix;
-        uint64_t rightResult = (prefix | ((uint64_t)1 << ((maxLevel+5)- currLevel - 1)));;
+        uint64_t rightResult = (prefix | ((uint64_t)1 << ((maxLevel+(uint64_t)(log2(sizeof(wordType)*8))-1)- currLevel - 1)));;
         for (i = 0; i < nTries; ++i) {
             if (tempActiveTries[i] && currLevel != maxLevel - 1) {
                 uint64_t leftNode = Ts[i] -> getLeftChild(roots[i], currLevel);
@@ -132,22 +134,26 @@ void runsAND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &m
     return;
 };
 
-template<class rankType>
-bool AND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &maxLevel,
+
+template<class rankType, class wordType>
+bool AND(vector<fastBinaryTrie<rankType, wordType>*> &Ts, uint64_t nTries, uint64_t &maxLevel,
         uint64_t currLevel, uint64_t roots[], uint64_t prefix, vector<uint64_t> &r){
     if (currLevel == maxLevel-1) {
-        uint64_t w = ~0;
+        // uint64_t w = (~0);
+        wordType w = (~0);
         for (uint16_t i = 0; i < nTries; ++i) 
-            w &= Ts[i] -> getNode(roots[i], currLevel);
-        prefix <<= 6;
+            // w &= Ts[i] -> getNode(roots[i], currLevel);
+            w &= Ts[i] -> getWord(roots[i]);
+        // prefix <<= 6;
         while (w != 0){
-            uint64_t t = w & (~w + 1);            
+            wordType t = w & (~w + 1);            
             uint64_t z = __builtin_ctzll(w);
             r.push_back(z + prefix);
             w ^= t;
         }
         return true;
     }
+
     uint64_t i;
     uint64_t andResult = 0b11;
     for (i = 0; i < nTries; ++i) {
@@ -172,7 +178,7 @@ bool AND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &maxLe
     }
     else if (andResult == 0b01) {
         uint64_t rightNodes[16];
-        uint64_t rightResult = (prefix | ((uint64_t)1 << (maxLevel- currLevel - 1)));
+        uint64_t rightResult = (prefix | ((uint64_t)1 << ((maxLevel+(uint64_t)(log2(sizeof(wordType)*8))-1)- currLevel - 1)));
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel -1)
                 rightNodes[i] = Ts[i] -> getRightChild(roots[i], currLevel);
@@ -184,7 +190,7 @@ bool AND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &maxLe
         uint64_t leftNodes[16];
         uint64_t rightNodes[16];
         uint64_t leftResult = prefix;
-        uint64_t rightResult = (prefix | (1ULL << (maxLevel- currLevel - 1)));;
+        uint64_t rightResult = (prefix | ((uint64_t)1 << ((maxLevel+(uint64_t)(log2(sizeof(wordType)*8))-1)- currLevel - 1)));;
         for (i = 0; i < nTries; ++i) {
             if (currLevel != maxLevel - 1) {
                 uint64_t leftNode = Ts[i] -> getLeftChild(roots[i], currLevel);
@@ -200,8 +206,9 @@ bool AND(vector<fastBinaryTrie<rankType>*> &Ts, uint64_t nTries, uint64_t &maxLe
     return false;
 };
 
-template<class rankType>
-void partialAND(vector<fastBinaryTrie<rankType>*> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level, 
+
+template<class rankType, class wordType>
+void partialAND(vector<fastBinaryTrie<rankType, wordType>*> &Ts, uint16_t n_tries, uint64_t max_level, uint64_t curr_level, 
                 uint64_t cut_level, uint64_t roots[], bool activeTries[], uint64_t partial_int,
                 vector <uint64_t> &r, vector<uint64_t> &partial_ints, vector<uint64_t*> &threads_roots,
                 vector<bool*> &threads_activeTries, bool runs) {
@@ -251,7 +258,7 @@ void partialAND(vector<fastBinaryTrie<rankType>*> &Ts, uint16_t n_tries, uint64_
         return;
     if (runs && node00 == 0b00) {
         uint64_t below = partial_int;
-        uint64_t range = ((uint64_t)1 << ((max_level+5) - curr_level))- 1;
+        uint64_t range = ((uint64_t)1 << ((max_level+(uint64_t)(log2(sizeof(wordType)*8))-1) - curr_level))- 1;
         uint64_t above = partial_int | range;
         // std::generate_n(std::back_inserter(r), above-below+1,[&]()mutable{return r.size();});
         for (uint64_t i = below; i <= above; ++i) r.push_back(i);
@@ -276,7 +283,7 @@ void partialAND(vector<fastBinaryTrie<rankType>*> &Ts, uint16_t n_tries, uint64_
     else if (result == 0b01){
         uint64_t right_nodes[16];
         uint64_t rightResult = partial_int;
-        rightResult = (rightResult | ((uint64_t)1 << ((max_level+5)- curr_level - 1)));
+        rightResult = (rightResult | ((uint64_t)1 << ((max_level+(uint64_t)(log2(sizeof(wordType)*8))-1)- curr_level - 1)));
         for (uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i])
                 right_nodes[i] = Ts[i] -> getRightChild(roots[i], curr_level);
@@ -293,7 +300,7 @@ void partialAND(vector<fastBinaryTrie<rankType>*> &Ts, uint16_t n_tries, uint64_
         uint64_t right_nodes[16];
         uint64_t leftResult = partial_int;
         uint64_t rightResult = partial_int;
-        rightResult = (rightResult | ((uint64_t)1 << ((max_level+5)- curr_level - 1)));
+        rightResult = (rightResult | ((uint64_t)1 << ((max_level+(uint64_t)(log2(sizeof(wordType)*8))-1)- curr_level - 1)));
         for(uint64_t i = 0; i < n_tries; ++i) {
             if (runs && tempActiveTries[i]) {
                 uint64_t left_node = Ts[i] -> getLeftChild(roots[i], curr_level);
@@ -317,8 +324,8 @@ void partialAND(vector<fastBinaryTrie<rankType>*> &Ts, uint16_t n_tries, uint64_
     }
 }
 
-template<class rankType>
-vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, bool parallel){
+template<class rankType, class wordType>
+vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType, wordType>*> &Ts, bool runs, bool parallel){
     uint64_t height = Ts[0] -> getHeight();
     for (auto T: Ts){
         if (T->getHeight() != height){
@@ -347,7 +354,7 @@ vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, boo
         vector<uint64_t*> threadRoots;
         vector<uint64_t> tpartialSolutions;
 
-        partialAND<rankType>(Ts, nTries, height, 0, level_of_cut, 
+        partialAND<rankType, wordType>(Ts, nTries, height, 0, level_of_cut, 
                     roots, activeTries, 0, intersection,
                     tpartialSolutions, threadRoots, threadActiveTries, runs);
         
@@ -360,8 +367,8 @@ vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, boo
         vector<uint64_t> nextPartialSolutions;
         uint64_t i = 0;
         while ((nThreads - usedThreads > 1) && (i < totalThreads)) {
-            partialAND<rankType>(Ts, nTries, height, level_of_cut, level_of_cut+1, threadRoots[i], 
-                        threadActiveTries[i], tpartialSolutions[i], intersection, 
+            partialAND<rankType, wordType>(Ts, nTries, height, level_of_cut, level_of_cut+1, threadRoots[i], 
+                        runs?threadActiveTries[i]:activeTries, tpartialSolutions[i], intersection, 
                         nextPartialSolutions, nextRoots, nextActiveTries, runs);
             usedThreads = totalThreads + nextRoots.size() - (++i);
         }
@@ -369,7 +376,9 @@ vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, boo
 
         for(uint16_t j = i; j < totalThreads; ++j) {
             nextRoots.push_back(threadRoots[j]);
-            nextActiveTries.push_back(threadActiveTries[j]);
+            if (runs){
+                nextActiveTries.push_back(threadActiveTries[j]);
+            }
             nextPartialSolutions.push_back(tpartialSolutions[j]);
             nextInitLevel.push_back(level_of_cut);
         }
@@ -380,7 +389,7 @@ vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, boo
         if (runs){
             parallel_for(usedThreads, usedThreads, [&](int start, int end) {
                 for (uint16_t threadId = start; threadId < end; ++threadId) {
-                    runsAND<rankType>(Ts, nTries, height, nextInitLevel[threadId], 
+                    runsAND<rankType, wordType>(Ts, nTries, height, nextInitLevel[threadId], 
                         nextRoots[threadId], nextActiveTries[threadId],
                         nextPartialSolutions[threadId], threads_results[threadId]);
                 }
@@ -389,7 +398,7 @@ vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, boo
         else {
             parallel_for(usedThreads, usedThreads, [&](int start, int end) {
                 for (uint16_t threadId = start; threadId < end; ++threadId) {
-                    AND<rankType>(Ts, nTries, height, nextInitLevel[threadId], 
+                    AND<rankType, wordType>(Ts, nTries, height, nextInitLevel[threadId], 
                         nextRoots[threadId], nextPartialSolutions[threadId], 
                         threads_results[threadId]);
                 }
@@ -440,7 +449,21 @@ vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType>*> &Ts, bool runs, boo
 
     return intersection;
 }
+// Rank v
 template
-vector<uint64_t> Intersect<rank_support_v<1>>(vector<fastBinaryTrie<rank_support_v<1>>*> &Ts, bool runs, bool parallel);
+vector<uint64_t> Intersect<rank_support_v<1>, uint64_t>(vector<fastBinaryTrie<rank_support_v<1>, uint64_t>*> &Ts, bool runs, bool parallel);
 template
-vector<uint64_t> Intersect<rank_support_v5<1>>(vector<fastBinaryTrie<rank_support_v5<1>>*> &Ts, bool runs, bool parallel);
+vector<uint64_t> Intersect<rank_support_v<1>, uint32_t>(vector<fastBinaryTrie<rank_support_v<1>, uint32_t>*> &Ts, bool runs, bool parallel);
+template
+vector<uint64_t> Intersect<rank_support_v<1>, uint16_t>(vector<fastBinaryTrie<rank_support_v<1>, uint16_t>*> &Ts, bool runs, bool parallel);
+template
+vector<uint64_t> Intersect<rank_support_v<1>, uint8_t>(vector<fastBinaryTrie<rank_support_v<1>, uint8_t>*> &Ts, bool runs, bool parallel);
+// Rank v5
+template
+vector<uint64_t> Intersect<rank_support_v5<1>, uint64_t>(vector<fastBinaryTrie<rank_support_v5<1>, uint64_t>*> &Ts, bool runs, bool parallel);
+template
+vector<uint64_t> Intersect<rank_support_v5<1>, uint32_t>(vector<fastBinaryTrie<rank_support_v5<1>, uint32_t>*> &Ts, bool runs, bool parallel);
+template
+vector<uint64_t> Intersect<rank_support_v5<1>, uint16_t>(vector<fastBinaryTrie<rank_support_v5<1>, uint16_t>*> &Ts, bool runs, bool parallel);
+template
+vector<uint64_t> Intersect<rank_support_v5<1>, uint8_t>(vector<fastBinaryTrie<rank_support_v5<1>, uint8_t>*> &Ts, bool runs, bool parallel);
