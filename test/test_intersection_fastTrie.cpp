@@ -15,6 +15,7 @@ using namespace sdsl;
 bool runs = false;
 bool levelwise = false;
 uint32_t block_size = 512; //Only needed on binTrie_il
+uint16_t wsize = 64;
 
 
 vector<vector<uint64_t>> loadQueryLog(string queryPath){
@@ -38,15 +39,15 @@ vector<vector<uint64_t>> loadQueryLog(string queryPath){
     return queries;
 }
 
-template<class rankType>
-map<uint64_t, fastBinaryTrie<rankType>*> loadTries(ifstream &in, vector<vector<uint64_t>> &queries){
+template<class rankType, class wordType>
+map<uint64_t, fastBinaryTrie<rankType, wordType>*> loadTries(ifstream &in, vector<vector<uint64_t>> &queries){
     vector<uint64_t> setIndexes;
     for(auto q: queries)
         setIndexes.insert(setIndexes.end(), q.begin(), q.end());
     sort(setIndexes.begin(), setIndexes.end());
     setIndexes.erase(unique(setIndexes.begin(), setIndexes.end()), setIndexes.end());
 
-    map<uint64_t, fastBinaryTrie<rankType>*> tries; 
+    map<uint64_t, fastBinaryTrie<rankType, wordType>*> tries; 
     uint64_t nIl = 0;
     uint32_t _1, u, n;
     in.read(reinterpret_cast<char*>(&n), sizeof(n));
@@ -56,7 +57,7 @@ map<uint64_t, fastBinaryTrie<rankType>*> loadTries(ifstream &in, vector<vector<u
     std::cout << "Universe: "<< u << std::endl;
     uint32_t np = 0;
     for(uint32_t i = 0; i < n; ++i) {
-        fastBinaryTrie<rankType>* trie = new fastBinaryTrie<rankType>();
+        fastBinaryTrie<rankType, wordType>* trie = new fastBinaryTrie<rankType, wordType>();
         trie -> load(in);
         if (i == setIndexes[np]){
             tries.insert({i, trie});
@@ -67,23 +68,23 @@ map<uint64_t, fastBinaryTrie<rankType>*> loadTries(ifstream &in, vector<vector<u
     return tries;
 }
 
-template<class rankType>
+template<class rankType, class wordType>
 void performIntersections( std::ifstream &in_sequences, std::string query_path,
                          bool runs_encoded) {
     
     vector<vector<uint64_t>> queries;
-    map<uint64_t, fastBinaryTrie<rankType>*> tries;
+    map<uint64_t, fastBinaryTrie<rankType, wordType>*> tries;
 
     queries = loadQueryLog(query_path);
     cout << "Queries loaded succefully, Total: " << queries.size() << "" << endl;
-    tries = loadTries<rankType>(in_sequences, queries);
+    tries = loadTries<rankType, wordType>(in_sequences, queries);
     cout << "Sequences loaded succefully, Total: " << tries.size() << endl;
 
     cout << "Computing queries...\n";
     uint64_t nq = 0;
     long unsigned int total_time = 0;
     for (auto q: queries) {
-        vector<fastBinaryTrie<rankType>*> QTries;
+        vector<fastBinaryTrie<rankType, wordType>*> QTries;
         vector<vector<uint64_t>> Qsets;
         for (auto i: q){
             vector<uint64_t> decodedTrie;
@@ -95,7 +96,7 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
         vector<uint64_t> FBintersection;
         if (QTries.size() <= 16){
             auto start = std::chrono::high_resolution_clock::now();
-            intersection = Intersect<rankType>(QTries, runs_encoded, true);
+            intersection = Intersect<rankType, wordType>(QTries, runs_encoded, true);
             auto end = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
             auto time = elapsed.count();
@@ -165,10 +166,26 @@ int main(int argc, char const *argv[]) {
     std::cout << "* Runs:" << (runs == 1 ? "true" : "false") << std::endl;
     std::cout << "* Level-wise: " << (levelwise == 1 ? "true" : "false") << std::endl;
 
-    if (rankT == 0)
-        performIntersections<sdsl::rank_support_v<1>>(in_sequences, querylog_filename, runs);
-    else
-        performIntersections<sdsl::rank_support_v5<1>>(in_sequences, querylog_filename, runs);
+    if (rankT == 0){
+        if (wsize == 64)
+            performIntersections<sdsl::rank_support_v<1>, uint64_t>(in_sequences, querylog_filename, runs);
+        else if (wsize == 32)
+            performIntersections<sdsl::rank_support_v<1>, uint32_t>(in_sequences, querylog_filename, runs);
+        else if (wsize == 16)
+            performIntersections<sdsl::rank_support_v<1>, uint16_t>(in_sequences, querylog_filename, runs);
+        else
+            performIntersections<sdsl::rank_support_v<1>, uint8_t>(in_sequences, querylog_filename, runs);
+    }
+    else{
+        if (wsize == 64)
+            performIntersections<sdsl::rank_support_v5<1>, uint64_t>(in_sequences, querylog_filename, runs);
+        else if (wsize == 32)
+            performIntersections<sdsl::rank_support_v5<1>, uint32_t>(in_sequences, querylog_filename, runs);
+        else if (wsize == 16)
+            performIntersections<sdsl::rank_support_v5<1>, uint16_t>(in_sequences, querylog_filename, runs);
+        else
+            performIntersections<sdsl::rank_support_v5<1>, uint8_t>(in_sequences, querylog_filename, runs);
+    }
         
     return 0;
 }

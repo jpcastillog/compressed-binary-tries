@@ -19,6 +19,7 @@ vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
     return il;
 }
 
+
 template<class wordType>
 void verifyEncode(std::string input_path, uint32_t min_size, bool rank_type, bool runs) {
     std::ifstream input_stream;
@@ -65,16 +66,16 @@ void verifyEncode(std::string input_path, uint32_t min_size, bool rank_type, boo
         uint64_t trie_bytes_size;
         if (n > min_size){
             vector <uint64_t> il = read_inv_list(input_stream, n);
-            uint64_t max_value = il[n - 1];
             if (rank_type == 0) {
-                fastBinaryTrie<rank_support_v<1>, wordType> trie(il, u);
-                // cout << "trie encoded" << endl;
-                if (runs)
+                cout << "rank v " << runs << " " << sizeof(wordType) << "\n ";
+                fastBinaryTrie<rank_support_v<1>, wordType> trie = fastBinaryTrie<rank_support_v<1>, wordType>(il, u);
+                if (runs){
+                    cout << "encoding runs\n";
                     trie.encodeRuns();
+                }
                 trie_bytes_size = trie.size_in_bytes();
                 vector<uint64_t> decoded;
                 trie.decode(decoded);
-                // cout << "trie decoded" << endl;
                 if (decoded != il) {
                     cout << "set " << n_il << " is not correct encoded\n";
                     cout << il.size() << ", " << decoded.size() << "\n";
@@ -87,28 +88,12 @@ void verifyEncode(std::string input_path, uint32_t min_size, bool rank_type, boo
                     }
                     cout << "\n";
                 }
-                // else cout << "set " << n_il << " correct encoded\n";
             }
-            // else if (rank_type == 1) {
-            //     if (levelwise) {
-            //         trie = new binTrie_il<block_size>(il, u);
-            //         if (runs) {
-            //             trie->encodeRuns();
-            //         }
-            //         trie_bytes_size = trie->size_in_bytes();
-            //     }
-            //     else {
-            //         trie = new flatBinTrie_il<block_size>(il, u);
-            //         if (runs)
-            //             trie->encodeRuns();
-            //         trie_bytes_size = trie->size_in_bytes();
-            //     }
-
-            // }
             else {
+                cout << "rank v5\n";
                 fastBinaryTrie<rank_support_v5<1>, wordType> trie(il, u);
-                // if (runs)
-                //     trie->encodeRuns();
+                if (runs)
+                    trie.encodeRuns();
                 trie_bytes_size = trie.size_in_bytes();
                 vector<uint64_t> decoded;
                 trie.decode(decoded);
@@ -190,7 +175,7 @@ int main(int argc, char** argv) {
         }
         if (std::string(argv[i]) == "--wsize") {
             ++i;
-            wsize= atoi(argv[i]);
+            wsize= stoi(argv[i]);
 
         }
     }

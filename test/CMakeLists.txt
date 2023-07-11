@@ -1,9 +1,9 @@
 add_executable(test_encoding test_encoding.cpp)
 add_executable(test_fastTrie test_fastTrie.cpp)
 add_executable(test_intersection test_intersection.cpp)
-# add_executable(test_intersection_fastTrie test_intersection_fastTrie.cpp)
+add_executable(test_intersection_fastTrie test_intersection_fastTrie.cpp)
 
 target_link_libraries(test_encoding PUBLIC sdsl divsufsort divsufsort64)
 target_link_libraries(test_fastTrie PUBLIC sdsl divsufsort divsufsort64)
-# target_link_libraries(test_intersection_fastTrie PUBLIC sdsl divsufsort divsufsort64 pthread fastTrieIntersection)
+target_link_libraries(test_intersection_fastTrie PUBLIC sdsl divsufsort divsufsort64 pthread fastTrieIntersection)
 target_link_libraries(test_intersection PUBLIC sdsl divsufsort divsufsort64 pthread intersection)

@@ -19,9 +19,10 @@ vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
     return il;
 }
 
-
+template <class wordType>
 void buildCollection(std::string input_path, std::string out_path,
-                     uint64_t min_size, int rank_type, bool runs, bool levelwise) {
+                     uint64_t min_size, int rank_type, bool runs, 
+                     bool levelwise, uint16_t wsize) {
     
     std::ifstream input_stream;
     input_stream.open(input_path, std::ios::binary | std::ios::in);
@@ -65,6 +66,7 @@ void buildCollection(std::string input_path, std::string out_path,
         //     out.write(reinterpret_cast<char *> (block_size), sizeof(block_size));
         out.write(reinterpret_cast<char *> (&runs), sizeof(runs));
         out.write(reinterpret_cast<char *> (&levelwise), sizeof(levelwise));
+        out.write(reinterpret_cast<char *> (&wsize), sizeof(wsize));
         out.write(reinterpret_cast<char *> (&nSets), sizeof(nSets));
         out.write(reinterpret_cast<char *> (&_1), sizeof(_1));
         out.write(reinterpret_cast<char *> (&u), sizeof(u));
@@ -90,7 +92,7 @@ void buildCollection(std::string input_path, std::string out_path,
             uint64_t max_value = il[n - 1];
             
             if (rank_type == 0) {
-                fastBinaryTrie<rank_support_v<1>> trie_v = fastBinaryTrie<rank_support_v<1>>(il, u);
+                fastBinaryTrie<rank_support_v<1>, wordType> trie_v(il, u);
                 if (runs)
                     trie_v.encodeRuns();
                 if (out_path != "") {
@@ -98,41 +100,14 @@ void buildCollection(std::string input_path, std::string out_path,
                 }
                 trie_bytes_size = trie_v.size_in_bytes();
             }
-
-            // else if (rank_type == 1) {
-            //     if (levelwise) {
-            //         binTrie_il<block_size> trie_il(il, u);
-            //         if (runs) {
-            //             trie_il.encodeRuns();
-            //         }
-            //         if (out_path != "") {
-            //             trie_il.serialize(out);
-            //         }
-            //         trie_bytes_size = trie_il.size_in_bytes();
-            //     }
-            //     else {
-            //         flatBinTrie_il<block_size> trie_il(il, u);
-            //         if (runs) {
-            //             trie_il.encodeRuns();
-            //         }
-            //         if (out_path != "") {
-            //             trie_il.serialize(out);
-            //         }
-            //         trie_bytes_size = trie_il.size_in_bytes();
-            //     }
-
-            // }
-
             else {
-                fastBinaryTrie<rank_support_v5<1>> trie_v5 = fastBinaryTrie<rank_support_v5<1>>(il, u);
+                fastBinaryTrie<rank_support_v5<1>, wordType> trie_v5(il, u);
                 if (runs)
                     trie_v5.encodeRuns();
                 if (out_path != "") {
                     trie_v5.serialize(out);
                 }
                 trie_bytes_size = trie_v5.size_in_bytes();
-                // vector<uint64_t> decoded;
-                // trie_v5.decode(decoded);
             }
             total_size += trie_bytes_size;
             total_elements += n;
@@ -175,6 +150,7 @@ int main(int argc, char** argv) {
     int rank = 0;
     uint64_t min_size = 0;
     uint32_t block_size = 512;
+    uint16_t wsize = 64;
     bool runs = false;
     bool levelwise = false;
     std::string output_filename = "";
@@ -218,6 +194,10 @@ int main(int argc, char** argv) {
             else
                 levelwise = false;
         }
+        if (std::string(argv[i]) == "--wsize"){
+            ++i;
+            wsize = std::atoi(argv[i]);
+        }
     }
     
     std::cout << "Min size: " << min_size << std::endl;
@@ -235,15 +215,18 @@ int main(int argc, char** argv) {
     }
     std::cout << "* Runs: " << (runs == 1 ? "true" : "false") << std::endl;
     std::cout << "* Level-wise: " << (levelwise == 1 ? "true" : "false") << std::endl;
+    std::cout << "* word size: " << wsize << std::endl;
     std::cout << "Output file name: "<< output_filename << endl;
     
-    // if (block_size == 512)
-        buildCollection(input_filename, output_filename, min_size, rank, runs, levelwise);
-    // else if (block_size == 256)
-    //     buildCollection<256>(input_filename, output_filename, min_size, rank, runs, levelwise);
-    // else if (block_size == 128)
-    //     buildCollection<128>(input_filename, output_filename, min_size, rank, runs, levelwise);
-    // else
-    //     buildCollection<64> (input_filename, output_filename, min_size, rank, runs, levelwise);
 
+    if (wsize == 64)
+        buildCollection<uint64_t>(input_filename, output_filename, min_size, rank, runs, levelwise, wsize);
+    else if (wsize == 32)
+        buildCollection<uint32_t>(input_filename, output_filename, min_size, rank, runs, levelwise, wsize);
+    else if (wsize == 16)
+        buildCollection<uint16_t>(input_filename, output_filename, min_size, rank, runs, levelwise, wsize);
+    else if (wsize == 8)
+        buildCollection<uint8_t>(input_filename, output_filename, min_size, rank, runs, levelwise, wsize);
+    
+    return 0;
 }

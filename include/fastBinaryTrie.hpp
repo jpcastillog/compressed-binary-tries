@@ -63,10 +63,10 @@ class fastBinaryTrie{
                 q.pop();
 
                 if (level == height-1){
-                    uint64_t word = 0;
+                    wordType word = 0;
                     for (uint64_t i = l; i < r+1; ++i){
                         uint64_t element = set[i] & (((uint64_t)1 << (uint64_t)(log2(sizeof(wordType)*8))) - 1);
-                        word |= ((uint64_t)1 << element);
+                        word |= ((wordType)1 << element);
                     }
                     fastBinaryTrie::lastLevel.push_back(word);
                     if (count_nodes == nodes_curr_level) break;
@@ -193,7 +193,8 @@ class fastBinaryTrie{
         // return size of bytes of all data structure
         inline uint64_t size_in_bytes() {
             uint64_t bv_size = sdsl::size_in_bytes(fastBinaryTrie::bTrie);
-            uint64_t lastL_size = sizeof(fastBinaryTrie::lastLevel) + 
+            uint64_t lastL_size = 
+                                // sizeof(fastBinaryTrie::lastLevel) + 
                                   sizeof(wordType)*fastBinaryTrie::lastLevel.size();
             uint64_t rank_size = sdsl::size_in_bytes(fastBinaryTrie::b_rank);
             return bv_size +
