@@ -67,10 +67,10 @@ void verifyEncode(std::string input_path, uint32_t min_size, bool rank_type, boo
         if (n > min_size){
             vector <uint64_t> il = read_inv_list(input_stream, n);
             if (rank_type == 0) {
-                cout << "rank v " << runs << " " << sizeof(wordType) << "\n ";
+                // cout << "rank v " << runs << " " << sizeof(wordType) << "\n ";
                 fastBinaryTrie<rank_support_v<1>, wordType> trie = fastBinaryTrie<rank_support_v<1>, wordType>(il, u);
                 if (runs){
-                    cout << "encoding runs\n";
+                    // cout << "encoding runs\n";
                     trie.encodeRuns();
                 }
                 trie_bytes_size = trie.size_in_bytes();
@@ -90,7 +90,7 @@ void verifyEncode(std::string input_path, uint32_t min_size, bool rank_type, boo
                 }
             }
             else {
-                cout << "rank v5\n";
+                // cout << "rank v5\n";
                 fastBinaryTrie<rank_support_v5<1>, wordType> trie(il, u);
                 if (runs)
                     trie.encodeRuns();
