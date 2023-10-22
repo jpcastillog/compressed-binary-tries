@@ -345,7 +345,7 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs, bool parallel){
         uint64_t i = 0;
         while ((nThreads - usedThreads > 1) && (i < totalThreads)) {
             partialAND(Ts, nTries, height, level_of_cut, level_of_cut+1, threadRoots[i], 
-                        threadActiveTries[i], tpartialSolutions[i], intersection, 
+                        runs?threadActiveTries[i]:activeTries, tpartialSolutions[i], intersection, 
                         nextPartialSolutions, nextRoots, nextActiveTries, runs);
             usedThreads = totalThreads + nextRoots.size() - (++i);
         }
@@ -353,7 +353,8 @@ vector<uint64_t> Intersect(vector<binaryTrie*> &Ts, bool runs, bool parallel){
 
         for(uint16_t j = i; j < totalThreads; ++j) {
             nextRoots.push_back(threadRoots[j]);
-            nextActiveTries.push_back(threadActiveTries[j]);
+            if (runs)
+                nextActiveTries.push_back(threadActiveTries[j]);
             nextPartialSolutions.push_back(tpartialSolutions[j]);
             nextInitLevel.push_back(level_of_cut);
         }

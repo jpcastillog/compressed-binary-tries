@@ -6,6 +6,8 @@
 using namespace std;
 using namespace sdsl;
 
+bool verbose = false;
+
 
 vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
 
@@ -114,7 +116,7 @@ void buildCollection(std::string input_path, std::string out_path,
             n_il++;
 
             // cout << "#Elements: " << n << " | Bpi: " << (float)(trie_bytes_size*8)/n << endl;
-            if ((n_il % 1000) == 0) {
+            if ((n_il % 1000) == 0 && verbose) {
                 cout << n_il  <<" Sets processed " << endl;
             }
         }
@@ -128,7 +130,7 @@ void buildCollection(std::string input_path, std::string out_path,
 
     cout << "Total inverted lists: " << n_il << "| Bpi: " << (float)(total_size*8)/total_elements << endl;
     cout << "Total ints: " << total_elements << endl;
-    
+    cout << "----------------------------------------------------------\n";
     return;
 }
 
@@ -198,6 +200,8 @@ int main(int argc, char** argv) {
             ++i;
             wsize = std::atoi(argv[i]);
         }
+        if (std::string(argv[i]) == "--verbose")
+            verbose = true;
     }
     
     std::cout << "Min size: " << min_size << std::endl;

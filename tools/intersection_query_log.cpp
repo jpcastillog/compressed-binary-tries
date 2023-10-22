@@ -19,6 +19,8 @@ int rankType = 0;
 bool runs = false;
 bool levelwise = false;
 uint32_t block_size = 512; //Only needed on binTrie_il
+bool verbose = false;
+bool parallel = true;
 
 
 vector<binaryTrie*> loadSequences(std::ifstream &in) {
@@ -134,7 +136,7 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
             uint64_t time_10 = 0;
             for(int rep = 0; rep < trep; ++rep) {
                 auto start = std::chrono::high_resolution_clock::now();
-                intersection = Intersect(QTries, runs_encoded, true);
+                intersection = Intersect(QTries, runs_encoded, parallel);
                 auto end = std::chrono::high_resolution_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
                 auto time = elapsed.count();
@@ -150,7 +152,7 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
             }
             // std::cout << nq <<"|Time execution: " << (double)(time_10*1e-3)/(trep) << "[ms] " << intersection.size() << std::endl;
             ++nq;
-            if (nq % 1000 == 0) {
+            if (verbose && nq % 1000 == 0) {
                 std::cout << nq << " queries processed" << std::endl;
             }
         }
@@ -189,6 +191,20 @@ int main(int argc, char const *argv[]) {
         if (std::string(argv[i]) == "--out") {
             ++i;
             output_filename = std::string(argv[i]);
+        }
+        if (std::string(argv[i]) == "--verbose"){
+            ++i;
+            if (std::string(argv[i]) == "t")
+                verbose = true;
+            else 
+                verbose = false;
+        }
+        if (std::string(argv[i]) == "--parallel"){
+            ++i;
+            if (std::string(argv[i]) == "t")
+                parallel = true;
+            else 
+                parallel = false;
         }
     }
 

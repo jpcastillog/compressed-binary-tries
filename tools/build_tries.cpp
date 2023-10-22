@@ -10,6 +10,9 @@
 using namespace std;
 using namespace sdsl;
 
+bool verbose = false;
+uint32_t block = 512;
+
 
 vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
 
@@ -67,7 +70,7 @@ void buildCollection(std::string input_path, std::string out_path,
     if (out_path != "") {
         out.write(reinterpret_cast<char *> (&rank_type), sizeof(rank_type));
         if (rank_type == 1) 
-            out.write(reinterpret_cast<char *> (block_size), sizeof(block_size));
+            out.write(reinterpret_cast<char *> (&block), sizeof(block));
         out.write(reinterpret_cast<char *> (&runs), sizeof(runs));
         out.write(reinterpret_cast<char *> (&levelwise), sizeof(levelwise));
         out.write(reinterpret_cast<char *> (&nSets), sizeof(nSets));
@@ -166,7 +169,7 @@ void buildCollection(std::string input_path, std::string out_path,
             n_il++;
 
             // cout << "#Elements: " << n << " | Bpi: " << (float)(trie_bytes_size*8)/n << endl;
-            if ((n_il % 1000) == 0) {
+            if ((n_il % 1000) == 0 && verbose) {
                 cout << n_il  <<" Sets processed " << endl;
             }
         }
@@ -201,7 +204,6 @@ int main(int argc, char** argv) {
 
     int rank = 0;
     uint64_t min_size = 0;
-    uint32_t block_size = 512;
     bool runs = false;
     bool levelwise = false;
     std::string output_filename = "";
@@ -221,7 +223,7 @@ int main(int argc, char** argv) {
             else if (std::string(argv[i]) == "il") {
                 rank = 1;
                 i++;
-                block_size = std::atoi(argv[i]);
+                block = std::atoi(argv[i]);
             }
             else {
                 rank = 2;
@@ -245,6 +247,13 @@ int main(int argc, char** argv) {
             else
                 levelwise = false;
         }
+        if (std::string(argv[i]) == "--verbose") {
+            ++i;
+            if (std::string(argv[i]) == "t")
+                verbose = true;
+            else
+                verbose = false;
+        }
     }
     
     std::cout << "Min size: " << min_size << std::endl;
@@ -255,7 +264,7 @@ int main(int argc, char** argv) {
     }
     else if (rank == 1) {
         std::cout << "rank il" << std::endl;
-        std::cout << "* Block-size: " << block_size << std::endl;
+        std::cout << "* Block-size: " << block << std::endl;
     }
     else {
         std::cout << "rank v5" << std::endl;
@@ -264,11 +273,11 @@ int main(int argc, char** argv) {
     std::cout << "* Level-wise: " << (levelwise == 1 ? "true" : "false") << std::endl;
     std::cout << "Output file name: "<< output_filename << endl;
     
-    if (block_size == 512)
+    if (block == 512)
         buildCollection<512>(input_filename, output_filename, min_size, rank, runs, levelwise);
-    else if (block_size == 256)
+    else if (block == 256)
         buildCollection<256>(input_filename, output_filename, min_size, rank, runs, levelwise);
-    else if (block_size == 128)
+    else if (block == 128)
         buildCollection<128>(input_filename, output_filename, min_size, rank, runs, levelwise);
     else
         buildCollection<64> (input_filename, output_filename, min_size, rank, runs, levelwise);

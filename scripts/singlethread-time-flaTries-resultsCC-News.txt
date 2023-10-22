@@ -1,0 +1,74 @@
+Type of trie
+* Rank: rank il
+** Block size: 512
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 79831
+Universe: 43495426
+Sequences loaded succefully, Total: 79831
+Queries loaded succefully, Total: 9666
+Computing queries...
+Number of queries: 9665
+Avg time execution: 76.084[ms]
+Type of trie
+* Rank: rank il
+** Block size: 512
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 79831
+Universe: 43495426
+Sequences loaded succefully, Total: 79831
+Queries loaded succefully, Total: 9666
+Computing queries...
+Number of queries: 9665
+Avg time execution: 80.6324[ms]
+Type of trie
+* Rank: rank v5
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 79831
+Universe: 43495426
+Sequences loaded succefully, Total: 79831
+Queries loaded succefully, Total: 9666
+Computing queries...
+Number of queries: 9665
+Avg time execution: 78.1812[ms]
+Type of trie
+* Rank: rank v5
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 79831
+Universe: 43495426
+Sequences loaded succefully, Total: 79831
+Queries loaded succefully, Total: 9666
+Computing queries...
+Number of queries: 9665
+Avg time execution: 82.4693[ms]
+Type of trie
+* Rank: rank v
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 79831
+Universe: 43495426
+Sequences loaded succefully, Total: 79831
+Queries loaded succefully, Total: 9666
+Computing queries...
+Number of queries: 9665
+Avg time execution: 46.9862[ms]
+Type of trie
+* Rank: rank v
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 79831
+Universe: 43495426
+Sequences loaded succefully, Total: 79831
+Queries loaded succefully, Total: 9666
+Computing queries...
+Number of queries: 9665
+Avg time execution: 51.2648[ms]

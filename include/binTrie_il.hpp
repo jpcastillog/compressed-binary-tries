@@ -172,14 +172,14 @@ class binTrie_il: public binaryTrie{
                     sizeof(binaryTrie::height_with_runs);
         };
 
-        // Implementar esto ...
+
         uint64_t serialize(std::ostream &out){
             uint16_t height = (uint16_t)(binTrie_il::bTrie.size());
             
             out.write(reinterpret_cast<char*>(height) , sizeof(height));
-            out.write(reinterpret_cast<char*>(&height_with_runs), sizeof(height_with_runs));
-            out.write(reinterpret_cast<char*>(&empty_trie)      , sizeof(empty_trie));
-            out.write(reinterpret_cast<char*>(&runs_encoded)    , sizeof(runs_encoded));
+            out.write(reinterpret_cast<char*>(&(binaryTrie::height_with_runs)), sizeof(binaryTrie::height_with_runs));
+            out.write(reinterpret_cast<char*>(&(binaryTrie::empty_trie))      , sizeof(binaryTrie::empty_trie));
+            out.write(reinterpret_cast<char*>(&(binaryTrie::runs_encoded))    , sizeof(binaryTrie::runs_encoded));
             
             uint64_t bvs_size=0, rank_size=0;
             
@@ -197,9 +197,9 @@ class binTrie_il: public binaryTrie{
         void load(std::istream &in){
             uint16_t height;
             in.read(reinterpret_cast<char*>(&height)          , sizeof(height));
-            in.read(reinterpret_cast<char*>(&height_with_runs), sizeof(height_with_runs));
-            in.read(reinterpret_cast<char*>(&empty_trie)      , sizeof(empty_trie));
-            in.read(reinterpret_cast<char*>(&runs_encoded)    , sizeof(runs_encoded));
+            in.read(reinterpret_cast<char*>(&(binaryTrie::height_with_runs)), sizeof(binaryTrie::height_with_runs));
+            in.read(reinterpret_cast<char*>(&(binaryTrie::empty_trie))      , sizeof(binaryTrie::empty_trie));
+            in.read(reinterpret_cast<char*>(&(binaryTrie::runs_encoded))    , sizeof(binaryTrie::runs_encoded));
 
             binTrie_il::bTrie = vector<sdsl::bit_vector_il<block_size>>(height);
             binTrie_il::bv_rank = vector<rank_support_il<1, block_size> >(height-1);

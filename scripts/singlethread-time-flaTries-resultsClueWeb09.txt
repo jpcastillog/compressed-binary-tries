@@ -1,0 +1,74 @@
+Type of trie
+* Rank: rank il
+** Block size: 512
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 1000000
+Universe: 50220423
+Sequences loaded succefully, Total: 1000000
+Queries loaded succefully, Total: 20000
+Computing queries...
+Number of queries: 20000
+Avg time execution: 23.4032[ms]
+Type of trie
+* Rank: rank il
+** Block size: 512
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 1000000
+Universe: 50220423
+Sequences loaded succefully, Total: 1000000
+Queries loaded succefully, Total: 20000
+Computing queries...
+Number of queries: 20000
+Avg time execution: 24.4212[ms]
+Type of trie
+* Rank: rank v5
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 1000000
+Universe: 50220423
+Sequences loaded succefully, Total: 1000000
+Queries loaded succefully, Total: 20000
+Computing queries...
+Number of queries: 20000
+Avg time execution: 23.6815[ms]
+Type of trie
+* Rank: rank v5
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 1000000
+Universe: 50220423
+Sequences loaded succefully, Total: 1000000
+Queries loaded succefully, Total: 20000
+Computing queries...
+Number of queries: 20000
+Avg time execution: 24.5167[ms]
+Type of trie
+* Rank: rank v
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 1000000
+Universe: 50220423
+Sequences loaded succefully, Total: 1000000
+Queries loaded succefully, Total: 20000
+Computing queries...
+Number of queries: 20000
+Avg time execution: 13.5357[ms]
+Type of trie
+* Rank: rank v
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 1000000
+Universe: 50220423
+Sequences loaded succefully, Total: 1000000
+Queries loaded succefully, Total: 20000
+Computing queries...
+Number of queries: 20000
+Avg time execution: 14.6164[ms]

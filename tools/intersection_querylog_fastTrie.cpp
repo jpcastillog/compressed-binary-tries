@@ -14,6 +14,7 @@ using namespace sdsl;
 
 bool runs = false;
 bool levelwise = false;
+bool verbose = false;
 uint32_t block_size = 512; //Only needed on binTrie_il
 uint16_t wsize = 64;
 
@@ -102,7 +103,7 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
                     intersection.clear();
             }
             ++nq;
-            if (nq % 1000 == 0) {
+            if (nq % 1000 == 0 && verbose) {
                 std::cout << nq << " correct queries processed" << std::endl;
             }
         }
@@ -112,6 +113,7 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
 
     std::cout << "Number of queries: " << nq << std::endl;
     std::cout <<"Avg time execution: " << (double)(total_time*1e-3)/(nq*rep) << "[ms]" << std::endl;
+    std::cout << "---------------------------------------------------------\n";
 }
 
 
@@ -123,6 +125,13 @@ int main(int argc, char const *argv[]) {
                         "query log" // (*)
                     << "\n";
         return 1;
+    }
+
+
+    for (int i = 1; i < argc; ++i){
+        if (std::string(argv[i]) == "--verbose") {
+            verbose = true;
+        }
     }
 
     int rankT = 0;
@@ -148,6 +157,7 @@ int main(int argc, char const *argv[]) {
         std::cout << "** Block size: " << block_size << std::endl;
     }
     else std::cout << "rank v5" << std::endl;
+    std::cout << "* Word size: " << wsize << std::endl;
     std::cout << "* Runs:" << (runs == 1 ? "true" : "false") << std::endl;
     std::cout << "* Level-wise: " << (levelwise == 1 ? "true" : "false") << std::endl;
 
