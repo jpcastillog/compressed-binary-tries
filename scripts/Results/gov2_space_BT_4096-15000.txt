@@ -1,0 +1,74 @@
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Binary Tries/gov2_rankv_runsf.trie
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 13.2957
+Total ints: 249371235
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Binary Tries/gov2_rankv_runst.trie
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 12.9495
+Total ints: 249371235
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Binary Tries/gov2_rankv5_runsf.trie
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 11.5614
+Total ints: 249371235
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Binary Tries/gov2_rankv5_runst.trie
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 11.2397
+Total ints: 249371235
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank il
+* Block-size: 512
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Binary Tries/gov2_rankil512_runsf.trie
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 12.1766
+Total ints: 249371235
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank il
+* Block-size: 512
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Binary Tries/gov2_rankil512_runst.trie
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 11.8467
+Total ints: 249371235
+----------------------------------------------------

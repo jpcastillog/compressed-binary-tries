@@ -164,6 +164,7 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
 
     std::cout << "Number of queries: " << nq << std::endl;
     std::cout <<"Avg time execution: " << (double)(total_time*1e-3)/(nq*trep) << "[ms]" << std::endl;
+    std::cout << "---------------------------------------------------------\n";
 }
 
 

@@ -1,0 +1,208 @@
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 71.4048
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 71.4048
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 69.4066
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 69.4066
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 45.9348
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 45.9348
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 43.5964
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 43.5964
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 33.6147
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 33.6147
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 30.9213
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 30.9213
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 28.3769
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 28.3769
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 25.3177
+Total ints: 315071043
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Fast
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 25.3177
+Total ints: 315071043
+----------------------------------------------------------

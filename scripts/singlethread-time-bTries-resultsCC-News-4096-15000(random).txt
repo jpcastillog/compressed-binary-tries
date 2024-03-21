@@ -1,0 +1,80 @@
+Type of trie
+* Rank: rank il
+** Block size: 512
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 40771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.177643[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank il
+** Block size: 512
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 40771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.191781[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 40771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.179212[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 40771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.193577[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 40771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.123647[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 40771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.138829[ms]
+---------------------------------------------------------

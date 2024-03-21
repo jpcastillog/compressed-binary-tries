@@ -1,0 +1,196 @@
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv_runsf_64.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 39.7354
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv_runst_64.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 39.6822
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv5_runsf_64.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 38.5714
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv5_runst_64.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 38.5183
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Treis/clueweb09_rankv_runsf_32.fastbin
+Can't open  output file:  /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Treis/clueweb09_rankv_runsf_32.fastbin
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Treis/clueweb09_rankv_runst_32.fastbin
+Can't open  output file:  /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Treis/clueweb09_rankv_runst_32.fastbin
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Treis/clueweb09_rankv5_runsf_32.fastbin
+Can't open  output file:  /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Treis/clueweb09_rankv5_runsf_32.fastbin
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Treis/clueweb09_rankv5_runst_32.fastbin
+Can't open  output file:  /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Treis/clueweb09_rankv5_runst_32.fastbin
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv_runsf_16.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 19.7374
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv_runst_16.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 19.618
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv5_runsf_16.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 18.1847
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv5_runst_16.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 18.0667
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv_runsf_8.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 16.9798
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv_runst_8.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 16.8083
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv5_runsf_8.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 15.2082
+Total ints: 577568886
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Fast Tries/clueweb09_rankv5_runst_8.fastbin
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 15.0408
+Total ints: 577568886
+----------------------------------------------------------

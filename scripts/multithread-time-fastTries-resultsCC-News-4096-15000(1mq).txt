@@ -1,0 +1,208 @@
+Type of trie
+* Rank: rank v5
+* Word size: 16
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.314431[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 32
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.308823[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 64
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.306054[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 8
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.3339[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 16
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.373592[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 32
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.322023[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 64
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.312231[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 8
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.326538[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 16
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.293977[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 32
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.288577[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 64
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.278538[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 8
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.295523[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 16
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.294762[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 32
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.346646[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 64
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.337[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 8
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 13
+Num. of sets: 40771
+Universe: 43495426
+Sequences loaded succefully, Total: 10
+Computing queries...
+Number of queries: 13
+Avg time execution: 0.296777[ms]
+---------------------------------------------------------

@@ -23,7 +23,8 @@ vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
 
 template <class wordType>
 void buildCollection(std::string input_path, std::string out_path,
-                     uint64_t min_size, int rank_type, bool runs, 
+                     uint64_t min_size, uint64_t max_size, 
+                     int rank_type, bool runs, 
                      bool levelwise, uint16_t wsize) {
     
     std::ifstream input_stream;
@@ -53,7 +54,7 @@ void buildCollection(std::string input_path, std::string out_path,
         if (input_stream.eof()){
             break;
         }
-        if (n > min_size) {
+        if (n > min_size && n <= max_size) {
             nSets++;
         }
         input_stream.seekg(4*n, ios::cur);
@@ -88,7 +89,7 @@ void buildCollection(std::string input_path, std::string out_path,
         }
         
         uint64_t trie_bytes_size;
-        if (n > min_size){
+        if (n > min_size && n <= max_size) {
 
             vector <uint64_t> il = read_inv_list(input_stream, n);
             uint64_t max_value = il[n - 1];
@@ -139,10 +140,11 @@ int main(int argc, char** argv) {
     int mandatory = 3;
 
     if (argc < mandatory){
-        std::cout   << "collection filename "
+        std::cout   << "collection filename (*)"
                         "[--min_size m] "
-                        "[--rank v] "
-                        "[--runs r] "
+                        "[--max_size m] "
+                        "[--rank v] (*)"
+                        "[--runs r] (*)"
                         "[--out output_filename]"
                     <<
         std::endl;
@@ -151,6 +153,7 @@ int main(int argc, char** argv) {
 
     int rank = 0;
     uint64_t min_size = 0;
+    uint64_t max_size = -1;
     uint32_t block_size = 512;
     uint16_t wsize = 64;
     bool runs = false;
@@ -163,6 +166,10 @@ int main(int argc, char** argv) {
         if (std::string(argv[i]) == "--min_size") {
             ++i;
             min_size = std::stoull(argv[i]);
+        }
+        if (std::string(argv[i]) == "--max_size") {
+            ++i;
+            max_size = std::stoull(argv[i]);
         }
         if (std::string(argv[i]) == "--rank") {
             ++i;
@@ -205,6 +212,9 @@ int main(int argc, char** argv) {
     }
     
     std::cout << "Min size: " << min_size << std::endl;
+    std::cout << "Max size: ";
+    (max_size == (uint64_t)(-1) ? (std::cout << "inf") : (std::cout << max_size));
+    std::cout << endl;
     std::cout << "Type of trie\n";
     std::cout << "* Rank: ";
     if (rank  == 0){
@@ -224,13 +234,13 @@ int main(int argc, char** argv) {
     
 
     if (wsize == 64)
-        buildCollection<uint64_t>(input_filename, output_filename, min_size, rank, runs, levelwise, wsize);
+        buildCollection<uint64_t>(input_filename, output_filename, min_size, max_size, rank, runs, levelwise, wsize);
     else if (wsize == 32)
-        buildCollection<uint32_t>(input_filename, output_filename, min_size, rank, runs, levelwise, wsize);
+        buildCollection<uint32_t>(input_filename, output_filename, min_size, max_size, rank, runs, levelwise, wsize);
     else if (wsize == 16)
-        buildCollection<uint16_t>(input_filename, output_filename, min_size, rank, runs, levelwise, wsize);
+        buildCollection<uint16_t>(input_filename, output_filename, min_size, max_size, rank, runs, levelwise, wsize);
     else if (wsize == 8)
-        buildCollection<uint8_t>(input_filename, output_filename, min_size, rank, runs, levelwise, wsize);
+        buildCollection<uint8_t>(input_filename, output_filename, min_size, max_size, rank, runs, levelwise, wsize);
     
     return 0;
 }

@@ -358,6 +358,10 @@ vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType, wordType>*> &Ts, bool
                     roots, activeTries, 0, intersection,
                     tpartialSolutions, threadRoots, threadActiveTries, runs);
         
+        if (threadRoots.size() == 0) {
+            return intersection;
+        }
+
         uint16_t usedThreads = threadRoots.size(); //Number of threads to use until level of cut
         uint16_t totalThreads = usedThreads;
         vector<uint64_t> initLevel(usedThreads, level_of_cut);
@@ -385,6 +389,10 @@ vector<uint64_t> Intersect(vector<fastBinaryTrie<rankType, wordType>*> &Ts, bool
         // Init the vector to contain threads solutions
         vector<vector<uint64_t>> threads_results(usedThreads);
         for (auto tr: threads_results) tr.reserve(1000000);
+
+        if (nextRoots.size() == 0) {
+            return intersection;
+        }
 
         if (runs){
             parallel_for(usedThreads, usedThreads, [&](int start, int end) {

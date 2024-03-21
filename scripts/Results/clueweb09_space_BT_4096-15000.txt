@@ -1,0 +1,74 @@
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Binary Tries/clueweb09_rankv_runsf.trie
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 16.8865
+Total ints: 577568886
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Binary Tries/clueweb09_rankv_runst.trie
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 16.4635
+Total ints: 577568886
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Binary Tries/clueweb09_rankv5_runsf.trie
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 14.6069
+Total ints: 577568886
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Binary Tries/clueweb09_rankv5_runst.trie
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 14.212
+Total ints: 577568886
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank il
+* Block-size: 512
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Binary Tries/clueweb09_rankil512_runsf.trie
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 15.4041
+Total ints: 577568886
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/ClueWeb09/clueweb09_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank il
+* Block-size: 512
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/ClueWeb09/compressed/Binary Tries/clueweb09_rankil512_runst.trie
+Universe: 50220423
+Total inverted lists: 76363| Bpi: 14.9998
+Total ints: 577568886
+----------------------------------------------------

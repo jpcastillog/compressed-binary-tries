@@ -1,0 +1,156 @@
+Type of trie
+* Rank: rank v5
+* Word size: 16
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.287785[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 64
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.251892[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 8
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.306866[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 16
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.311313[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 64
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.270821[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Word size: 8
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.330723[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 16
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.152231[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 64
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.140813[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 8
+* Runs:false
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.171108[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 16
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.187072[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 64
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.166248[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Word size: 8
+* Runs:true
+* Level-wise: false
+Queries loaded succefully, Total: 105
+Num. of sets: 76363
+Universe: 50220423
+Sequences loaded succefully, Total: 203
+Computing queries...
+Number of queries: 105
+Avg time execution: 0.191893[ms]
+---------------------------------------------------------

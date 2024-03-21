@@ -1,0 +1,80 @@
+Type of trie
+* Rank: rank il
+** Block size: 512
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 32771
+Universe: 25205179
+Sequences loaded succefully, Total: 32771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.0440264[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank il
+** Block size: 512
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 32771
+Universe: 25205179
+Sequences loaded succefully, Total: 32771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.0486978[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 32771
+Universe: 25205179
+Sequences loaded succefully, Total: 32771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.04304[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v5
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 32771
+Universe: 25205179
+Sequences loaded succefully, Total: 32771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.0459804[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Runs:false
+* Level-wise: false
+Output file: 
+Num. of sets: 32771
+Universe: 25205179
+Sequences loaded succefully, Total: 32771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.0299734[ms]
+---------------------------------------------------------
+Type of trie
+* Rank: rank v
+* Runs:true
+* Level-wise: false
+Output file: 
+Num. of sets: 32771
+Universe: 25205179
+Sequences loaded succefully, Total: 32771
+Queries loaded succefully, Total: 4000
+Computing queries...
+Number of queries: 4000
+Avg time execution: 0.0341312[ms]
+---------------------------------------------------------

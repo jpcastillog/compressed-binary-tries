@@ -29,7 +29,8 @@ vector<uint64_t> read_inv_list(std::ifstream &input_stream, uint32_t n) {
 
 template <uint32_t block_size>
 void buildCollection(std::string input_path, std::string out_path,
-                     uint64_t min_size, int rank_type, bool runs, bool levelwise) {
+                     uint64_t min_size, uint64_t max_size,
+                     int rank_type, bool runs, bool levelwise) {
     
     std::ifstream input_stream;
     input_stream.open(input_path, std::ios::binary | std::ios::in);
@@ -58,7 +59,7 @@ void buildCollection(std::string input_path, std::string out_path,
         if (input_stream.eof()){
             break;
         }
-        if (n > min_size) {
+        if (n > min_size && n <= max_size) {
             nSets++;
         }
         input_stream.seekg(4*n, ios::cur);
@@ -92,7 +93,7 @@ void buildCollection(std::string input_path, std::string out_path,
         }
         
         uint64_t trie_bytes_size;
-        if (n > min_size){
+        if (n > min_size && n <= max_size){
 
             vector <uint64_t> il = read_inv_list(input_stream, n);
             uint64_t max_value = il[n - 1];
@@ -183,6 +184,7 @@ void buildCollection(std::string input_path, std::string out_path,
 
     cout << "Total inverted lists: " << n_il << "| Bpi: " << (float)(total_size*8)/total_elements << endl;
     cout << "Total ints: " << total_elements << endl;
+    cout << "----------------------------------------------------" << endl;
     
     return;
 }
@@ -192,18 +194,19 @@ int main(int argc, char** argv) {
     int mandatory = 3;
 
     if (argc < mandatory){
-        std::cout   << "collection filename "
+        std::cout   << "collection filename (*)"
                         "[--min_size m] "
-                        "[--rank v] "
-                        "[--runs r] "
+                        "[--max_size m] "
+                        "[--rank v] (*)"
+                        "[--runs r] (*)"
                         "[--out output_filename]"
                     <<
         std::endl;
-        return 1;
     }
 
     int rank = 0;
     uint64_t min_size = 0;
+    uint64_t max_size = -1;
     bool runs = false;
     bool levelwise = false;
     std::string output_filename = "";
@@ -214,6 +217,10 @@ int main(int argc, char** argv) {
         if (std::string(argv[i]) == "--min_size") {
             ++i;
             min_size = std::stoull(argv[i]);
+        }
+        if (std::string(argv[i]) == "--max_size") {
+            ++i;
+            max_size = std::stoull(argv[i]);
         }
         if (std::string(argv[i]) == "--rank") {
             ++i;
@@ -257,6 +264,9 @@ int main(int argc, char** argv) {
     }
     
     std::cout << "Min size: " << min_size << std::endl;
+    std::cout << "Max size: ";
+    (max_size == (uint64_t)(-1) ? (std::cout << "inf") : (std::cout << max_size));
+    std::cout << endl;
     std::cout << "Type of trie\n";
     std::cout << "* Rank: ";
     if (rank  == 0){
@@ -274,12 +284,12 @@ int main(int argc, char** argv) {
     std::cout << "Output file name: "<< output_filename << endl;
     
     if (block == 512)
-        buildCollection<512>(input_filename, output_filename, min_size, rank, runs, levelwise);
+        buildCollection<512>(input_filename, output_filename, min_size, max_size, rank, runs, levelwise);
     else if (block == 256)
-        buildCollection<256>(input_filename, output_filename, min_size, rank, runs, levelwise);
+        buildCollection<256>(input_filename, output_filename, min_size, max_size, rank, runs, levelwise);
     else if (block == 128)
-        buildCollection<128>(input_filename, output_filename, min_size, rank, runs, levelwise);
+        buildCollection<128>(input_filename, output_filename, min_size, max_size, rank, runs, levelwise);
     else
-        buildCollection<64> (input_filename, output_filename, min_size, rank, runs, levelwise);
+        buildCollection<64> (input_filename, output_filename, min_size, max_size, rank, runs, levelwise);
 
 }

@@ -15,6 +15,7 @@ using namespace sdsl;
 bool runs = false;
 bool levelwise = false;
 bool verbose = false;
+bool parallel = false;
 uint32_t block_size = 512; //Only needed on binTrie_il
 uint16_t wsize = 64;
 
@@ -60,10 +61,14 @@ map<uint64_t, fastBinaryTrie<rankType, wordType>*> loadTries(ifstream &in, vecto
     for(uint32_t i = 0; i < n; ++i) {
         fastBinaryTrie<rankType, wordType>* trie = new fastBinaryTrie<rankType, wordType>();
         trie -> load(in);
+        
         if (i == setIndexes[np]){
             tries.insert({i, trie});
             np++;
             if (np == setIndexes.size()) break;
+        }
+        else { // I dont now how space will use the trie
+            delete trie;
         }
     }
     return tries;
@@ -71,7 +76,7 @@ map<uint64_t, fastBinaryTrie<rankType, wordType>*> loadTries(ifstream &in, vecto
 
 template<class rankType, class wordType>
 void performIntersections( std::ifstream &in_sequences, std::string query_path,
-                         bool runs_encoded) {
+                         bool runs_encoded, bool parallel) {
     uint16_t rep = 10;
     vector<vector<uint64_t>> queries;
     map<uint64_t, fastBinaryTrie<rankType, wordType>*> tries;
@@ -94,7 +99,7 @@ void performIntersections( std::ifstream &in_sequences, std::string query_path,
         if (QTries.size() <= 16){
             for (uint16_t i = 0; i < 10; ++i){
                 auto start = std::chrono::high_resolution_clock::now();
-                intersection = Intersect<rankType, wordType>(QTries, runs_encoded, true);
+                intersection = Intersect<rankType, wordType>(QTries, runs_encoded, parallel);
                 auto end = std::chrono::high_resolution_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
                 auto time = elapsed.count();
@@ -132,6 +137,13 @@ int main(int argc, char const *argv[]) {
         if (std::string(argv[i]) == "--verbose") {
             verbose = true;
         }
+        if (std::string(argv[i]) == "--parallel"){
+            ++i;
+            if (std::string(argv[i]) == "t")
+                parallel = true;
+            else 
+                parallel = false;
+        }
     }
 
     int rankT = 0;
@@ -163,23 +175,23 @@ int main(int argc, char const *argv[]) {
 
     if (rankT == 0){
         if (wsize == 64)
-            performIntersections<sdsl::rank_support_v<1>, uint64_t>(in_sequences, querylog_filename, runs);
+            performIntersections<sdsl::rank_support_v<1>, uint64_t>(in_sequences, querylog_filename, runs, parallel);
         else if (wsize == 32)
-            performIntersections<sdsl::rank_support_v<1>, uint32_t>(in_sequences, querylog_filename, runs);
+            performIntersections<sdsl::rank_support_v<1>, uint32_t>(in_sequences, querylog_filename, runs, parallel);
         else if (wsize == 16)
-            performIntersections<sdsl::rank_support_v<1>, uint16_t>(in_sequences, querylog_filename, runs);
+            performIntersections<sdsl::rank_support_v<1>, uint16_t>(in_sequences, querylog_filename, runs, parallel);
         else
-            performIntersections<sdsl::rank_support_v<1>, uint8_t>(in_sequences, querylog_filename, runs);
+            performIntersections<sdsl::rank_support_v<1>, uint8_t>(in_sequences, querylog_filename, runs, parallel);
     }
     else{
         if (wsize == 64)
-            performIntersections<sdsl::rank_support_v5<1>, uint64_t>(in_sequences, querylog_filename, runs);
+            performIntersections<sdsl::rank_support_v5<1>, uint64_t>(in_sequences, querylog_filename, runs, parallel);
         else if (wsize == 32)
-            performIntersections<sdsl::rank_support_v5<1>, uint32_t>(in_sequences, querylog_filename, runs);
+            performIntersections<sdsl::rank_support_v5<1>, uint32_t>(in_sequences, querylog_filename, runs, parallel);
         else if (wsize == 16)
-            performIntersections<sdsl::rank_support_v5<1>, uint16_t>(in_sequences, querylog_filename, runs);
+            performIntersections<sdsl::rank_support_v5<1>, uint16_t>(in_sequences, querylog_filename, runs, parallel);
         else
-            performIntersections<sdsl::rank_support_v5<1>, uint8_t>(in_sequences, querylog_filename, runs);
+            performIntersections<sdsl::rank_support_v5<1>, uint8_t>(in_sequences, querylog_filename, runs, parallel);
     }
         
     return 0;

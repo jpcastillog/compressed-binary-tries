@@ -1,0 +1,74 @@
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Binary Tries/cc-news_rankv_runsf.trie
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 27.4045
+Total ints: 315071043
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Binary Tries/cc-news_rankv_runst.trie
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 27.4045
+Total ints: 315071043
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Binary Tries/cc-news_rankv5_runsf.trie
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 23.5993
+Total ints: 315071043
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Binary Tries/cc-news_rankv5_runst.trie
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 23.5993
+Total ints: 315071043
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank il
+* Block-size: 512
+* Runs: false
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Binary Tries/cc-news_rankil512_runsf.trie
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 24.9043
+Total ints: 315071043
+----------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/CC-News/cc-news_4096-15000.docs
+Min size: 4096
+Max size: 15000
+Type of trie
+* Rank: rank il
+* Block-size: 512
+* Runs: true
+* Level-wise: false
+Output file name: /media/jpcastillog/Respaldo 1/PISA/CC-News/compressed/Binary Tries/cc-news_rankil512_runst.trie
+Universe: 43495426
+Total inverted lists: 40771| Bpi: 24.9043
+Total ints: 315071043
+----------------------------------------------------

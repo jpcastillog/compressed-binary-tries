@@ -1,0 +1,208 @@
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 31.65
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 31.5706
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 30.9888
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 64
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 30.9097
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 21.2334
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 21.1352
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 20.4128
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 32
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 20.3154
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 15.7862
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 15.6648
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 14.7813
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 16
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 14.6618
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: false
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 13.3182
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v
+* Runs: true
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 13.1618
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: false
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 12.1016
+Total ints: 249371235
+----------------------------------------------------------
+/media/jpcastillog/Respaldo 1/PISA/Gov2/gov2_4096-15000.docs
+Min size: 1
+Max size: inf
+Type of trie
+* Rank: rank v5
+* Runs: true
+* Level-wise: false
+* word size: 8
+Output file name: /media/jpcastillog/Respaldo 1/PISA/Gov2/compressed/Fast
+Universe: 25205179
+Total inverted lists: 32771| Bpi: 11.9497
+Total ints: 249371235
+----------------------------------------------------------
