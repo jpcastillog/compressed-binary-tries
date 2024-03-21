@@ -49,9 +49,9 @@ done;
 #     ../build/tools/intersection_querylog_fastTrie "$file" "$q2" --parallel f >> singlethread-time-fastTries-resultsClueWeb09-4096-15000\(1mq\)2.txt
 #     echo -e "---> ${file} done!"
 # done;
-echo -e "---------------CC-News---------------"
-q3=/media/jpcastillog/Respaldo\ 1/PISA/1mq\ queries\ 4096-15000/CC-News/1mq.txt
-for file in /media/jpcastillog/Respaldo\ 1/PISA/CC-News/compressed/Fast\ Tries/* ; do
-    ../build/tools/intersection_querylog_fastTrie "$file" "$q3" --parallel f >> singlethread-time-fastTries-resultsCC-News-4096-15000\(1mq\).txt
-    echo -e "---> ${file} done!"
-done
+    echo -e "---------------CC-News---------------"
+    q3=/media/jpcastillog/Respaldo\ 1/PISA/1mq\ queries\ 4096-15000/CC-News/1mq.txt
+    for file in /media/jpcastillog/Respaldo\ 1/PISA/CC-News/compressed/Fast\ Tries/* ; do
+        ../build/tools/intersection_querylog_fastTrie "$file" "$q3" --parallel f >> singlethread-time-fastTries-resultsCC-News-4096-15000\(1mq\).txt
+        echo -e "---> ${file} done!"
+    done
